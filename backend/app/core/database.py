@@ -2,7 +2,6 @@
 
 from redis.asyncio import Redis
 from redis import exceptions
-from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import FastAPI
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker
