@@ -98,6 +98,7 @@ export interface ObjTable {
   index?: number;
   id?: number;
   name?: string;
+  code?: string;
   status?: boolean;
   description?: string;
   created_at?: string;
@@ -108,6 +109,7 @@ export interface ObjTable {
 export interface ObjForm {
   id?: number;
   name?: string;
+  code?: string;
   status?: boolean;
   description?: string;
 }

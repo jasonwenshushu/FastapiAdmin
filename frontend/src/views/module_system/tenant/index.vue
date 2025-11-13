@@ -154,6 +154,7 @@
           </template>
         </el-table-column>
         <el-table-column v-if="tableColumns.find((col) => col.prop === 'name')?.show" label="名称" prop="name" min-width="140" />
+        <el-table-column v-if="tableColumns.find((col) => col.prop === 'code')?.show" label="编码" prop="code" min-width="140" />
         <el-table-column v-if="tableColumns.find((col) => col.prop === 'status')?.show" label="状态" prop="status" min-width="120">
           <template #default="scope">
             <el-tag :type="scope.row.status ? 'success' : 'info'">
@@ -192,6 +193,9 @@
           <el-descriptions-item label="名称" :span="2">
             {{ detailFormData.name }}
           </el-descriptions-item>
+          <el-descriptions-item label="编码" :span="2">
+            {{ detailFormData.code }}
+          </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status ? 'success' : 'danger'">
               {{ detailFormData.status ? '启用' : '停用' }}
@@ -215,7 +219,10 @@
       <template v-else>
         <el-form ref="dataFormRef" :model="formData" :rules="rules" label-suffix=":" label-width="auto" label-position="right">
           <el-form-item label="名称" prop="name">
-            <el-input v-model="formData.name" placeholder="请输入名称" :maxlength="50" />
+            <el-input v-model="formData.name" placeholder="请输入名称" :maxlength="64" />
+          </el-form-item>
+          <el-form-item label="编码" prop="code">
+            <el-input v-model="formData.code" placeholder="请输入编码" :maxlength="20" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formData.status">
@@ -259,7 +266,7 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: "Example",
+  name: "Tenant",
   inheritAttrs: false,
 });
 
@@ -293,6 +300,7 @@ const tableColumns = ref([
   { prop: 'selection', label: '选择框', show: true },
   { prop: 'index', label: '序号', show: true },
   { prop: 'name', label: '名称', show: true },
+  { prop: 'code', label: '编码', show: true },
   { prop: 'status', label: '状态', show: true },
   { prop: 'description', label: '描述', show: true },
   { prop: 'created_at', label: '创建时间', show: true },
@@ -304,6 +312,7 @@ const tableColumns = ref([
 // 仅用于导出字段的列（排除非数据列及嵌套对象列）
 const exportColumns = [
   { prop: 'name', label: '名称' },
+  { prop: 'code', label: '编码' },
   { prop: 'status', label: '状态' },
   { prop: 'description', label: '描述' },
   { prop: 'created_at', label: '创建时间' },
@@ -366,6 +375,7 @@ const queryFormData = reactive<ObjPageQuery>({
 const formData = reactive<ObjForm>({
   id: undefined,
   name: '',
+  code: '',
   status: true,
   description: undefined,
 })
@@ -380,6 +390,7 @@ const dialogVisible = reactive({
 // 表单验证规则
 const rules = reactive({
   name: [{ required: true, message: "请输入名称", trigger: "blur" }],
+  code: [{ required: true, message: "请输入编码", trigger: "blur" }],
   status: [{ required: true, message: "请选择状态", trigger: "blur" }],
 });
 
@@ -446,6 +457,7 @@ async function handleResetQuery() {
 const initialFormData: ObjForm = {
   id: undefined,
   name: '',
+  code: '',
   status: true,
   description: '',
 }

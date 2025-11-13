@@ -6,6 +6,7 @@
 {% if table.sub %}
 from sqlalchemy.orm import relationship
 {% endif %}
+from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.base_model import CreatorMixin

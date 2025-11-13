@@ -6,6 +6,8 @@
  * 项目地址：https://gitee.com/youlaiorg/vue3-element-admin
  *
  * 在使用时，请保留此注释，感谢您对开源的支持！
+ *
+ * 修改：此版本返回纯文本格式，使用 editor.getText() 获取内容
 -->
 
 <template>
@@ -24,6 +26,7 @@
       :default-config="editorConfig"
       mode="simple"
       @on-created="handleCreated"
+      @on-change="handleChange"
     />
   </div>
 </template>
@@ -90,6 +93,15 @@ const editorConfig = ref<Partial<IEditorConfig>>({
 // 记录 editor 实例，重要！
 const handleCreated = (editor: any) => {
   editorRef.value = editor;
+};
+
+// 处理内容变化 - 获取纯文本而不是HTML
+const handleChange = (editor: any) => {
+  editorRef.value = editor;
+  if (editorRef.value) {
+    const text = editorRef.value.getText();
+    modelValue.value = text;
+  }
 };
 
 // 组件销毁时，也及时销毁编辑器，重要！
