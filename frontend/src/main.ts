@@ -40,13 +40,13 @@ const setTitleAndFavicon = async () => {
     }
 
     if (webLogo) {
-      const loadingLogo = document.querySelector('.loading-container-logo');
+      const loadingLogo = document.querySelector(".loading-container-logo");
       if (loadingLogo instanceof HTMLImageElement) {
         loadingLogo.src = webLogo;
       }
     }
   } catch (error) {
-    console.error('获取配置数据失败:', error);
+    console.error("获取配置数据失败:", error);
   }
 };
 

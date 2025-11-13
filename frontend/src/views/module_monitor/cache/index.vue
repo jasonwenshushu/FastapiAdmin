@@ -20,15 +20,15 @@
                   </el-tooltip>
                 </div>
               </template>
-              <el-descriptions :column=12 border :direction="'vertical'">
+              <el-descriptions :column="12" border :direction="'vertical'">
                 <el-descriptions-item label="Redis版本">
-                  {{ cache.info?.redis_version || '-' }}
+                  {{ cache.info?.redis_version || "-" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="运行模式">
-                  {{ cache.info?.redis_mode === 'standalone' ? '单机' : '集群' }}
+                  {{ cache.info?.redis_mode === "standalone" ? "单机" : "集群" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="端口">
-                  {{ cache.info?.tcp_port || '-' }}
+                  {{ cache.info?.tcp_port || "-" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="客户端数">
                   {{ cache.info?.connected_clients || 0 }}
@@ -37,26 +37,30 @@
                   {{ cache.info?.uptime_in_days || 0 }}
                 </el-descriptions-item>
                 <el-descriptions-item label="使用内存">
-                  {{ cache.info?.used_memory_human || '-' }}
+                  {{ cache.info?.used_memory_human || "-" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="使用CPU">
-                  {{ cache.info?.used_cpu_user_children ? parseFloat(cache.info.used_cpu_user_children).toFixed(2) : '-'
+                  {{
+                    cache.info?.used_cpu_user_children
+                      ? parseFloat(cache.info.used_cpu_user_children).toFixed(2)
+                      : "-"
                   }}
                 </el-descriptions-item>
                 <el-descriptions-item label="内存配置">
-                  {{ cache.info?.maxmemory_human || '-' }}
+                  {{ cache.info?.maxmemory_human || "-" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="AOF是否开启">
-                  {{ cache.info?.aof_enabled === '0' ? '否' : '是' }}
+                  {{ cache.info?.aof_enabled === "0" ? "否" : "是" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="RDB是否成功">
-                  {{ cache.info?.rdb_last_bgsave_status || '-' }}
+                  {{ cache.info?.rdb_last_bgsave_status || "-" }}
                 </el-descriptions-item>
                 <el-descriptions-item label="Key数量">
                   {{ cache.db_size || 0 }}
                 </el-descriptions-item>
                 <el-descriptions-item label="网络入口/出口">
-                  {{ `${cache.info?.instantaneous_input_kbps || 0}kps/${cache.info?.instantaneous_output_kbps || 0}kps`
+                  {{
+                    `${cache.info?.instantaneous_input_kbps || 0}kps/${cache.info?.instantaneous_output_kbps || 0}kps`
                   }}
                 </el-descriptions-item>
               </el-descriptions>
@@ -124,25 +128,55 @@
                     </el-tooltip>
                   </div>
                   <div>
-                    <el-button v-hasPerm="['module_monitor:cache:refresh']" type="primary" link icon="RefreshRight" @click="refreshCacheNames"/>
+                    <el-button
+                      v-hasPerm="['module_monitor:cache:refresh']"
+                      type="primary"
+                      link
+                      icon="RefreshRight"
+                      @click="refreshCacheNames"
+                    />
                   </div>
                 </div>
               </template>
-              <el-table :loading="loading" :data="cacheNames" row-key="cache_name" height="600" border>
+              <el-table
+                :loading="loading"
+                :data="cacheNames"
+                row-key="cache_name"
+                height="600"
+                border
+              >
                 <template #empty>
                   <el-empty :image-size="80" description="暂无数据" />
                 </template>
                 <el-table-column prop="cache_name" label="缓存名称" show-overflow-tooltip>
                   <template #default="{ row }">
-                    <el-button v-hasPerm="['module_monitor:cache:view']" type="primary" link @click="getCacheKeyList(row)">{{ row.cache_name }}</el-button>
+                    <el-button
+                      v-hasPerm="['module_monitor:cache:view']"
+                      type="primary"
+                      link
+                      @click="getCacheKeyList(row)"
+                    >
+                      {{ row.cache_name }}
+                    </el-button>
                   </template>
                 </el-table-column>
                 <el-table-column prop="remark" label="备注" show-overflow-tooltip />
                 <el-table-column label="操作" width="60" align="center">
                   <template #default="{ row }">
-                    <el-popconfirm class="box-item" :title="`确认删除缓存 ${row.cache_name} 吗？`" placement="top" @confirm="handleClearCacheName(row)">
+                    <el-popconfirm
+                      class="box-item"
+                      :title="`确认删除缓存 ${row.cache_name} 吗？`"
+                      placement="top"
+                      @confirm="handleClearCacheName(row)"
+                    >
                       <template #reference>
-                        <el-button v-hasPerm="['module_monitor:cache:delete']" type="danger" size="small" link icon="delete"/>
+                        <el-button
+                          v-hasPerm="['module_monitor:cache:delete']"
+                          type="danger"
+                          size="small"
+                          link
+                          icon="delete"
+                        />
                       </template>
                     </el-popconfirm>
                   </template>
@@ -168,24 +202,54 @@
                     </el-tooltip>
                   </div>
                   <div>
-                    <el-button v-hasPerm="['module_monitor:cache:refresh']" type="primary" link icon="RefreshRight" @click="refreshCacheKeys"/>
+                    <el-button
+                      v-hasPerm="['module_monitor:cache:refresh']"
+                      type="primary"
+                      link
+                      icon="RefreshRight"
+                      @click="refreshCacheKeys"
+                    />
                   </div>
                 </div>
               </template>
-              <el-table :loading="subLoading" :data="cacheKeys.map(key => ({ cacheKey: key }))" height="600" row-key="cacheKey" border>
+              <el-table
+                :loading="subLoading"
+                :data="cacheKeys.map((key) => ({ cacheKey: key }))"
+                height="600"
+                row-key="cacheKey"
+                border
+              >
                 <template #empty>
                   <el-empty :image-size="80" description="暂无数据" />
                 </template>
                 <el-table-column prop="cacheKey" label="缓存键名" show-overflow-tooltip>
                   <template #default="{ row }">
-                    <el-button v-hasPerm="['module_monitor:cache:detail']" type="primary" link @click="handleCacheValue(row.cacheKey)">{{ row.cacheKey}}</el-button>
+                    <el-button
+                      v-hasPerm="['module_monitor:cache:detail']"
+                      type="primary"
+                      link
+                      @click="handleCacheValue(row.cacheKey)"
+                    >
+                      {{ row.cacheKey }}
+                    </el-button>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" width="60" align="center">
                   <template #default="{ row }">
-                    <el-popconfirm class="box-item" :title="`确认删除键 ${row.cacheKey} 吗？`" placement="top" @confirm="handleClearCacheKey(row.cacheKey)">
+                    <el-popconfirm
+                      class="box-item"
+                      :title="`确认删除键 ${row.cacheKey} 吗？`"
+                      placement="top"
+                      @confirm="handleClearCacheKey(row.cacheKey)"
+                    >
                       <template #reference>
-                        <el-button v-hasPerm="['module_monitor:cache:delete']" type="danger" size="small" link icon="delete"/>
+                        <el-button
+                          v-hasPerm="['module_monitor:cache:delete']"
+                          type="danger"
+                          size="small"
+                          link
+                          icon="delete"
+                        />
                       </template>
                     </el-popconfirm>
                   </template>
@@ -211,7 +275,15 @@
                     </el-tooltip>
                   </div>
                   <div>
-                    <el-button v-hasPerm="['module_monitor:cache:delete_all']" type="danger" link icon="delete" @click="handleClearCacheAll">清理全部</el-button>
+                    <el-button
+                      v-hasPerm="['module_monitor:cache:delete_all']"
+                      type="danger"
+                      link
+                      icon="delete"
+                      @click="handleClearCacheAll"
+                    >
+                      清理全部
+                    </el-button>
                   </div>
                 </div>
               </template>
@@ -223,7 +295,13 @@
                   <el-input v-model="cacheForm.cache_key" readonly placeholder="缓存键名" />
                 </el-form-item>
                 <el-form-item label="缓存内容">
-                  <el-input v-model="cacheForm.cache_value" type="textarea" :rows="18" readonly placeholder="缓存内容" />
+                  <el-input
+                    v-model="cacheForm.cache_value"
+                    type="textarea"
+                    :rows="18"
+                    readonly
+                    placeholder="缓存内容"
+                  />
                 </el-form-item>
               </el-form>
             </el-card>
@@ -235,26 +313,31 @@
 </template>
 
 <script lang="ts" setup>
-import CacheAPI, { type CacheInfo, type CacheForm, type CacheMonitor, type RedisInfo } from "@/api/module_monitor/cache";
-import * as echarts from 'echarts';
+import CacheAPI, {
+  type CacheInfo,
+  type CacheForm,
+  type CacheMonitor,
+  type RedisInfo,
+} from "@/api/module_monitor/cache";
+import * as echarts from "echarts";
 
 // 响应式状态定义
 const cacheNames = ref<CacheInfo[]>([]);
 const cacheKeys = ref<string[]>([]);
 const loading = ref(true);
 const subLoading = ref(false);
-const nowCacheName = ref('');
+const nowCacheName = ref("");
 const commandstats = ref<HTMLElement | null>(null);
 const usedmemory = ref<HTMLElement | null>(null);
 const cache = ref<CacheMonitor>({
   info: {} as RedisInfo,
   command_stats: [],
-  db_size: 0
+  db_size: 0,
 });
 const cacheForm = ref<CacheForm>({
-  cache_name: '',
-  cache_key: '',
-  cache_value: ''
+  cache_name: "",
+  cache_key: "",
+  cache_value: "",
 });
 
 let commandstatsInstance: echarts.ECharts | null = null;
@@ -263,9 +346,9 @@ let usedmemoryInstance: echarts.ECharts | null = null;
 const resetCacheForm = () => {
   cacheKeys.value = [];
   cacheForm.value = {
-    cache_name: '',
-    cache_key: '',
-    cache_value: ''
+    cache_name: "",
+    cache_key: "",
+    cache_value: "",
   };
 };
 
@@ -273,11 +356,11 @@ const resetCacheForm = () => {
 const getCacheNameList = async () => {
   try {
     loading.value = true;
-    const response = await CacheAPI.getCacheNames()
+    const response = await CacheAPI.getCacheNames();
     cacheNames.value = response.data.data;
     resetCacheForm();
   } catch (error) {
-    console.error('获取缓存列表出错:', error);
+    console.error("获取缓存列表出错:", error);
   } finally {
     loading.value = false;
   }
@@ -294,7 +377,7 @@ const handleClearCacheName = async (row: CacheInfo) => {
     await CacheAPI.deleteCacheName(row.cache_name);
     refreshCacheNames();
   } catch (error) {
-    console.error('清理缓存名称出错:', error);
+    console.error("清理缓存名称出错:", error);
   }
 };
 
@@ -310,11 +393,11 @@ const getCacheKeyList = async (row?: CacheInfo) => {
     nowCacheName.value = cacheName;
     cacheForm.value = {
       cache_name: cacheName,
-      cache_key: '',
-      cache_value: ''
+      cache_key: "",
+      cache_value: "",
     };
   } catch (error) {
-    console.error('获取缓存键名列表出错:', error);
+    console.error("获取缓存键名列表出错:", error);
   } finally {
     subLoading.value = false;
   }
@@ -331,34 +414,30 @@ async function handleClearCacheKey(cacheKey: string) {
     await CacheAPI.deleteCacheKey(cacheKey);
     getCacheKeyList();
   } catch (error) {
-    console.error('清理缓存键名出错:', error);
+    console.error("清理缓存键名出错:", error);
   }
-};
+}
 
 // 缓存内容相关方法
 async function handleCacheValue(cacheKey: string) {
   try {
     loading.value = true;
-    const response = await CacheAPI.getCacheValue(nowCacheName.value, cacheKey)
+    const response = await CacheAPI.getCacheValue(nowCacheName.value, cacheKey);
     cacheForm.value = response.data.data;
   } catch (error) {
-    console.error('获取缓存内容失败:', error);
+    console.error("获取缓存内容失败:", error);
   } finally {
     loading.value = false;
   }
-};
+}
 
 // 清理全部缓存
 const handleClearCacheAll = async () => {
-  ElMessageBox.confirm(
-    '确定要清理全部缓存吗？',
-    '危险！',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
+  ElMessageBox.confirm("确定要清理全部缓存吗？", "危险！", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
     .then(async () => {
       return await CacheAPI.deleteCacheAll();
     })
@@ -366,8 +445,8 @@ const handleClearCacheAll = async () => {
       getCacheNameList();
     })
     .catch((error) => {
-      if (error !== 'cancel') {
-        console.error('清理全部缓存失败:', error);
+      if (error !== "cancel") {
+        console.error("清理全部缓存失败:", error);
       }
     });
 };
@@ -376,15 +455,15 @@ const handleClearCacheAll = async () => {
 const getInfo = async () => {
   try {
     loading.value = true;
-    const response = await CacheAPI.getCacheInfo()
+    const response = await CacheAPI.getCacheInfo();
     cache.value = response.data.data || {
       info: {},
       command_stats: [],
-      dbSize: 0
+      dbSize: 0,
     };
     initCharts();
   } catch (error) {
-    console.error('获取缓存监控数据失败:', error);
+    console.error("获取缓存监控数据失败:", error);
   } finally {
     loading.value = false;
   }
@@ -394,44 +473,50 @@ const getInfo = async () => {
 const initCharts = () => {
   if (!commandstats.value || !usedmemory.value) return;
 
-  commandstatsInstance = echarts.init(commandstats.value, 'macarons');
-  usedmemoryInstance = echarts.init(usedmemory.value, 'macarons');
+  commandstatsInstance = echarts.init(commandstats.value, "macarons");
+  usedmemoryInstance = echarts.init(usedmemory.value, "macarons");
 
   const commandStatsOption = {
     tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
+      trigger: "item",
+      formatter: "{a} <br/>{b} : {c} ({d}%)",
     },
-    series: [{
-      name: '命令',
-      type: 'pie',
-      roseType: 'radius',
-      radius: [15, 95],
-      center: ['50%', '38%'],
-      data: cache.value.command_stats || [],
-      animationEasing: 'cubicInOut',
-      animationDuration: 1000
-    }]
+    series: [
+      {
+        name: "命令",
+        type: "pie",
+        roseType: "radius",
+        radius: [15, 95],
+        center: ["50%", "38%"],
+        data: cache.value.command_stats || [],
+        animationEasing: "cubicInOut",
+        animationDuration: 1000,
+      },
+    ],
   };
 
-  const usedMemory = cache.value.info?.used_memory_human || '0';
+  const usedMemory = cache.value.info?.used_memory_human || "0";
   const usedMemoryOption = {
     tooltip: {
-      formatter: `{b} <br/>{a} : ${usedMemory}`
+      formatter: `{b} <br/>{a} : ${usedMemory}`,
     },
-    series: [{
-      name: '峰值',
-      type: 'gauge',
-      min: 0,
-      max: 1000,
-      detail: {
-        formatter: usedMemory
+    series: [
+      {
+        name: "峰值",
+        type: "gauge",
+        min: 0,
+        max: 1000,
+        detail: {
+          formatter: usedMemory,
+        },
+        data: [
+          {
+            value: parseFloat(usedMemory) || 0,
+            name: "内存消耗",
+          },
+        ],
       },
-      data: [{
-        value: parseFloat(usedMemory) || 0,
-        name: '内存消耗'
-      }]
-    }]
+    ],
   };
 
   commandstatsInstance.setOption(commandStatsOption);

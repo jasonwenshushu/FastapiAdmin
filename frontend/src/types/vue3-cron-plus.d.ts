@@ -1,8 +1,8 @@
 declare module "vue3-cron-plus" {
   import { DefineComponent } from "vue";
-  
+
   export const vue3CronPlus: DefineComponent<{}, {}, any>;
-  
+
   export default vue3CronPlus;
 }
 

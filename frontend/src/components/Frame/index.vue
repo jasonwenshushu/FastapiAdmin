@@ -1,34 +1,29 @@
 <!-- 自定义 iframe 组件 -->
 <template>
   <div v-loading="loading" :style="'height:' + height">
-    <iframe 
-      :src="url" 
-      frameborder="0" 
-      width="100%"
-      height="100%"
-      scrolling="auto" />
+    <iframe :src="url" frameborder="0" width="100%" height="100%" scrolling="auto" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from "vue";
 
 const props = defineProps({
   src: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const height = ref(document.documentElement.clientHeight - 94.5 + "px;")
-const loading = ref(true)
-const url = computed(() => props.src)
+const height = ref(document.documentElement.clientHeight - 94.5 + "px;");
+const loading = ref(true);
+const url = computed(() => props.src);
 
 onMounted(() => {
   setTimeout(() => {
     loading.value = false;
   }, 300);
-})
+});
 </script>
 
 <style lang="scss" scoped>

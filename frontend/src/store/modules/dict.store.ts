@@ -14,13 +14,13 @@ export const useDictStore = defineStore("dict", {
     // 获取指定类型的字典数据，确保返回数组
     // 获取指定类型的字典数据，确保返回有效的数组且项包含必需属性
     getDictArray() {
-      return (type: string): Array<{dict_value: string; dict_label: string}> => {
-        return (this.dictData[type] || []).filter(
-          item => item.dict_value !== undefined && item.dict_label !== undefined
-        ).map(item => ({
-          dict_value: item.dict_value!, 
-          dict_label: item.dict_label!
-        }));
+      return (type: string): Array<{ dict_value: string; dict_label: string }> => {
+        return (this.dictData[type] || [])
+          .filter((item) => item.dict_value !== undefined && item.dict_label !== undefined)
+          .map((item) => ({
+            dict_value: item.dict_value!,
+            dict_label: item.dict_label!,
+          }));
       };
     },
   },
@@ -33,17 +33,20 @@ export const useDictStore = defineStore("dict", {
           if (!this.dictData[type]) {
             const response = await DictAPI.getInitDict(type);
             // 确保数据格式正确
-            this.dictData[type] = (response.data.data as DictDataTable[] || []).filter(
-              item => item.dict_value !== undefined && item.dict_label !== undefined
+            this.dictData[type] = ((response.data.data as DictDataTable[]) || []).filter(
+              (item) => item.dict_value !== undefined && item.dict_label !== undefined
             );
             this.isLoaded = true;
           }
         }
         // 返回请求的字典数据
-        return types.reduce((result, type) => {
-          result[type] = this.getDictArray(type);
-          return result;
-        }, {} as Record<string, DictDataTable[]>);
+        return types.reduce(
+          (result, type) => {
+            result[type] = this.getDictArray(type);
+            return result;
+          },
+          {} as Record<string, DictDataTable[]>
+        );
       } catch (error) {
         console.error("获取字典数据失败", error);
         return {};

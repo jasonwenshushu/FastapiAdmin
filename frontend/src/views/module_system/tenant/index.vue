@@ -13,28 +13,30 @@
         <el-form-item prop="name" label="名称">
           <el-input v-model="queryFormData.name" placeholder="请输入名称" clearable />
         </el-form-item>
-        <el-form-item prop="status" label="状态" >
-          <el-select v-model="queryFormData.status" placeholder="请选择状态" style="width: 170px;" clearable>
+        <el-form-item prop="status" label="状态">
+          <el-select
+            v-model="queryFormData.status"
+            placeholder="请选择状态"
+            style="width: 170px"
+            clearable
+          >
             <el-option value="true" label="启用" />
             <el-option value="false" label="停用" />
           </el-select>
         </el-form-item>
         <el-form-item v-if="isExpand" prop="creator" label="创建人">
           <UserTableSelect
-              v-model="queryFormData.creator"
-              @confirm-click="handleConfirm"
-              @clear-click="handleQuery"
+            v-model="queryFormData.creator"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
           />
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
         <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
-          <DatePicker
-            v-model="dateRange"
-            @update:model-value="handleDateRangeChange"
-          />
+          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
-        <el-form-item >
+        <el-form-item>
           <el-button
             v-hasPerm="['module_generator:tenant:query']"
             type="primary"
@@ -67,7 +69,7 @@
         </el-form-item>
       </el-form>
     </div>
-    
+
     <!-- 内容区域 -->
     <el-card class="data-table">
       <template #header>
@@ -86,18 +88,39 @@
         <div class="data-table__toolbar--left">
           <el-row :gutter="10">
             <el-col :span="1.5">
-              <el-button v-hasPerm="['module_generator:tenant:create']" type="success" icon="plus" @click="handleOpenDialog('create')">新增</el-button>
+              <el-button
+                v-hasPerm="['module_generator:tenant:create']"
+                type="success"
+                icon="plus"
+                @click="handleOpenDialog('create')"
+              >
+                新增
+              </el-button>
             </el-col>
             <el-col :span="1.5">
-              <el-button v-hasPerm="['module_generator:tenant:delete']" type="danger" icon="delete" :disabled="selectIds.length === 0" @click="handleDelete(selectIds)">批量删除</el-button>
+              <el-button
+                v-hasPerm="['module_generator:tenant:delete']"
+                type="danger"
+                icon="delete"
+                :disabled="selectIds.length === 0"
+                @click="handleDelete(selectIds)"
+              >
+                批量删除
+              </el-button>
             </el-col>
             <el-col :span="1.5">
               <el-dropdown v-hasPerm="['module_generator:tenant:batch']" trigger="click">
-                <el-button type="default" :disabled="selectIds.length === 0" icon="ArrowDown">更多</el-button>
+                <el-button type="default" :disabled="selectIds.length === 0" icon="ArrowDown">
+                  更多
+                </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item icon="Check" @click="handleMoreClick(true)">批量启用</el-dropdown-item>
-                    <el-dropdown-item icon="CircleClose" @click="handleMoreClick(false)">批量停用</el-dropdown-item>
+                    <el-dropdown-item icon="Check" @click="handleMoreClick(true)">
+                      批量启用
+                    </el-dropdown-item>
+                    <el-dropdown-item icon="CircleClose" @click="handleMoreClick(false)">
+                      批量停用
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -108,22 +131,46 @@
           <el-row :gutter="10">
             <el-col :span="1.5">
               <el-tooltip content="导入">
-                <el-button v-hasPerm="['module_generator:tenant:import']" type="success" icon="upload" circle @click="handleOpenImportDialog" />
+                <el-button
+                  v-hasPerm="['module_generator:tenant:import']"
+                  type="success"
+                  icon="upload"
+                  circle
+                  @click="handleOpenImportDialog"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
               <el-tooltip content="导出">
-                <el-button v-hasPerm="['module_generator:tenant:export']" type="warning" icon="download" circle @click="handleOpenExportsModal" />
+                <el-button
+                  v-hasPerm="['module_generator:tenant:export']"
+                  type="warning"
+                  icon="download"
+                  circle
+                  @click="handleOpenExportsModal"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
               <el-tooltip content="搜索显示/隐藏">
-                <el-button v-hasPerm="['*:*:*']" type="info" icon="search" circle @click="visible = !visible" />
+                <el-button
+                  v-hasPerm="['*:*:*']"
+                  type="info"
+                  icon="search"
+                  circle
+                  @click="visible = !visible"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
               <el-tooltip content="刷新">
-                <el-button v-hasPerm="['module_generator:tenant:refresh']" type="primary" icon="refresh" circle @click="handleRefresh" />
+                <el-button
+                  v-hasPerm="['module_generator:tenant:refresh']"
+                  type="primary"
+                  icon="refresh"
+                  circle
+                  @click="handleRefresh"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
@@ -143,50 +190,142 @@
       </div>
 
       <!-- 表格区域：系统配置列表 -->
-      <el-table ref="tableRef" v-loading="loading" :data="pageTableData" highlight-current-row class="data-table__content" :height="450" border stripe @selection-change="handleSelectionChange">
+      <el-table
+        ref="tableRef"
+        v-loading="loading"
+        :data="pageTableData"
+        highlight-current-row
+        class="data-table__content"
+        :height="450"
+        border
+        stripe
+        @selection-change="handleSelectionChange"
+      >
         <template #empty>
           <el-empty :image-size="80" description="暂无数据" />
         </template>
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'selection')?.show" type="selection" min-width="55" align="center"/>
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'index')?.show" fixed label="序号" min-width="60">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'selection')?.show"
+          type="selection"
+          min-width="55"
+          align="center"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'index')?.show"
+          fixed
+          label="序号"
+          min-width="60"
+        >
           <template #default="scope">
             {{ (queryFormData.page_no - 1) * queryFormData.page_size + scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'name')?.show" label="名称" prop="name" min-width="140" />
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'code')?.show" label="编码" prop="code" min-width="140" />
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'status')?.show" label="状态" prop="status" min-width="120">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'name')?.show"
+          label="名称"
+          prop="name"
+          min-width="140"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'code')?.show"
+          label="编码"
+          prop="code"
+          min-width="140"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'status')?.show"
+          label="状态"
+          prop="status"
+          min-width="120"
+        >
           <template #default="scope">
             <el-tag :type="scope.row.status ? 'success' : 'info'">
-              {{ scope.row.status ? '启用' : '停用' }}
+              {{ scope.row.status ? "启用" : "停用" }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'description')?.show" label="描述" prop="description" min-width="140" />
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'created_at')?.show" label="创建时间" prop="created_at" min-width="180" />
-        <el-table-column v-if="tableColumns.find((col) => col.prop === 'updated_at')?.show" label="更新时间" prop="updated_at" min-width="180" />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'description')?.show"
+          label="描述"
+          prop="description"
+          min-width="140"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'created_at')?.show"
+          label="创建时间"
+          prop="created_at"
+          min-width="180"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'updated_at')?.show"
+          label="更新时间"
+          prop="updated_at"
+          min-width="180"
+        />
         <!-- <el-table-column v-if="tableColumns.find((col) => col.prop === 'creator')?.show" label="创建人" prop="creator" min-width="120">
           <template #default="scope">
             <el-tag>{{ scope.row.creator?.name }}</el-tag>
           </template>
         </el-table-column> -->
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'operation')?.show" fixed="right" label="操作" align="center" min-width="180">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'operation')?.show"
+          fixed="right"
+          label="操作"
+          align="center"
+          min-width="180"
+        >
           <template #default="scope">
-            <el-button v-hasPerm="['module_generator:tenant:detail']" type="info" size="small" link icon="document" @click="handleOpenDialog('detail', scope.row.id)">详情</el-button>
-            <el-button v-hasPerm="['module_generator:tenant:update']" type="primary" size="small" link icon="edit" @click="handleOpenDialog('update', scope.row.id)">编辑</el-button>
-            <el-button v-hasPerm="['module_generator:tenant:delete']" type="danger" size="small" link icon="delete" @click="handleDelete([scope.row.id])">删除</el-button>
+            <el-button
+              v-hasPerm="['module_generator:tenant:detail']"
+              type="info"
+              size="small"
+              link
+              icon="document"
+              @click="handleOpenDialog('detail', scope.row.id)"
+            >
+              详情
+            </el-button>
+            <el-button
+              v-hasPerm="['module_generator:tenant:update']"
+              type="primary"
+              size="small"
+              link
+              icon="edit"
+              @click="handleOpenDialog('update', scope.row.id)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              v-hasPerm="['module_generator:tenant:delete']"
+              type="danger"
+              size="small"
+              link
+              icon="delete"
+              @click="handleDelete([scope.row.id])"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
       <template #footer>
-        <pagination v-model:total="total" v-model:page="queryFormData.page_no" v-model:limit="queryFormData.page_size" @pagination="loadingData" />
+        <pagination
+          v-model:total="total"
+          v-model:page="queryFormData.page_no"
+          v-model:limit="queryFormData.page_size"
+          @pagination="loadingData"
+        />
       </template>
     </el-card>
 
     <!-- 弹窗区域 -->
-    <el-dialog v-model="dialogVisible.visible" :title="dialogVisible.title" @close="handleCloseDialog">
+    <el-dialog
+      v-model="dialogVisible.visible"
+      :title="dialogVisible.title"
+      @close="handleCloseDialog"
+    >
       <!-- 详情 -->
       <template v-if="dialogVisible.type === 'detail'">
         <el-descriptions :column="4" border>
@@ -198,7 +337,7 @@
           </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status ? 'success' : 'danger'">
-              {{ detailFormData.status ? '启用' : '停用' }}
+              {{ detailFormData.status ? "启用" : "停用" }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="描述" :span="2">
@@ -217,7 +356,14 @@
       </template>
       <!-- 新增、编辑表单 -->
       <template v-else>
-        <el-form ref="dataFormRef" :model="formData" :rules="rules" label-suffix=":" label-width="auto" label-position="right">
+        <el-form
+          ref="dataFormRef"
+          :model="formData"
+          :rules="rules"
+          label-suffix=":"
+          label-width="auto"
+          label-position="right"
+        >
           <el-form-item label="名称" prop="name">
             <el-input v-model="formData.name" placeholder="请输入名称" :maxlength="64" />
           </el-form-item>
@@ -231,7 +377,14 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="描述" prop="description">
-            <el-input v-model="formData.description" :rows="4" :maxlength="100" show-word-limit type="textarea" placeholder="请输入描述" />
+            <el-input
+              v-model="formData.description"
+              :rows="4"
+              :maxlength="100"
+              show-word-limit
+              type="textarea"
+              placeholder="请输入描述"
+            />
           </el-form-item>
         </el-form>
       </template>
@@ -240,21 +393,35 @@
         <div class="dialog-footer">
           <!-- 详情弹窗不需要确定按钮的提交逻辑 -->
           <el-button @click="handleCloseDialog">取消</el-button>
-          <el-button v-if="dialogVisible.type !== 'detail'" v-hasPerm="['module_generator:tenant:submit']" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button v-else v-hasPerm="['smodule_generator:tenant:detail']" type="primary" @click="handleCloseDialog">确定</el-button>
+          <el-button
+            v-if="dialogVisible.type !== 'detail'"
+            v-hasPerm="['module_generator:tenant:submit']"
+            type="primary"
+            @click="handleSubmit"
+          >
+            确定
+          </el-button>
+          <el-button
+            v-else
+            v-hasPerm="['smodule_generator:tenant:detail']"
+            type="primary"
+            @click="handleCloseDialog"
+          >
+            确定
+          </el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 导入弹窗 -->
-    <ImportModal 
-      v-model="importDialogVisible" 
+    <ImportModal
+      v-model="importDialogVisible"
       :content-config="curdContentConfig"
-      @upload="handleUpload" 
+      @upload="handleUpload"
     />
 
     <!-- 导出弹窗 -->
-    <ExportModal 
+    <ExportModal
       v-model="exportsDialogVisible"
       :content-config="curdContentConfig"
       :query-params="queryFormData"
@@ -281,7 +448,6 @@ import { QuestionFilled, ArrowUp, ArrowDown } from "@element-plus/icons-vue";
 import { formatToDateTime } from "@/utils/dateUtil";
 import TenantAPI, { ObjTable, ObjForm, ObjPageQuery } from "@/api/module_system/tenant";
 
-
 const visible = ref(true);
 const queryFormRef = ref();
 const dataFormRef = ref();
@@ -297,37 +463,37 @@ const pageTableData = ref<ObjTable[]>([]);
 
 // 表格列配置
 const tableColumns = ref([
-  { prop: 'selection', label: '选择框', show: true },
-  { prop: 'index', label: '序号', show: true },
-  { prop: 'name', label: '名称', show: true },
-  { prop: 'code', label: '编码', show: true },
-  { prop: 'status', label: '状态', show: true },
-  { prop: 'description', label: '描述', show: true },
-  { prop: 'created_at', label: '创建时间', show: true },
-  { prop: 'updated_at', label: '更新时间', show: true },
-  { prop: 'creator', label: '创建人', show: true },
-  { prop: 'operation', label: '操作', show: true }
-])
+  { prop: "selection", label: "选择框", show: true },
+  { prop: "index", label: "序号", show: true },
+  { prop: "name", label: "名称", show: true },
+  { prop: "code", label: "编码", show: true },
+  { prop: "status", label: "状态", show: true },
+  { prop: "description", label: "描述", show: true },
+  { prop: "created_at", label: "创建时间", show: true },
+  { prop: "updated_at", label: "更新时间", show: true },
+  { prop: "creator", label: "创建人", show: true },
+  { prop: "operation", label: "操作", show: true },
+]);
 
 // 仅用于导出字段的列（排除非数据列及嵌套对象列）
 const exportColumns = [
-  { prop: 'name', label: '名称' },
-  { prop: 'code', label: '编码' },
-  { prop: 'status', label: '状态' },
-  { prop: 'description', label: '描述' },
-  { prop: 'created_at', label: '创建时间' },
-  { prop: 'updated_at', label: '更新时间' },
+  { prop: "name", label: "名称" },
+  { prop: "code", label: "编码" },
+  { prop: "status", label: "状态" },
+  { prop: "description", label: "描述" },
+  { prop: "created_at", label: "创建时间" },
+  { prop: "updated_at", label: "更新时间" },
 ];
 
 // 导入/导出配置
 const curdContentConfig = {
-  permPrefix: 'module_generator:tenant',
+  permPrefix: "module_generator:tenant",
   cols: exportColumns as any,
   importTemplate: () => TenantAPI.download(),
   exportsAction: async (params: any) => {
     const query: any = { ...params };
-    if (typeof query.status === 'string') {
-      query.status = query.status === 'true';
+    if (typeof query.status === "string") {
+      query.status = query.status === "true";
     }
     query.page_no = 1;
     query.page_size = 9999;
@@ -348,7 +514,7 @@ const detailFormData = ref<ObjTable>({});
 // 日期范围临时变量
 const dateRange = ref<[Date, Date] | []>([]);
 
- // 处理日期范围变化
+// 处理日期范围变化
 function handleDateRangeChange(range: [Date, Date]) {
   dateRange.value = range;
   if (range && range.length === 2) {
@@ -374,17 +540,17 @@ const queryFormData = reactive<ObjPageQuery>({
 // 编辑表单
 const formData = reactive<ObjForm>({
   id: undefined,
-  name: '',
-  code: '',
+  name: "",
+  code: "",
   status: true,
   description: undefined,
-})
+});
 
 // 弹窗状态
 const dialogVisible = reactive({
   title: "",
   visible: false,
-  type: 'create' as 'create' | 'update' | 'detail',
+  type: "create" as "create" | "update" | "detail",
 });
 
 // 表单验证规则
@@ -413,7 +579,7 @@ function handleOpenExportsModal() {
 // 列表刷新
 async function handleRefresh() {
   await loadingData();
-};
+}
 
 // 加载表格数据
 async function loadingData() {
@@ -422,11 +588,9 @@ async function loadingData() {
     const response = await TenantAPI.list(queryFormData);
     pageTableData.value = response.data.data.items;
     total.value = response.data.data.total;
-  }
-  catch (error: any) {
+  } catch (error: any) {
     console.error(error);
-  }
-  finally {
+  } finally {
     loading.value = false;
   }
 }
@@ -456,11 +620,11 @@ async function handleResetQuery() {
 // 定义初始表单数据常量
 const initialFormData: ObjForm = {
   id: undefined,
-  name: '',
-  code: '',
+  name: "",
+  code: "",
   status: true,
-  description: '',
-}
+  description: "",
+};
 
 // 重置表单
 async function resetForm() {
@@ -485,14 +649,14 @@ async function handleCloseDialog() {
 }
 
 // 打开弹窗
-async function handleOpenDialog(type: 'create' | 'update' | 'detail', id?: number) {
+async function handleOpenDialog(type: "create" | "update" | "detail", id?: number) {
   dialogVisible.type = type;
   if (id) {
     const response = await TenantAPI.detail(id);
-    if (type === 'detail') {
+    if (type === "detail") {
       dialogVisible.title = "详情";
       Object.assign(detailFormData.value, response.data.data);
-    } else if (type === 'update') {
+    } else if (type === "update") {
       dialogVisible.title = "修改";
       Object.assign(formData, response.data.data);
     }
@@ -508,35 +672,35 @@ async function handleSubmit() {
   // 表单校验
   dataFormRef.value.validate(async (valid: any) => {
     if (valid) {
-        loading.value = true;
-        // 根据弹窗传入的参数(deatil\create\update)判断走什么逻辑
-        const id = formData.id;
-        if (id) {
-          try {
-            await TenantAPI.update(id, { id, ...formData })
-            dialogVisible.visible = false;
-            resetForm();
-            handleCloseDialog();
-            handleResetQuery();
-          } catch (error: any) {
-              console.error(error);
-          } finally {
-            loading.value = false;
-          }
-        } else {
-          try {
-            await TenantAPI.create(formData)
-            dialogVisible.visible = false;
-            resetForm();
-            handleCloseDialog();
-            handleResetQuery();
-          } catch (error: any) {
-            console.error(error);
-          } finally {
-            loading.value = false;
-          }
+      loading.value = true;
+      // 根据弹窗传入的参数(deatil\create\update)判断走什么逻辑
+      const id = formData.id;
+      if (id) {
+        try {
+          await TenantAPI.update(id, { id, ...formData });
+          dialogVisible.visible = false;
+          resetForm();
+          handleCloseDialog();
+          handleResetQuery();
+        } catch (error: any) {
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        try {
+          await TenantAPI.create(formData);
+          dialogVisible.visible = false;
+          resetForm();
+          handleCloseDialog();
+          handleResetQuery();
+        } catch (error: any) {
+          console.error(error);
+        } finally {
+          loading.value = false;
         }
       }
+    }
   });
 }
 
@@ -546,41 +710,45 @@ async function handleDelete(ids: number[]) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await TenantAPI.delete(ids);
-      handleResetQuery();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
-}
-
-// 批量启用/停用
-async function handleMoreClick(status: boolean) {
-  if (selectIds.value.length) {
-    ElMessageBox.confirm(`确认${status ? '启用' : '停用'}该项数据?`, "警告", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning",
-    }).then(async () => {
+  })
+    .then(async () => {
       try {
         loading.value = true;
-        await TenantAPI.batch({ ids: selectIds.value, status });
+        await TenantAPI.delete(ids);
         handleResetQuery();
       } catch (error: any) {
         console.error(error);
       } finally {
         loading.value = false;
       }
-    }).catch(() => {
+    })
+    .catch(() => {
       ElMessageBox.close();
     });
+}
+
+// 批量启用/停用
+async function handleMoreClick(status: boolean) {
+  if (selectIds.value.length) {
+    ElMessageBox.confirm(`确认${status ? "启用" : "停用"}该项数据?`, "警告", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    })
+      .then(async () => {
+        try {
+          loading.value = true;
+          await TenantAPI.batch({ ids: selectIds.value, status });
+          handleResetQuery();
+        } catch (error: any) {
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      })
+      .catch(() => {
+        ElMessageBox.close();
+      });
   }
 }
 
@@ -594,7 +762,7 @@ const handleUpload = async (formData: FormData) => {
       await handleQuery();
     }
   } catch (error: any) {
-      console.error(error);
+    console.error(error);
   }
 };
 

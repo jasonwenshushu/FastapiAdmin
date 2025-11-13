@@ -12,7 +12,7 @@ const TenantAPI = {
   },
 
   detail(query: number) {
-    return request<ApiResponse<ObjTable>>({ 
+    return request<ApiResponse<ObjTable>>({
       url: `${API_PATH}/detail/${query}`,
       method: "get",
     });

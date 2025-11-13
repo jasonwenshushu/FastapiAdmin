@@ -1,33 +1,58 @@
 <template>
-  <el-form :model="crontabValueObj" ref="formRef" label-width="auto" label-suffix=":" :inline="true" class="interval-tab-form">
+  <el-form
+    ref="formRef"
+    :model="crontabValueObj"
+    label-width="auto"
+    label-suffix=":"
+    :inline="true"
+    class="interval-tab-form"
+  >
     <el-form-item label="秒" prop="second" class="form-item">
       <el-select v-model="crontabValueObj.second" placeholder="秒" clearable>
         <el-option label="每秒" value="*">*</el-option>
-        <el-option v-for="second in seconds" :key="second" :label="second" :value="second.toString()">{{ second }}</el-option>
+        <el-option
+          v-for="second in seconds"
+          :key="second"
+          :label="second"
+          :value="second.toString()"
+        >
+          {{ second }}
+        </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="分" prop="min" class="form-item">
       <el-select v-model="crontabValueObj.min" placeholder="分" clearable>
         <el-option label="每分" value="*">*</el-option>
-        <el-option v-for="min in minutes" :key="min" :label="min" :value="min.toString()">{{min}}</el-option>
+        <el-option v-for="min in minutes" :key="min" :label="min" :value="min.toString()">
+          {{ min }}
+        </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="时" prop="hour" class="form-item">
       <el-select v-model="crontabValueObj.hour" placeholder="时" clearable>
         <el-option label="每时" value="*">*</el-option>
-        <el-option v-for="hour in hours" :key="hour" :label="hour" :value="hour.toString()">{{hour}}</el-option>
+        <el-option v-for="hour in hours" :key="hour" :label="hour" :value="hour.toString()">
+          {{ hour }}
+        </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="天" prop="day" class="form-item">
       <el-select v-model="crontabValueObj.day" placeholder="天" clearable>
         <el-option label="每天" value="*">*</el-option>
-        <el-option v-for="day in days" :key="day" :label="day" :value="day">{{day}}</el-option>
+        <el-option v-for="day in days" :key="day" :label="day" :value="day">{{ day }}</el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="周" prop="week" class="form-item">
       <el-select v-model="crontabValueObj.week" placeholder="周" clearable>
         <el-option label="每周" value="*">*</el-option>
-        <el-option v-for="week in weekOptions" :key="week.value" :label="week.label" :value="week.value">{{week.label}}</el-option>
+        <el-option
+          v-for="week in weekOptions"
+          :key="week.value"
+          :label="week.label"
+          :value="week.value"
+        >
+          {{ week.label }}
+        </el-option>
       </el-select>
     </el-form-item>
 
@@ -39,7 +64,6 @@
 </template>
 
 <script lang="ts" setup>
-
 // 定义接口，增强类型安全
 interface CrontabValue {
   second: string;
@@ -61,8 +85,8 @@ const props = defineProps<{
 
 // 定义emits
 const emit = defineEmits<{
-  (e: 'confirm', value: string): void;
-  (e: 'cancel'): void;
+  (e: "confirm", value: string): void;
+  (e: "cancel"): void;
 }>();
 
 const formRef = ref();
@@ -94,7 +118,7 @@ const weekOptions: WeekOption[] = [
   { value: "4", label: "周四" },
   { value: "5", label: "周五" },
   { value: "6", label: "周六" },
-  { value: "7", label: "周日" }
+  { value: "7", label: "周日" },
 ];
 
 // 初始化时设置cron值
@@ -109,30 +133,30 @@ const handleConfirm = () => {
   // 简单验证
   const obj = crontabValueObj.value;
   if (!obj.second || !obj.min || !obj.hour || !obj.day || !obj.week) {
-    ElMessage.warning('请完善所有时间选项');
+    ElMessage.warning("请完善所有时间选项");
     return;
   }
 
   const cronStr = `${obj.second} ${obj.min} ${obj.hour} ${obj.day} ${obj.week}`;
-  emit('confirm', cronStr);
+  emit("confirm", cronStr);
 };
 
 // 设置cron表达式的值
 const setCron = (cronStr: string) => {
   if (!cronStr) return;
-  const parts = cronStr.split(' ');
+  const parts = cronStr.split(" ");
   if (parts.length !== 5) {
-    ElMessage.warning('无效的cron表达式格式');
+    ElMessage.warning("无效的cron表达式格式");
     return;
   }
 
   const [second, min, hour, day, week] = parts;
   crontabValueObj.value = {
-    second: second || '*',
-    min: min || '*',
-    hour: hour || '*',
-    day: day || '*',
-    week: week || '*'
+    second: second || "*",
+    min: min || "*",
+    hour: hour || "*",
+    day: day || "*",
+    week: week || "*",
   };
 };
 

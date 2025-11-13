@@ -21,7 +21,6 @@
       <div v-if="settingStore.showLangSelect" class="navbar-actions__item">
         <LangSelect />
       </div>
-
     </template>
 
     <!-- 通知 -->
@@ -67,7 +66,7 @@
               <el-icon><Lock /></el-icon>
               {{ t("navbar.lock") }}
             </el-dropdown-item>
-            <el-dropdown-item  @click="logout">
+            <el-dropdown-item @click="logout">
               <el-icon><SwitchButton /></el-icon>
               {{ t("navbar.logout") }}
             </el-dropdown-item>
@@ -76,7 +75,7 @@
       </el-dropdown>
     </div>
   </div>
-  
+
   <!-- 引导 -->
   <Guide v-if="guideVisible" v-model="guideVisible" @skip="handleGuideExit" />
 
@@ -89,8 +88,7 @@
   </teleport>
 
   <!-- 配置中心抽屉 -->
-  <ConfigInfoDrawer v-model="drawerVisible"/>
-  
+  <ConfigInfoDrawer v-model="drawerVisible" />
 </template>
 
 <script setup lang="ts">
@@ -108,11 +106,10 @@ import Fullscreen from "@/components/Fullscreen/index.vue";
 import SizeSelect from "@/components/SizeSelect/index.vue";
 import LangSelect from "@/components/LangSelect/index.vue";
 import Notification from "@/components/Notification/index.vue";
-import LockDialog from './LockDialog.vue'
-import LockPage from './LockPage.vue'
-import Guide from '@/components/Guide/index.vue'
-import ConfigInfoDrawer from "@/views/module_system/param/components/ConfigInfoDrawer.vue"
-
+import LockDialog from "./LockDialog.vue";
+import LockPage from "./LockPage.vue";
+import Guide from "@/components/Guide/index.vue";
+import ConfigInfoDrawer from "@/views/module_system/param/components/ConfigInfoDrawer.vue";
 
 const { t } = useI18n();
 const appStore = useAppStore();
@@ -131,7 +128,6 @@ function handleProfileClick() {
   router.push({ name: "Profile" });
 }
 
-
 const drawerVisible = ref(false);
 /**
  * 打开配置中心页面
@@ -140,29 +136,28 @@ function handleConfigClick() {
   drawerVisible.value = true;
 }
 
-
 /**
  * 项目文档
  */
 function handleDocumentClick() {
-  window.open('https://service.fastapiadmin.com', '_blank');
+  window.open("https://service.fastapiadmin.com", "_blank");
 }
 
 /**
  * Gitee 项目地址
  */
 function handleGiteeClick() {
-  window.open('https://gitee.com/tao__tao/FastapiAdmin')
+  window.open("https://gitee.com/tao__tao/FastapiAdmin");
 }
 
 /**
- * 项目引导 
+ * 项目引导
  */
 // 使用ref而不是computed，以便可以修改引导可见性
 // 使用 computed 实现双向绑定，减少 watch 的使用
 const guideVisible = computed({
   get: () => appStore.guideVisible,
-  set: (newValue) => appStore.showGuide(newValue)
+  set: (newValue) => appStore.showGuide(newValue),
 });
 
 function handleTourClick() {
@@ -177,27 +172,29 @@ function handleTourClick() {
 // 引导结束（点击跳过或最后一步完成关闭）后，自动关闭下次登录的自动展示
 function handleGuideExit() {
   // 关闭自动展示开关，确保下次登录不再自动开启
-  settingStore.updateSetting('showGuide', false);
+  settingStore.updateSetting("showGuide", false);
 }
 
 // 监听引导关闭（从 true -> false），也同步关闭自动展示开关
-watch(() => guideVisible.value, (val, oldVal) => {
-  if (oldVal && !val) {
-    settingStore.updateSetting('showGuide', false);
+watch(
+  () => guideVisible.value,
+  (val, oldVal) => {
+    if (oldVal && !val) {
+      settingStore.updateSetting("showGuide", false);
+    }
   }
-});
+);
 
 /**
  * 锁屏
  */
-const lockStore = useLockStore()
-const getIsLock = computed(() => lockStore.getLockInfo?.isLock ?? false)
-const dialogVisible = ref<boolean>(false)
+const lockStore = useLockStore();
+const getIsLock = computed(() => lockStore.getLockInfo?.isLock ?? false);
+const dialogVisible = ref<boolean>(false);
 // 锁定屏幕
 const handlelockScreen = () => {
-  dialogVisible.value = true
-}
-
+  dialogVisible.value = true;
+};
 
 // 根据主题和侧边栏配色方案选择样式类
 const navbarActionsClass = computed(() => {
@@ -234,15 +231,16 @@ function logout() {
     cancelButtonText: "取消",
     type: "warning",
     lockScroll: false,
-  }).then(() => {
-    userStore.logout().then(() => {
-      router.push(`/login`);
+  })
+    .then(() => {
+      userStore.logout().then(() => {
+        router.push(`/login`);
+      });
+    })
+    .catch(() => {
+      ElMessageBox.close();
     });
-  }).catch(() => {
-    ElMessageBox.close();
-  });
 }
-
 </script>
 
 <style lang="scss" scoped>

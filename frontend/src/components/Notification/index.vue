@@ -13,11 +13,11 @@
           <div v-for="(item, index) in noticeList" :key="index" class="w-400px py-3">
             <div class="flex-y-center">
               <el-tag :type="item.notice_type === '1' ? 'primary' : 'warning'">
-                {{ item.notice_type === '1' ? '通知' : '公告' }}
+                {{ item.notice_type === "1" ? "通知" : "公告" }}
               </el-tag>
 
               <!-- truncated: 超出部分省略 -->
-              <el-text size="small" class="w-200px cursor-pointer !ml-2 !flex-1" truncated > 
+              <el-text size="small" class="w-200px cursor-pointer !ml-2 !flex-1" truncated>
                 {{ item.notice_content }}
               </el-text>
 
@@ -28,7 +28,7 @@
             </div>
           </div>
           <el-divider />
-          
+
           <div class="flex-x-between">
             <el-link type="primary" underline="never" @click="handleViewMoreNotice">
               <span class="text-xs">查看更多</span>
@@ -36,7 +36,12 @@
                 <ArrowRight />
               </el-icon>
             </el-link>
-            <el-link v-if="noticeList.length > 0" type="primary" underline="never" @click="handleMarkAllAsRead">
+            <el-link
+              v-if="noticeList.length > 0"
+              type="primary"
+              underline="never"
+              @click="handleMarkAllAsRead"
+            >
               <span class="text-xs">全部已读</span>
             </el-link>
           </div>
@@ -50,7 +55,12 @@
     </template>
   </el-dropdown>
 
-  <el-dialog v-model="noticeDialogVisible" :title="noticeDetail?.notice_title ?? '通知详情'" width="800px" custom-class="notification-detail">
+  <el-dialog
+    v-model="noticeDialogVisible"
+    :title="noticeDetail?.notice_title ?? '通知详情'"
+    width="800px"
+    custom-class="notification-detail"
+  >
     <div v-if="noticeDetail" class="p-x-20px">
       <div class="flex-y-center mb-16px text-13px text-color-secondary">
         <span class="flex-y-center">
@@ -89,7 +99,7 @@ const noticeDetail = ref<NoticeTable | null>(null);
  * 获取我的通知公告
  */
 async function featchMyNotice() {
-  await noticeStore.getNotice()
+  await noticeStore.getNotice();
   noticeList.value = noticeStore.noticeList;
 }
 
@@ -100,7 +110,9 @@ function handleViewMoreNotice() {
 
 // 全部已读：将这些公告禁用（status=false），刷新后不再出现
 function handleMarkAllAsRead() {
-  const ids = noticeList.value.map((item) => item.id).filter((id): id is number => id !== undefined);
+  const ids = noticeList.value
+    .map((item) => item.id)
+    .filter((id): id is number => id !== undefined);
   NoticeAPI.batchAvailableNotice({ ids, status: false }).then(async () => {
     await noticeStore.getNotice();
     noticeList.value = noticeStore.noticeList;
@@ -110,8 +122,6 @@ function handleMarkAllAsRead() {
 onMounted(() => {
   featchMyNotice();
 });
-
-
 </script>
 
 <style lang="scss" scoped></style>

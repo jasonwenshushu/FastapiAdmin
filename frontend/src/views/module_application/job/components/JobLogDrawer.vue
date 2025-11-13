@@ -1,21 +1,33 @@
 <!-- 任务日志抽屉 -->
 <template>
-  <el-drawer v-model="drawerVisible" :title="'【' + props.jobName + '】任务日志'" :size="drawerSize">
+  <el-drawer
+    v-model="drawerVisible"
+    :title="'【' + props.jobName + '】任务日志'"
+    :size="drawerSize"
+  >
     <!-- 搜索区域 -->
     <div class="search-container">
-      <el-form ref="queryFormRef" :model="queryFormData" :inline="true" label-suffix=":" @submit.prevent="handleQuery">
+      <el-form
+        ref="queryFormRef"
+        :model="queryFormData"
+        :inline="true"
+        label-suffix=":"
+        @submit.prevent="handleQuery"
+      >
         <el-form-item prop="status" label="执行状态">
-          <el-select v-model="queryFormData.status" placeholder="请选择执行状态" style="width: 167.5px" clearable>
+          <el-select
+            v-model="queryFormData.status"
+            placeholder="请选择执行状态"
+            style="width: 167.5px"
+            clearable
+          >
             <el-option :value="true" label="成功" />
             <el-option :value="false" label="失败" />
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
         <el-form-item v-if="isExpand" prop="start_time" label="执行时间">
-          <DatePicker
-            v-model="dateRange"
-            @update:model-value="handleDateRangeChange"
-          />
+          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
         <el-form-item class="search-buttons">
@@ -44,7 +56,9 @@
       <template #header>
         <div class="card-header">
           <span>
-            <el-tooltip content="任务执行日志记录每次定时任务的执行情况，包括成功、失败状态及错误信息。">
+            <el-tooltip
+              content="任务执行日志记录每次定时任务的执行情况，包括成功、失败状态及错误信息。"
+            >
               <QuestionFilled class="w-4 h-4 mx-1" />
             </el-tooltip>
             任务执行日志列表
@@ -57,7 +71,14 @@
         <div class="data-table__toolbar--left">
           <el-row :gutter="10">
             <el-col :span="1.5">
-              <el-button type="danger" icon="delete" :disabled="selectIds.length === 0" @click="handleDelete(selectIds)">批量删除</el-button>
+              <el-button
+                type="danger"
+                icon="delete"
+                :disabled="selectIds.length === 0"
+                @click="handleDelete(selectIds)"
+              >
+                批量删除
+              </el-button>
             </el-col>
             <el-col :span="1.5">
               <el-button type="warning" icon="delete" @click="handleClearLog">清空日志</el-button>
@@ -82,7 +103,17 @@
       </div>
 
       <!-- 表格区域：任务日志列表 -->
-      <el-table ref="dataTableRef" v-loading="loading" :data="pageTableData" highlight-current-row class="data-table__content" height="460" border stripe @selection-change="handleSelectionChange">
+      <el-table
+        ref="dataTableRef"
+        v-loading="loading"
+        :data="pageTableData"
+        highlight-current-row
+        class="data-table__content"
+        height="460"
+        border
+        stripe
+        @selection-change="handleSelectionChange"
+      >
         <template #empty>
           <el-empty :image-size="80" description="暂无数据" />
         </template>
@@ -101,49 +132,116 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="执行信息" prop="job_message" min-width="200" show-overflow-tooltip />
-        <el-table-column label="异常信息" prop="exception_info" min-width="250" show-overflow-tooltip />
+        <el-table-column
+          label="执行信息"
+          prop="job_message"
+          min-width="200"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          label="异常信息"
+          prop="exception_info"
+          min-width="250"
+          show-overflow-tooltip
+        />
         <el-table-column label="执行器" prop="job_executor" min-width="120" show-overflow-tooltip />
-        <el-table-column label="调用目标" prop="invoke_target" min-width="200" show-overflow-tooltip />
+        <el-table-column
+          label="调用目标"
+          prop="invoke_target"
+          min-width="200"
+          show-overflow-tooltip
+        />
         <el-table-column label="位置参数" prop="job_args" min-width="150" show-overflow-tooltip />
-        <el-table-column label="关键字参数" prop="job_kwargs" min-width="150" show-overflow-tooltip />
+        <el-table-column
+          label="关键字参数"
+          prop="job_kwargs"
+          min-width="150"
+          show-overflow-tooltip
+        />
         <el-table-column label="触发器" prop="job_trigger" min-width="120" show-overflow-tooltip />
         <el-table-column label="创建时间" prop="create_time" min-width="180" sortable />
         <el-table-column fixed="right" label="操作" align="center" min-width="150">
           <template #default="scope">
-            <el-button type="info" size="small" link icon="document" @click="handleOpenDialog('detail', scope.row.id)">详情</el-button>
-            <el-button type="danger" size="small" link icon="delete" @click="handleDelete([scope.row.id])">删除</el-button>
+            <el-button
+              type="info"
+              size="small"
+              link
+              icon="document"
+              @click="handleOpenDialog('detail', scope.row.id)"
+            >
+              详情
+            </el-button>
+            <el-button
+              type="danger"
+              size="small"
+              link
+              icon="delete"
+              @click="handleDelete([scope.row.id])"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
       <template #footer>
-        <pagination v-model:total="total" v-model:page="queryFormData.page_no" v-model:limit="queryFormData.page_size" @pagination="loadingData" />
+        <pagination
+          v-model:total="total"
+          v-model:page="queryFormData.page_no"
+          v-model:limit="queryFormData.page_size"
+          @pagination="loadingData"
+        />
       </template>
     </el-card>
 
     <!-- 弹窗区域 -->
-    <el-dialog v-model="dialogVisible.visible" :title="dialogVisible.title" @close="handleCloseDialog">
+    <el-dialog
+      v-model="dialogVisible.visible"
+      :title="dialogVisible.title"
+      @close="handleCloseDialog"
+    >
       <!-- 详情 -->
       <template v-if="dialogVisible.type === 'detail'">
         <el-descriptions :column="2" border label-width="120px">
-          <el-descriptions-item label="日志ID" :span="2">{{ detailFormData.id }}</el-descriptions-item>
-          <el-descriptions-item label="任务名称" :span="2">{{ detailFormData.job_name }}</el-descriptions-item>
-          <el-descriptions-item label="任务组名" :span="2">{{ detailFormData.job_group }}</el-descriptions-item>
+          <el-descriptions-item label="日志ID" :span="2">
+            {{ detailFormData.id }}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务名称" :span="2">
+            {{ detailFormData.job_name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务组名" :span="2">
+            {{ detailFormData.job_group }}
+          </el-descriptions-item>
           <el-descriptions-item label="执行状态" :span="2">
             <el-tag :type="detailFormData.status === true ? 'success' : 'danger'">
               {{ detailFormData.status ? "成功" : "失败" }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="执行信息" :span="2">{{ detailFormData.job_message || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="异常信息" :span="2">{{ detailFormData.exception_info || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="执行器" :span="2">{{ detailFormData.job_executor || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="调用目标" :span="2">{{ detailFormData.invoke_target || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="位置参数" :span="2">{{ detailFormData.job_args || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="关键字参数" :span="2">{{ detailFormData.job_kwargs || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="触发器" :span="2">{{ detailFormData.job_trigger || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间" :span="2">{{ detailFormData.create_time }}</el-descriptions-item>
+          <el-descriptions-item label="执行信息" :span="2">
+            {{ detailFormData.job_message || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="异常信息" :span="2">
+            {{ detailFormData.exception_info || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="执行器" :span="2">
+            {{ detailFormData.job_executor || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="调用目标" :span="2">
+            {{ detailFormData.invoke_target || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="位置参数" :span="2">
+            {{ detailFormData.job_args || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="关键字参数" :span="2">
+            {{ detailFormData.job_kwargs || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="触发器" :span="2">
+            {{ detailFormData.job_trigger || "-" }}
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间" :span="2">
+            {{ detailFormData.create_time }}
+          </el-descriptions-item>
         </el-descriptions>
       </template>
     </el-dialog>
@@ -164,13 +262,13 @@
 const props = defineProps({
   jobId: {
     type: Number,
-    required: true
+    required: true,
   },
   jobName: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 import JobAPI, { JobLogPageQuery, JobLogTable } from "@/api/module_application/job";
 import { useAppStore } from "@/store/modules/app.store";
@@ -216,7 +314,7 @@ const queryFormData = reactive<JobLogPageQuery>({
 const dialogVisible = reactive({
   title: "",
   visible: false,
-  type: 'detail',
+  type: "detail",
 });
 
 // 日期范围临时变量
@@ -235,9 +333,9 @@ function handleDateRangeChange(range: [Date, Date]) {
 }
 
 // 列表刷新
-async function handleRefresh () {
+async function handleRefresh() {
   await loadingData();
-};
+}
 
 // 加载表格数据
 async function loadingData() {
@@ -247,11 +345,9 @@ async function loadingData() {
     const response = await JobAPI.getJobLogList(queryFormData);
     pageTableData.value = response.data.data.items;
     total.value = response.data.data.total;
-  }
-  catch (error: any) {
+  } catch (error: any) {
     console.error(error);
-  }
-  finally {
+  } finally {
     loading.value = false;
   }
 }
@@ -290,7 +386,7 @@ async function handleCloseDialog() {
 }
 
 // 打开详情弹窗
-async function handleOpenDialog(type: 'detail', id?: number) {
+async function handleOpenDialog(type: "detail", id?: number) {
   dialogVisible.type = type;
   if (id) {
     const response = await JobAPI.getJobLogDetail(id);
@@ -310,21 +406,23 @@ async function handleDelete(ids: number[]) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await JobAPI.deleteJobLog(validIds);
-      // 删除后刷新并清空选择状态
-      handleResetQuery();
-      selectIds.value = [];
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
+  })
+    .then(async () => {
+      try {
+        loading.value = true;
+        await JobAPI.deleteJobLog(validIds);
+        // 删除后刷新并清空选择状态
+        handleResetQuery();
+        selectIds.value = [];
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 
 // 清空日志
@@ -333,19 +431,21 @@ async function handleClearLog() {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await JobAPI.clearJobLog();
-      handleResetQuery();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
+  })
+    .then(async () => {
+      try {
+        loading.value = true;
+        await JobAPI.clearJobLog();
+        handleResetQuery();
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 
 // 打开导出弹窗
@@ -355,22 +455,22 @@ function handleOpenExportsModal() {
 
 // 导出字段
 const exportColumns = [
-  { prop: 'job_name', label: '任务名称' },
-  { prop: 'job_group', label: '任务组名' },
-  { prop: 'status', label: '执行状态' },
-  { prop: 'job_message', label: '执行信息' },
-  { prop: 'exception_info', label: '异常信息' },
-  { prop: 'job_executor', label: '执行器' },
-  { prop: 'invoke_target', label: '调用目标' },
-  { prop: 'job_args', label: '位置参数' },
-  { prop: 'job_kwargs', label: '关键字参数' },
-  { prop: 'job_trigger', label: '触发器' },
-  { prop: 'create_time', label: '创建时间' },
+  { prop: "job_name", label: "任务名称" },
+  { prop: "job_group", label: "任务组名" },
+  { prop: "status", label: "执行状态" },
+  { prop: "job_message", label: "执行信息" },
+  { prop: "exception_info", label: "异常信息" },
+  { prop: "job_executor", label: "执行器" },
+  { prop: "invoke_target", label: "调用目标" },
+  { prop: "job_args", label: "位置参数" },
+  { prop: "job_kwargs", label: "关键字参数" },
+  { prop: "job_trigger", label: "触发器" },
+  { prop: "create_time", label: "创建时间" },
 ];
 
 // 导出配置（用于导出弹窗）
 const curdContentConfig = {
-  permPrefix: 'application:job_log',
+  permPrefix: "application:job_log",
   cols: exportColumns as any,
   exportsAction: async (params: any) => {
     const query: any = { ...params };
@@ -402,7 +502,7 @@ function closeDrawer() {
 // 暴露方法给父组件
 defineExpose({
   openDrawer,
-  closeDrawer
+  closeDrawer,
 });
 
 onMounted(() => {

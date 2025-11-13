@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 text-center m-0 mb-20px>{{ t("login.resetPassword") }}</h3>
-    <el-form ref="formRef" :model="model" :rules="rules" size="large"  label-suffix=":">
+    <el-form ref="formRef" :model="model" :rules="rules" size="large" label-suffix=":">
       <!-- 用户名 -->
       <el-form-item prop="username">
         <el-input v-model.trim="model.username" :placeholder="t('login.username')" clearable>
@@ -75,9 +75,11 @@ const { t } = useI18n();
 
 // 使用 defineModel 简化具名 v-model 绑定
 const modelValue = defineModel<string>();
-const presetUsername = defineModel<string>('presetUsername');
-const presetPassword = defineModel<string>('presetPassword');
-const toLogin = () => { modelValue.value = 'login'; };
+const presetUsername = defineModel<string>("presetUsername");
+const presetPassword = defineModel<string>("presetPassword");
+const toLogin = () => {
+  modelValue.value = "login";
+};
 
 const model = ref<ForgetPasswordForm>({
   username: "",
@@ -145,12 +147,11 @@ const submit = async () => {
 
     loading.value = true;
 
-    await UserAPI.forgetPassword(model.value)
+    await UserAPI.forgetPassword(model.value);
     // 重置成功后，双向绑定回写父容器的用户名和新密码，并切回登录
     presetUsername.value = model.value.username;
     presetPassword.value = model.value.new_password;
     toLogin();
-
   } catch (error) {
     console.error(error);
   } finally {

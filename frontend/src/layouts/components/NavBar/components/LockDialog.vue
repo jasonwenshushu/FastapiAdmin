@@ -13,7 +13,7 @@
       <!-- <span class="lock-dialog-name">{{ t('navbar.lock') }}</span> -->
       <span class="lock-dialog-name">{{ userStore.basicInfo.name }}</span>
     </div>
-    <el-form ref="lockFormRef" :model="form" :rules="rules" >
+    <el-form ref="lockFormRef" :model="form" :rules="rules">
       <el-form-item :label="t('lock.lockPassword')" prop="password">
         <el-input
           v-model="form.password"
@@ -25,63 +25,61 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button type="primary" @click="handleLock">{{ t('navbar.lock') }}</el-button>
+      <el-button type="primary" @click="handleLock">{{ t("navbar.lock") }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { useLockStore } from '@/store'
-import { useI18n } from 'vue-i18n'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, reactive, computed } from "vue";
+import { useLockStore } from "@/store";
+import { useI18n } from "vue-i18n";
+import type { FormInstance, FormRules } from "element-plus";
 
 import { useUserStore } from "@/store/modules/user.store";
 const userStore = useUserStore();
 
-const { t } = useI18n()
-const lockStore = useLockStore()
+const { t } = useI18n();
+const lockStore = useLockStore();
 
 const props = defineProps({
   modelValue: {
-    type: Boolean
-  }
-})
+    type: Boolean,
+  },
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"]);
 
 const dialogVisible = computed({
   get: () => props.modelValue,
   set: (val) => {
-    emit('update:modelValue', val)
-  }
-})
+    emit("update:modelValue", val);
+  },
+});
 
-const dialogTitle = ref(t('lock.lockScreen'))
-const lockFormRef = ref<FormInstance>()
+const dialogTitle = ref(t("lock.lockScreen"));
+const lockFormRef = ref<FormInstance>();
 const form = reactive({
-  password: ''
-})
+  password: "",
+});
 
 const rules: FormRules = {
-  password: [
-    { required: true, message: t('lock.required'), trigger: 'blur' }
-  ]
-}
+  password: [{ required: true, message: t("lock.required"), trigger: "blur" }],
+};
 
 // 优化后的锁定逻辑
 const handleLock = async () => {
   try {
-    await lockFormRef.value?.validate()
-    dialogVisible.value = false
+    await lockFormRef.value?.validate();
+    dialogVisible.value = false;
     lockStore.setLockInfo({
       isLock: true,
-      password: form.password
-    })
+      password: form.password,
+    });
   } catch {
     // 验证失败时不执行任何操作
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

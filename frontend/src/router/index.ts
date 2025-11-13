@@ -42,7 +42,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   },
   {
     path: "/:pathMatch(.*)*",
-    component: () => import('@/views/error/404.vue'),
+    component: () => import("@/views/error/404.vue"),
     meta: { hidden: true, title: "404" },
   },
   // 以下内容必须放在后面

@@ -41,9 +41,9 @@ export const useConfigStore = defineStore("config", {
         }
       });
       this.isConfigLoaded = true;
-    }
+    },
   },
-  persist: true
+  persist: true,
 });
 
 export function useConfigStoreHook() {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 text-center m-0 mb-20px>{{ t("login.reg") }}</h3>
-    <el-form ref="formRef" :model="model" :rules="rules" size="large"  label-suffix=":" >      
+    <el-form ref="formRef" :model="model" :rules="rules" size="large" label-suffix=":">
       <!-- 账号 -->
       <el-form-item prop="username">
         <el-input v-model.trim="model.username" :placeholder="t('login.username')" clearable>
@@ -49,11 +49,17 @@
         </el-form-item>
       </el-tooltip>
 
-      
       <el-form-item>
         <div class="flex-y-center w-full gap-10px">
           <el-checkbox v-model="isRead">{{ t("login.agree") }}</el-checkbox>
-          <el-link type="primary" underline="never" :href="configStore.configData.sys_web_clause.config_value" target="_blank">{{ t("login.userAgreement") }}</el-link>
+          <el-link
+            type="primary"
+            underline="never"
+            :href="configStore.configData.sys_web_clause.config_value"
+            target="_blank"
+          >
+            {{ t("login.userAgreement") }}
+          </el-link>
         </div>
       </el-form-item>
 
@@ -81,9 +87,11 @@ const { t } = useI18n();
 
 // 使用 defineModel 简化具名 v-model 绑定
 const modelValue = defineModel<string>();
-const presetUsername = defineModel<string>('presetUsername');
-const presetPassword = defineModel<string>('presetPassword');
-const toLogin = () => { modelValue.value = 'login'; };
+const presetUsername = defineModel<string>("presetUsername");
+const presetPassword = defineModel<string>("presetPassword");
+const toLogin = () => {
+  modelValue.value = "login";
+};
 
 const configStore = useConfigStore();
 
@@ -91,7 +99,6 @@ const formRef = ref<FormInstance>();
 const loading = ref(false); // 按钮 loading 状态
 const isCapsLock = ref(false); // 是否大写锁定
 const isRead = ref(false);
-
 
 const model = ref<RegisterForm>({
   username: "",
@@ -150,7 +157,6 @@ function checkCapsLock(event: KeyboardEvent) {
   }
 }
 
-
 const submit = async () => {
   try {
     // 0. 检查是否已勾选协议
@@ -164,12 +170,11 @@ const submit = async () => {
 
     loading.value = true;
 
-    await UserAPI.registerUser(model.value)
+    await UserAPI.registerUser(model.value);
     // 注册成功后，双向绑定回写父容器的用户名和密码，并切回登录
     presetUsername.value = model.value.username;
     presetPassword.value = model.value.password;
     toLogin();
-
   } catch (error) {
     console.error(error);
   } finally {
@@ -177,6 +182,5 @@ const submit = async () => {
   }
 };
 
-onMounted(() => {
-});
+onMounted(() => {});
 </script>

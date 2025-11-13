@@ -80,7 +80,7 @@ export interface MenuTable {
   hidden?: boolean;
   always_show?: boolean;
   title?: string;
-  params?: { key: string; value: string; }[];
+  params?: { key: string; value: string }[];
   affix?: boolean;
   status?: boolean;
   description?: string;

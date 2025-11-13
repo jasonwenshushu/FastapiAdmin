@@ -39,12 +39,17 @@
       <!-- 验证码 -->
       <el-form-item v-if="captchaState.enable" prop="captcha">
         <div flex>
-          <el-input v-model.trim="loginForm.captcha" :placeholder="t('login.captchaCode')" clearable @keyup.enter="handleLoginSubmit" >
+          <el-input
+            v-model.trim="loginForm.captcha"
+            :placeholder="t('login.captchaCode')"
+            clearable
+            @keyup.enter="handleLoginSubmit"
+          >
             <template #prefix>
               <div class="i-svg:captcha" />
             </template>
           </el-input>
-          <div cursor-pointer flex-center ml-10px  >
+          <div cursor-pointer flex-center ml-10px>
             <el-icon v-if="codeLoading" class="is-loading">
               <Loading />
             </el-icon>
@@ -104,7 +109,7 @@ import type { FormInstance } from "element-plus";
 import { LocationQuery, RouteLocationRaw, useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { onActivated, onMounted, watch } from "vue";
-import AuthAPI, {type LoginFormData, type CaptchaInfo } from "@/api/module_system/auth";
+import AuthAPI, { type LoginFormData, type CaptchaInfo } from "@/api/module_system/auth";
 import { useAppStore, useUserStore, useSettingsStore } from "@/store";
 import CommonWrapper from "@/components/CommonWrapper/index.vue";
 
@@ -126,7 +131,7 @@ onMounted(() => getCaptcha());
 onActivated(() => {
   getCaptcha();
   // 重置登录表单
-  loginForm.captcha = '';
+  loginForm.captcha = "";
 });
 
 // 监听路由变化，确保每次进入登录页面都有最新验证码
@@ -134,7 +139,7 @@ watch(
   () => route.fullPath,
   () => {
     getCaptcha();
-    loginForm.captcha = '';
+    loginForm.captcha = "";
   }
 );
 
@@ -142,7 +147,6 @@ const loginFormRef = ref<FormInstance>();
 const loading = ref(false);
 // 是否大写锁定
 const isCapsLock = ref(false);
-
 
 const loginForm = reactive<LoginFormData>({
   username: "",
@@ -157,10 +161,10 @@ const loginForm = reactive<LoginFormData>({
 watch(
   () => [props.presetUsername, props.presetPassword],
   ([presetUsername, presetPassword]) => {
-    if (typeof presetUsername === 'string') {
+    if (typeof presetUsername === "string") {
       loginForm.username = presetUsername;
     }
-    if (typeof presetPassword === 'string') {
+    if (typeof presetPassword === "string") {
       loginForm.password = presetPassword;
     }
   },
@@ -170,7 +174,7 @@ watch(
 const captchaState = reactive<CaptchaInfo>({
   enable: true,
   key: "",
-  img_base: ""
+  img_base: "",
 });
 
 const loginRules = computed(() => {
@@ -209,7 +213,7 @@ const codeLoading = ref(false);
 async function getCaptcha() {
   try {
     codeLoading.value = true;
-    const response = await AuthAPI.getCaptcha()
+    const response = await AuthAPI.getCaptcha();
     loginForm.captcha_key = response.data.data.key;
     captchaState.img_base = response.data.data.img_base;
   } finally {
@@ -241,17 +245,15 @@ async function handleLoginSubmit() {
     // 4. 记住我功能已实现，根据用户选择决定token的存储方式:
     // - 选中"记住我": token存储在localStorage中，浏览器关闭后仍然有效
     // - 未选中"记住我": token存储在sessionStorage中，浏览器关闭后失效
-    
+
     // 登录成功后自动开启项目引导
     if (settingsStore.showGuide) {
       appStore.showGuide(true);
     }
-
   } catch (error: any) {
     if (error) {
       getCaptcha(); // 刷新验证码
     }
-
   } finally {
     loading.value = false;
   }
@@ -295,8 +297,6 @@ const emit = defineEmits(["update:modelValue"]);
 function toOtherForm(type: "register" | "resetPwd") {
   emit("update:modelValue", type);
 }
-
-
 </script>
 
 <style lang="scss" scoped>

@@ -26,7 +26,11 @@
           </el-form-item>
           <el-form-item label="数据源" prop="origin">
             <el-select v-model="exportsFormData.origin">
-              <el-option label="当前数据 (当前页的数据)" :value="ExportsOriginEnum.CURRENT" :disabled="!pageData?.length" />
+              <el-option
+                label="当前数据 (当前页的数据)"
+                :value="ExportsOriginEnum.CURRENT"
+                :disabled="!pageData?.length"
+              />
               <el-option
                 label="选中数据 (所有选中的数据)"
                 :value="ExportsOriginEnum.SELECTED"
@@ -113,9 +117,8 @@ const exportsFormRules: FormRules = {
   origin: [{ required: true, message: "请选择数据源" }],
 };
 
-
 // 表格列
-const cols = computed(() => 
+const cols = computed(() =>
   props.contentConfig.cols.map((col) => {
     if (col.initFn) {
       col.initFn(col);
@@ -177,25 +180,28 @@ function handleExports() {
       }
     });
     worksheet.columns = columns;
-    
+
     if (exportsFormData.origin === ExportsOriginEnum.REMOTE) {
       if (props.contentConfig.exportsAction) {
         const lastFormData = props.queryParams ?? {};
-        props.contentConfig.exportsAction(lastFormData).then((res) => {
-          worksheet.addRows(res);
-          workbook.xlsx
-            .writeBuffer()
-            .then((buffer) => {
-              saveXlsx(buffer, filename as string);
-            })
-            .catch((error) => {
-              console.error("导出远程数据失败:", error);
-              ElMessage.error("导出远程数据失败");
-            });
-        }).catch((error) => {
-          console.error("获取远程数据失败:", error);
-          ElMessage.error("获取远程数据失败");
-        });
+        props.contentConfig
+          .exportsAction(lastFormData)
+          .then((res) => {
+            worksheet.addRows(res);
+            workbook.xlsx
+              .writeBuffer()
+              .then((buffer) => {
+                saveXlsx(buffer, filename as string);
+              })
+              .catch((error) => {
+                console.error("导出远程数据失败:", error);
+                ElMessage.error("导出远程数据失败");
+              });
+          })
+          .catch((error) => {
+            console.error("获取远程数据失败:", error);
+            ElMessage.error("获取远程数据失败");
+          });
       } else {
         ElMessage.error("未配置exportsAction");
       }

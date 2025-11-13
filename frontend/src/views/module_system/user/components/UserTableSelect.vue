@@ -1,6 +1,11 @@
 <!-- 列表选择器 -->
 <template>
-  <table-select :text="text" :select-config="selectConfig" @confirm-click="handleConfirm" @clear-click="handleClearSelection">
+  <table-select
+    :text="text"
+    :select-config="selectConfig"
+    @confirm-click="handleConfirm"
+    @clear-click="handleClearSelection"
+  >
     <template #status="scope">
       <el-tag :type="scope.row[scope.prop] === true ? 'success' : 'danger'">
         {{ scope.row[scope.prop] === true ? "启用" : "停用" }}

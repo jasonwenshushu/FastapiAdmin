@@ -7,7 +7,10 @@
       <div class="flex flex-wrap">
         <!-- 左侧问候语区域 -->
         <div class="flex-1 flex items-start">
-          <img class="w80px h80px rounded-full" :src="userStore.basicInfo.avatar + '?imageView2/1/w/80/h/80'" />
+          <img
+            class="w80px h80px rounded-full"
+            :src="userStore.basicInfo.avatar + '?imageView2/1/w/80/h/80'"
+          />
           <div class="ml-5">
             <div class="text-20px font-bold mb-5px">
               {{ timefix }}{{ userStore.basicInfo.name }}，{{ welcome }}
@@ -93,9 +96,7 @@
 
           <div class="flex-x-between mt-2 flex-1">
             <div class="flex-y-center">
-              <span class="text-lg transition-all duration-300 hover:scale-110">
-                9999
-              </span>
+              <span class="text-lg transition-all duration-300 hover:scale-110">9999</span>
               <span v-if="true" class="ml-2 text-xs text-[#67c23a]">
                 <el-icon>
                   <Connection />
@@ -153,7 +154,13 @@
               <div class="flex-x-between mt-2 flex-1">
                 <div class="flex-y-center">
                   <span class="text-lg">{{ Math.round(transitionUvCount) }}</span>
-                  <span :class="['text-xs', 'ml-2', computeGrowthRateClass(visitStatsData.uvGrowthRate)]">
+                  <span
+                    :class="[
+                      'text-xs',
+                      'ml-2',
+                      computeGrowthRateClass(visitStatsData.uvGrowthRate),
+                    ]"
+                  >
                     <el-icon>
                       <Top v-if="visitStatsData.uvGrowthRate > 0" />
                       <Bottom v-else-if="visitStatsData.uvGrowthRate < 0" />
@@ -207,7 +214,13 @@
               <div class="flex-x-between mt-2 flex-1">
                 <div class="flex-y-center">
                   <span class="text-lg">{{ Math.round(transitionPvCount) }}</span>
-                  <span :class="['text-xs', 'ml-2', computeGrowthRateClass(visitStatsData.pvGrowthRate)]">
+                  <span
+                    :class="[
+                      'text-xs',
+                      'ml-2',
+                      computeGrowthRateClass(visitStatsData.pvGrowthRate),
+                    ]"
+                  >
                     <el-icon>
                       <Top v-if="visitStatsData.pvGrowthRate > 0" />
                       <Bottom v-else-if="visitStatsData.pvGrowthRate < 0" />
@@ -250,7 +263,12 @@
           <template #header>
             <div class="flex-x-between">
               <span class="header-title">最新动态</span>
-              <el-link type="primary" underline="never" href="https://gitee.com/tao__tao/FastapiAdmin/releases" target="_blank">
+              <el-link
+                type="primary"
+                underline="never"
+                href="https://gitee.com/tao__tao/FastapiAdmin/releases"
+                target="_blank"
+              >
                 完整记录
                 <el-icon class="link-icon">
                   <TopRight />
@@ -261,7 +279,15 @@
 
           <el-scrollbar height="400px">
             <el-timeline class="p-3">
-              <el-timeline-item v-for="(item, index) in vesionList" :key="index" :timestamp="item.date" placement="top" :color="index === 0 ? '#67C23A' : '#909399'" :hollow="index !== 0" size="large">
+              <el-timeline-item
+                v-for="(item, index) in vesionList"
+                :key="index"
+                :timestamp="item.date"
+                placement="top"
+                :color="index === 0 ? '#67C23A' : '#909399'"
+                :hollow="index !== 0"
+                size="large"
+              >
                 <div class="version-item" :class="{ 'latest-item': index === 0 }">
                   <div>
                     <el-text tag="strong">{{ item.title }}</el-text>
@@ -273,7 +299,12 @@
                   <el-text class="version-content">{{ item.content }}</el-text>
 
                   <div v-if="item.link">
-                    <el-link :type="index === 0 ? 'primary' : 'info'" :href="item.link" target="_blank" underline="never">
+                    <el-link
+                      :type="index === 0 ? 'primary' : 'info'"
+                      :href="item.link"
+                      target="_blank"
+                      underline="never"
+                    >
                       详情
                       <el-icon class="link-icon">
                         <TopRight />
@@ -301,11 +332,10 @@ import { useUserStore } from "@/store/modules/user.store";
 import { formatGrowthRate } from "@/utils";
 import { useTransition } from "@vueuse/core";
 import { Connection, Failed } from "@element-plus/icons-vue";
-import { greetings } from '@/utils/common';
+import { greetings } from "@/utils/common";
 
 const timefix = greetings();
-const welcome = '祝你开心每一天！';
-
+const welcome = "祝你开心每一天！";
 
 interface VersionItem {
   id: string;
@@ -323,7 +353,7 @@ const vesionList = ref<VersionItem[]>([
   {
     id: "1",
     title: "v3.2.1",
-    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    date: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     content: "优化性能，修复若干小bug。",
     link: "https://gitee.com/tao__tao/FastapiAdmin/releases",
     tag: "更新",
@@ -331,7 +361,7 @@ const vesionList = ref<VersionItem[]>([
   {
     id: "2",
     title: "v3.2.0",
-    date: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+    date: dayjs().subtract(1, "day").format("YYYY-MM-DD HH:mm:ss"),
     content: "新增用户行为分析功能。",
     link: "https://gitee.com/tao__tao/FastapiAdmin/releases",
     tag: "新功能",
@@ -339,7 +369,7 @@ const vesionList = ref<VersionItem[]>([
   {
     id: "3",
     title: "v3.1.0",
-    date: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+    date: dayjs().subtract(3, "day").format("YYYY-MM-DD HH:mm:ss"),
     content: "优化权限管理系统。",
     link: "https://gitee.com/tao__tao/FastapiAdmin/releases",
     tag: "优化",
@@ -419,7 +449,9 @@ const updateVisitTrendChartOptions = () => {
     xAxis: {
       type: "category",
       data: Array.from({ length: visitTrendDateRange.value }, (_, index) =>
-        dayjs().subtract(visitTrendDateRange.value - index - 1, "day").format("YYYY-MM-DD")
+        dayjs()
+          .subtract(visitTrendDateRange.value - index - 1, "day")
+          .format("YYYY-MM-DD")
       ),
     },
     yAxis: {
@@ -435,8 +467,9 @@ const updateVisitTrendChartOptions = () => {
       {
         name: "浏览量(PV)",
         type: "line",
-        data: Array.from({ length: visitTrendDateRange.value }, () =>
-          Math.floor(Math.random() * 500) + 100
+        data: Array.from(
+          { length: visitTrendDateRange.value },
+          () => Math.floor(Math.random() * 500) + 100
         ),
         areaStyle: {
           color: "rgba(64, 158, 255, 0.1)",
@@ -452,8 +485,9 @@ const updateVisitTrendChartOptions = () => {
       {
         name: "访客数(UV)",
         type: "line",
-        data: Array.from({ length: visitTrendDateRange.value }, () =>
-          Math.floor(Math.random() * 200) + 50
+        data: Array.from(
+          { length: visitTrendDateRange.value },
+          () => Math.floor(Math.random() * 200) + 50
         ),
         areaStyle: {
           color: "rgba(103, 194, 58, 0.1)",

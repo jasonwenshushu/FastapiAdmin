@@ -25,9 +25,9 @@
             :preview-teleported="true"
             @click.stop="handleImageClick"
           />
-          <el-icon 
-            v-if="!props.disabled" 
-            class="single-upload__delete-btn" 
+          <el-icon
+            v-if="!props.disabled"
+            class="single-upload__delete-btn"
             @click.stop="handleDelete"
           >
             <CircleCloseFilled />
@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { UploadRawFile, UploadRequestOptions, ElMessage, type UploadUserFile } from "element-plus";
-import ParamsAPI from '@/api/module_system/params';
+import ParamsAPI from "@/api/module_system/params";
 
 const props = defineProps({
   /**
@@ -96,7 +96,7 @@ const props = defineProps({
       };
     },
   },
-  
+
   /**
    * 是否禁用
    */
@@ -104,7 +104,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  
+
   /**
    * 是否显示提示信息
    */
@@ -112,7 +112,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  
+
   /**
    * 提示文本
    */
@@ -120,7 +120,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  
+
   /**
    * 是否启用图片预览功能
    */
@@ -143,10 +143,12 @@ watch(
   () => modelValue.value,
   (newVal) => {
     if (newVal) {
-      internalFileList.value = [{
-        name: newVal.split('/').pop() || 'image',
-        url: newVal
-      }];
+      internalFileList.value = [
+        {
+          name: newVal.split("/").pop() || "image",
+          url: newVal,
+        },
+      ];
     } else {
       internalFileList.value = [];
     }
@@ -171,10 +173,10 @@ watch(
  * 定义组件触发的事件
  */
 const emit = defineEmits<{
-  (e: 'success', fileInfo: UploadFilePath): void;
-  (e: 'error', error: any): void;
-  (e: 'input', value: string): void;
-  (e: 'update:modelValue', value: string): void;
+  (e: "success", fileInfo: UploadFilePath): void;
+  (e: "error", error: any): void;
+  (e: "input", value: string): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
 /**
@@ -218,7 +220,7 @@ async function handleUpload(options: UploadRequestOptions) {
   try {
     const file = options.file;
     const formData = new FormData();
-    
+
     formData.append(props.name, file);
 
     // 处理附加参数
@@ -234,7 +236,7 @@ async function handleUpload(options: UploadRequestOptions) {
       onSuccess(fileInfo);
       return fileInfo;
     } else {
-      const errorMsg = response.data.msg || '上传失败';
+      const errorMsg = response.data.msg || "上传失败";
       ElMessage.error(errorMsg);
       throw new Error(errorMsg);
     }
@@ -259,9 +261,14 @@ function handleDelete() {
 function handleImageClick(event: Event) {
   // 阻止事件冒泡
   event.stopPropagation();
-  
+
   // 如果启用了预览功能，则触发预览
-  if (props.enablePreview && internalFileList.value && internalFileList.value.length > 0 && internalFileList.value[0].url) {
+  if (
+    props.enablePreview &&
+    internalFileList.value &&
+    internalFileList.value.length > 0 &&
+    internalFileList.value[0].url
+  ) {
     // Element Plus的el-image组件会自动处理preview-src-list的预览功能
     // 这里只需要阻止冒泡即可
   }
@@ -274,17 +281,19 @@ function handleImageClick(event: Event) {
  */
 const onSuccess = (fileInfo: UploadFilePath) => {
   // 更新绑定的值为文件URL
-  const newFileList = [{
-    name: fileInfo.file_name,
-    url: fileInfo.file_url
-  }];
-  
+  const newFileList = [
+    {
+      name: fileInfo.file_name,
+      url: fileInfo.file_url,
+    },
+  ];
+
   internalFileList.value = newFileList;
-  
+
   // 触发事件
-  emit('success', fileInfo);
-  emit('input', fileInfo.file_url);
-  emit('update:modelValue', fileInfo.file_url);
+  emit("success", fileInfo);
+  emit("input", fileInfo.file_url);
+  emit("update:modelValue", fileInfo.file_url);
 };
 
 /**
@@ -292,8 +301,8 @@ const onSuccess = (fileInfo: UploadFilePath) => {
  */
 const onError = (error: any) => {
   console.error("图片上传失败:", error);
-  ElMessage.error('图片上传失败，请重试');
-  emit('error', error);
+  ElMessage.error("图片上传失败，请重试");
+  emit("error", error);
 };
 </script>
 
@@ -308,7 +317,7 @@ const onError = (error: any) => {
   position: relative;
   width: v-bind("props.style.width ?? '150px'");
   height: v-bind("props.style.height ?? '150px'");
-  
+
   &:hover {
     .single-upload__delete-btn {
       display: block;
@@ -337,7 +346,7 @@ const onError = (error: any) => {
       color: #ff4500;
     }
   }
-  
+
   &__add-btn {
     font-size: 28px;
     color: #8c939d;

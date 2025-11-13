@@ -55,7 +55,9 @@ function usePage() {
       }
     } catch (error) {
       console.error("打开新增模态框失败:", error);
-      ElMessage.error("打开新增模态框失败: " + (error instanceof Error ? error.message : String(error)));
+      ElMessage.error(
+        "打开新增模态框失败: " + (error instanceof Error ? error.message : String(error))
+      );
     }
   }
 
@@ -84,7 +86,9 @@ function usePage() {
       }
     } catch (error) {
       console.error("打开编辑模态框失败:", error);
-      ElMessage.error("打开编辑模态框失败: " + (error instanceof Error ? error.message : String(error)));
+      ElMessage.error(
+        "打开编辑模态框失败: " + (error instanceof Error ? error.message : String(error))
+      );
     }
   }
 
@@ -113,7 +117,9 @@ function usePage() {
       }
     } catch (error) {
       console.error("打开查看模态框失败:", error);
-      ElMessage.error("打开查看模态框失败: " + (error instanceof Error ? error.message : String(error)));
+      ElMessage.error(
+        "打开查看模态框失败: " + (error instanceof Error ? error.message : String(error))
+      );
     }
   }
 
@@ -153,7 +159,9 @@ function usePage() {
       searchRef.value?.toggleVisible();
     } catch (error) {
       console.error("切换搜索栏失败:", error);
-      ElMessage.error("切换搜索栏失败: " + (error instanceof Error ? error.message : String(error)));
+      ElMessage.error(
+        "切换搜索栏失败: " + (error instanceof Error ? error.message : String(error))
+      );
     }
   }
 
@@ -190,7 +198,9 @@ function usePage() {
       handleSubmitClick();
     } catch (error) {
       console.error("处理更多操作失败:", error);
-      ElMessage.error("处理更多操作失败: " + (error instanceof Error ? error.message : String(error)));
+      ElMessage.error(
+        "处理更多操作失败: " + (error instanceof Error ? error.message : String(error))
+      );
     }
   }
 

@@ -3,7 +3,13 @@
   <div class="app-container">
     <!-- 搜索区域 -->
     <div class="search-container">
-      <el-form ref="queryFormRef" :model="queryFormData" :inline="true"  label-suffix=":" @submit.prevent="handleQuery" >
+      <el-form
+        ref="queryFormRef"
+        :model="queryFormData"
+        :inline="true"
+        label-suffix=":"
+        @submit.prevent="handleQuery"
+      >
         <el-form-item prop="ipaddr" label="IP地址">
           <el-input v-model="queryFormData.ipaddr" placeholder="请输入IP地址" clearable />
         </el-form-item>
@@ -15,8 +21,21 @@
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
         <el-form-item class="search-buttons">
-          <el-button v-hasPerm="['module_monitor:online:query']" type="primary" icon="search" native-type="submit">查询</el-button>
-          <el-button v-hasPerm="['module_monitor:online:query']" icon="refresh" @click="handleResetQuery">重置</el-button>
+          <el-button
+            v-hasPerm="['module_monitor:online:query']"
+            type="primary"
+            icon="search"
+            native-type="submit"
+          >
+            查询
+          </el-button>
+          <el-button
+            v-hasPerm="['module_monitor:online:query']"
+            icon="refresh"
+            @click="handleResetQuery"
+          >
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -39,7 +58,14 @@
         <div class="data-table__toolbar--left">
           <el-row :gutter="10">
             <el-col :span="1.5">
-              <el-button v-hasPerm="['module_monitor:online:force_logout']" type="danger" icon="delete" @click="handleClear">强退所有</el-button>
+              <el-button
+                v-hasPerm="['module_monitor:online:force_logout']"
+                type="danger"
+                icon="delete"
+                @click="handleClear"
+              >
+                强退所有
+              </el-button>
             </el-col>
           </el-row>
         </div>
@@ -47,7 +73,13 @@
           <el-row :gutter="10">
             <el-col :span="1.5">
               <el-tooltip content="刷新">
-                <el-button v-hasPerm="['module_monitor:online:refresh']" type="primary" icon="refresh" circle @click="handleRefresh"/>
+                <el-button
+                  v-hasPerm="['module_monitor:online:refresh']"
+                  type="primary"
+                  icon="refresh"
+                  circle
+                  @click="handleRefresh"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
@@ -67,29 +99,117 @@
       </div>
 
       <!-- 表格区域：系统配置列表 -->
-      <el-table ref="dataTableRef" v-loading="loading" :data="pageTableData" highlight-current-row class="data-table__content" :height="450" border stripe @selection-change="handleSelectionChange">
+      <el-table
+        ref="dataTableRef"
+        v-loading="loading"
+        :data="pageTableData"
+        highlight-current-row
+        class="data-table__content"
+        :height="450"
+        border
+        stripe
+        @selection-change="handleSelectionChange"
+      >
         <template #empty>
           <el-empty :image-size="80" description="暂无数据" />
         </template>
 
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'selection')?.show" type="selection" min-width="55" align="center" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'index')?.show" type="index" fixed label="序号" min-width="60" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'session_id')?.show" key="session_id" label="会话编号" prop="session_id" min-width="250" show-overflow-tooltip/>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'login_type')?.show" key="login_type" label="登录类型" prop="login_type" min-width="100" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'ipaddr')?.show" key="ipaddr" label="IP地址" prop="ipaddr" min-width="150" show-overflow-tooltip>
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'selection')?.show"
+          type="selection"
+          min-width="55"
+          align="center"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'index')?.show"
+          type="index"
+          fixed
+          label="序号"
+          min-width="60"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'session_id')?.show"
+          key="session_id"
+          label="会话编号"
+          prop="session_id"
+          min-width="250"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'login_type')?.show"
+          key="login_type"
+          label="登录类型"
+          prop="login_type"
+          min-width="100"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'ipaddr')?.show"
+          key="ipaddr"
+          label="IP地址"
+          prop="ipaddr"
+          min-width="150"
+          show-overflow-tooltip
+        >
           <template #default="scope">
             <el-text>{{ scope.row.ipaddr }}</el-text>
             <CopyButton v-if="scope.row.ipaddr" :text="scope.row.ipaddr" style="margin-left: 2px" />
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'name')?.show" key="name" label="用户名" prop="name" min-width="80" show-overflow-tooltip />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'user_name')?.show" key="user_name" label="账号" prop="user_name" min-width="80" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'login_location')?.show" key="login_location" label="登录位置" prop="login_location" min-width="280" show-overflow-tooltip/>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'os')?.show" key="os" label="操作系统" prop="os" min-width="120" show-overflow-tooltip />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'login_time')?.show" key="login_time" label="登录时间" prop="login_time" min-width="180" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'operation')?.show" key="operation" fixed="right" label="操作" min-width="100">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'name')?.show"
+          key="name"
+          label="用户名"
+          prop="name"
+          min-width="80"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'user_name')?.show"
+          key="user_name"
+          label="账号"
+          prop="user_name"
+          min-width="80"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'login_location')?.show"
+          key="login_location"
+          label="登录位置"
+          prop="login_location"
+          min-width="280"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'os')?.show"
+          key="os"
+          label="操作系统"
+          prop="os"
+          min-width="120"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'login_time')?.show"
+          key="login_time"
+          label="登录时间"
+          prop="login_time"
+          min-width="180"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'operation')?.show"
+          key="operation"
+          fixed="right"
+          label="操作"
+          min-width="100"
+        >
           <template #default="scope">
-            <el-button v-hasPerm="['module_monitor:online:force_logout']" type="danger" size="small" link icon="delete" @click="handleSubmit(scope.row.session_id)">强退
+            <el-button
+              v-hasPerm="['module_monitor:online:force_logout']"
+              type="danger"
+              size="small"
+              link
+              icon="delete"
+              @click="handleSubmit(scope.row.session_id)"
+            >
+              强退
             </el-button>
           </template>
         </el-table-column>
@@ -97,12 +217,15 @@
 
       <!-- 分页区域 -->
       <template #footer>
-        <pagination v-model:total="total" v-model:page="queryFormData.page_no" v-model:limit="queryFormData.page_size" @pagination="loadingData" />
+        <pagination
+          v-model:total="total"
+          v-model:page="queryFormData.page_no"
+          v-model:limit="queryFormData.page_size"
+          @pagination="loadingData"
+        />
       </template>
     </el-card>
-
   </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -111,7 +234,10 @@ defineOptions({
   inheritAttrs: false,
 });
 
-import OnlineAPI, { type OnlineUserPageQuery, type OnlineUserTable } from "@/api/module_monitor/online";
+import OnlineAPI, {
+  type OnlineUserPageQuery,
+  type OnlineUserTable,
+} from "@/api/module_monitor/online";
 
 const queryFormRef = ref();
 const total = ref(0);
@@ -121,20 +247,19 @@ const loading = ref(false);
 // 分页表单
 const pageTableData = ref<OnlineUserTable[]>([]);
 
-
 // 表格列配置
 const tableColumns = ref([
-  { label: '选择框', prop: 'selection', show: true },
-  { label: '序号', prop: 'index', show: true },
-  { label: '会话编号', prop: 'session_id', show: true },
-  { label: '登录类型', prop: 'login_type', show: true },
-  { label: '登录名称', prop: 'name', show: true },
-  { label: '用户账号', prop: 'user_name', show: true },
-  { label: '主机', prop: 'ipaddr', show: true },
-  { label: '登录地点', prop: 'login_location', show: true },
-  { label: '操作系统', prop: 'os', show: true },
-  { label: '登录时间', prop: 'login_time', show: true },
-  { label: '操作', prop: 'operation', show: true }
+  { label: "选择框", prop: "selection", show: true },
+  { label: "序号", prop: "index", show: true },
+  { label: "会话编号", prop: "session_id", show: true },
+  { label: "登录类型", prop: "login_type", show: true },
+  { label: "登录名称", prop: "name", show: true },
+  { label: "用户账号", prop: "user_name", show: true },
+  { label: "主机", prop: "ipaddr", show: true },
+  { label: "登录地点", prop: "login_location", show: true },
+  { label: "操作系统", prop: "os", show: true },
+  { label: "登录时间", prop: "login_time", show: true },
+  { label: "操作", prop: "operation", show: true },
 ]);
 
 // 分页查询参数
@@ -143,13 +268,13 @@ const queryFormData = reactive<OnlineUserPageQuery>({
   page_size: 10,
   name: undefined,
   login_location: undefined,
-  ipaddr: undefined
+  ipaddr: undefined,
 });
 
 // 列表刷新
-async function handleRefresh () {
+async function handleRefresh() {
   await loadingData();
-};
+}
 
 // 加载表格数据
 async function loadingData() {
@@ -158,11 +283,9 @@ async function loadingData() {
     const response = await OnlineAPI.getOnlineList(queryFormData);
     pageTableData.value = response.data.data.items;
     total.value = response.data.data.total;
-  }
-  catch (error: any) {
+  } catch (error: any) {
     console.error(error);
-  }
-  finally {
+  } finally {
     loading.value = false;
   }
 }
@@ -191,19 +314,21 @@ async function handleSubmit(session_id: string) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await OnlineAPI.deleteOnline(session_id);
-      handleResetQuery();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
+  })
+    .then(async () => {
+      try {
+        loading.value = true;
+        await OnlineAPI.deleteOnline(session_id);
+        handleResetQuery();
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 
 // 强退所有
@@ -212,19 +337,21 @@ async function handleClear() {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await OnlineAPI.clearOnline();
-      handleResetQuery();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
+  })
+    .then(async () => {
+      try {
+        loading.value = true;
+        await OnlineAPI.clearOnline();
+        handleResetQuery();
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 onMounted(() => {
   loadingData();

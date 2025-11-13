@@ -1,5 +1,5 @@
 // 问候语：根据当前小时返回不同问候语
-export function greetings () {
+export function greetings() {
   // 当前时间（用于计算问候语）
   const currentDate = new Date();
   const hours = currentDate.getHours();
@@ -16,7 +16,7 @@ export function greetings () {
   } else {
     return "偷偷向银河要了一把碎星，只等你闭上眼睛撒入你的梦中，晚安🌛！";
   }
-};
+}
 
 export function getRangeDate(startDate: string | number | Date, endDate: string | number | Date) {
   const targetArr = [];
@@ -37,27 +37,19 @@ export function getRangeDate(startDate: string | number | Date, endDate: string 
     if (startDateInfo.month !== endDateInfo.month) {
       //同年，不同月份
       //获取开始时间所在月的月底日期
-      const startMax = new Date(
-        startDateInfo.year,
-        startDateInfo.month,
-        0
-      ).getDate();
+      const startMax = new Date(startDateInfo.year, startDateInfo.month, 0).getDate();
       const endNum = startMax - startDateInfo.day + endDateInfo.day;
       for (let i = startDateInfo.day; i <= startDateInfo.day + endNum; i++) {
         if (i > startMax) {
           targetArr.push(
             `${endDateInfo.year}-${
-              endDateInfo.month < 10
-                ? "0" + endDateInfo.month
-                : endDateInfo.month
+              endDateInfo.month < 10 ? "0" + endDateInfo.month : endDateInfo.month
             }-${i - startMax < 10 ? "0" + (i - startMax) : i - startMax}`
           );
         } else {
           targetArr.push(
             `${startDateInfo.year}-${
-              startDateInfo.month < 10
-                ? "0" + startDateInfo.month
-                : startDateInfo.month
+              startDateInfo.month < 10 ? "0" + startDateInfo.month : startDateInfo.month
             }-${i < 10 ? "0" + i : i}`
           );
         }
@@ -67,20 +59,14 @@ export function getRangeDate(startDate: string | number | Date, endDate: string 
       for (let i = startDateInfo.day; i <= endDateInfo.day; i++) {
         targetArr.push(
           `${startDateInfo.year}-${
-            startDateInfo.month < 10
-              ? "0" + startDateInfo.month
-              : startDateInfo.month
+            startDateInfo.month < 10 ? "0" + startDateInfo.month : startDateInfo.month
           }-${i < 10 ? "0" + i : i}`
         );
       }
     }
   } else {
     //不同年   【既然不同年那肯定也不同月】
-    const startMax = new Date(
-      startDateInfo.year,
-      startDateInfo.month,
-      0
-    ).getDate();
+    const startMax = new Date(startDateInfo.year, startDateInfo.month, 0).getDate();
     const endNum = startMax - startDateInfo.day + endDateInfo.day;
     for (let i = startDateInfo.day; i <= startDateInfo.day + endNum; i++) {
       if (i > startMax) {
@@ -92,9 +78,7 @@ export function getRangeDate(startDate: string | number | Date, endDate: string 
       } else {
         targetArr.push(
           `${startDateInfo.year}-${
-            startDateInfo.month < 10
-              ? "0" + startDateInfo.month
-              : startDateInfo.month
+            startDateInfo.month < 10 ? "0" + startDateInfo.month : startDateInfo.month
           }-${i < 10 ? "0" + i : i}`
         );
       }
@@ -131,17 +115,17 @@ export function listToTree(list: any[]) {
 
 // 加载部门选项
 export function formatTree(nodes: any[]): any[] {
-  return nodes.map(node => {
+  return nodes.map((node) => {
     const formattedNode = {
       value: node.id,
       label: node.name,
-      disabled: node.status === false || String(node.status) === 'false'
+      disabled: node.status === false || String(node.status) === "false",
     };
-    
+
     if (node.children && node.children.length > 0) {
       Object.assign(formattedNode, { children: formatTree(node.children) });
     }
-    
+
     return formattedNode;
   });
 }
@@ -160,6 +144,5 @@ export function isEmpty(obj: string | null | undefined) {
 
 // 验证是否为blob格式
 export function blobValidate(data: Blob): boolean {
-  return data.type !== 'application/json'
+  return data.type !== "application/json";
 }
-

@@ -117,7 +117,6 @@ const JobAPI = {
       responseType: "blob",
     });
   },
-
 };
 
 export default JobAPI;

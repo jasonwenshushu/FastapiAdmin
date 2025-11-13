@@ -58,51 +58,53 @@ const topMenus = ref<RouteRecordRaw[]>([]);
 
 // 处理后的顶部菜单列表 - 智能显示唯一子菜单的标题
 const processedTopMenus = computed(() => {
-  return topMenus.value
-    .map((route) => {
-      // 如果路由本身设置了hidden=true，直接返回null
-      if (route.meta?.hidden === true) {
-        return null;
-      }
-
-      // 如果路由设置了 alwaysShow=true，或者没有子菜单，直接返回原路由
-      if (route.meta?.alwaysShow || !route.children || route.children.length === 0) {
-        return route;
-      }
-
-      // 过滤出非隐藏的子菜单
-      const visibleChildren = route.children.filter((child) => !child.meta?.hidden);
-
-      // 如果没有可见子菜单，返回null
-      if (visibleChildren.length === 0) {
-        return null;
-      }
-
-      // 如果只有一个非隐藏的子菜单，显示子菜单的信息
-      if (visibleChildren.length === 1) {
-        const onlyChild = visibleChildren[0];
-        // 检查子菜单是否应该显示在顶部菜单
-        if (onlyChild.meta?.hidden !== true) {
-          return {
-            ...route,
-            meta: {
-              ...route.meta,
-              title: onlyChild.meta?.title || route.meta?.title,
-              icon: onlyChild.meta?.icon || route.meta?.icon,
-            },
-            // 使用子菜单的path确保路由匹配正确
-            path: onlyChild.path
-          };
+  return (
+    topMenus.value
+      .map((route) => {
+        // 如果路由本身设置了hidden=true，直接返回null
+        if (route.meta?.hidden === true) {
+          return null;
         }
-        // 如果子菜单应该隐藏，则不显示该顶级菜单
-        return null;
-      }
 
-      // 其他情况返回原路由
-      return route;
-    })
-    // 过滤掉null值
-    .filter((route) => route !== null);
+        // 如果路由设置了 alwaysShow=true，或者没有子菜单，直接返回原路由
+        if (route.meta?.alwaysShow || !route.children || route.children.length === 0) {
+          return route;
+        }
+
+        // 过滤出非隐藏的子菜单
+        const visibleChildren = route.children.filter((child) => !child.meta?.hidden);
+
+        // 如果没有可见子菜单，返回null
+        if (visibleChildren.length === 0) {
+          return null;
+        }
+
+        // 如果只有一个非隐藏的子菜单，显示子菜单的信息
+        if (visibleChildren.length === 1) {
+          const onlyChild = visibleChildren[0];
+          // 检查子菜单是否应该显示在顶部菜单
+          if (onlyChild.meta?.hidden !== true) {
+            return {
+              ...route,
+              meta: {
+                ...route.meta,
+                title: onlyChild.meta?.title || route.meta?.title,
+                icon: onlyChild.meta?.icon || route.meta?.icon,
+              },
+              // 使用子菜单的path确保路由匹配正确
+              path: onlyChild.path,
+            };
+          }
+          // 如果子菜单应该隐藏，则不显示该顶级菜单
+          return null;
+        }
+
+        // 其他情况返回原路由
+        return route;
+      })
+      // 过滤掉null值
+      .filter((route) => route !== null)
+  );
 });
 
 /**

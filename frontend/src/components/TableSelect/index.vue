@@ -35,7 +35,7 @@
       <!-- 弹出框内容 -->
       <div ref="popoverContentRef">
         <!-- 表单 -->
-        <el-form ref="formRef" :model="queryParams" :inline="true" >
+        <el-form ref="formRef" :model="queryParams" :inline="true">
           <template v-for="item in selectConfig.formItems" :key="item.prop">
             <el-form-item :label="item.label" :prop="item.prop">
               <!-- Input 输入框 -->
@@ -156,7 +156,9 @@ export interface ISelectConfig<T = any> {
   // 占位符
   placeholder?: string;
   // popover组件属性
-  popover?: Partial<Omit<PopoverProps, "visible" | "v-model:visible">> & { width?: number | string };
+  popover?: Partial<Omit<PopoverProps, "visible" | "v-model:visible">> & {
+    width?: number | string;
+  };
   // 列表的网络请求函数(需返回promise)
   indexAction: (_queryParams: T) => Promise<any>;
   // 主键名(跨页选择必填,默认为id)

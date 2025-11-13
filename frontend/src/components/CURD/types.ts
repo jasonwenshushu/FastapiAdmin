@@ -19,8 +19,23 @@ export type IObject = Record<string, any>;
  */
 type DateComponent = "date-picker" | "time-picker" | "time-select" | "custom-tag" | "input-tag";
 type InputComponent = "input" | "select" | "input-number" | "cascader" | "tree-select";
-type OtherComponent = "text" | "radio" | "checkbox" | "switch" | "icon-select" | "custom";
-export type ISearchComponent = DateComponent | InputComponent;
+type OtherComponent =
+  | "text"
+  | "radio"
+  | "checkbox"
+  | "switch"
+  | "rate"
+  | "slider"
+  | "icon-select"
+  | "custom";
+export type ISearchComponent =
+  | DateComponent
+  | InputComponent
+  | "radio"
+  | "checkbox"
+  | "switch"
+  | "rate"
+  | "slider";
 export type IComponentType = DateComponent | InputComponent | OtherComponent;
 
 /**
@@ -87,6 +102,33 @@ export interface ISearchConfig {
   form?: IForm;
   /** 自适应网格布局(使用时表单不要添加 style: { width: "200px" }) */
   grid?: boolean | "left" | "right";
+  /** 自定义组件映射 */
+  customComponents?: Record<string, any>;
+  /** 是否显示搜索按钮(默认：true) */
+  showSearchButton?: boolean;
+  /** 是否显示重置按钮(默认：true) */
+  showResetButton?: boolean;
+  /** 搜索按钮权限 */
+  searchButtonPerm?: string | string[];
+  /** 重置按钮权限 */
+  resetButtonPerm?: string | string[];
+  /** 是否显示搜索区域切换按钮(默认：false) */
+  showToggle?: boolean;
+  /** 搜索区域切换按钮权限 */
+  togglePerm?: string | string[];
+  /** 自定义按钮组 */
+  customButtons?: Array<{
+    /** 按钮唯一标识 */
+    key: string;
+    /** 按钮文本 */
+    text: string;
+    /** 按钮属性 */
+    attrs?: IObject;
+    /** 按钮权限 */
+    perm?: string | string[];
+    /** 点击事件处理函数 */
+    handler?: (params: IObject, instance: any) => void;
+  }>;
 }
 
 /**
@@ -105,13 +147,13 @@ export interface IContentConfig<T = any> {
   pagePosition?: "left" | "right";
   /** pagination组件属性 */
   pagination?:
-  | boolean
-  | Partial<
-    Omit<
-      PaginationProps,
-      "v-model:page-size" | "v-model:current-page" | "total" | "currentPage"
-    >
-  >;
+    | boolean
+    | Partial<
+        Omit<
+          PaginationProps,
+          "v-model:page-size" | "v-model:current-page" | "total" | "currentPage"
+        >
+      >;
   /** 列表的网络请求函数(需返回promise) */
   indexAction: (queryParams: T) => Promise<any>;
   /** 默认的分页相关的请求参数 */
@@ -173,17 +215,17 @@ export interface IContentConfig<T = any> {
     show?: boolean;
     /** 模板类型 */
     templet?:
-    | "image"
-    | "list"
-    | "url"
-    | "switch"
-    | "input"
-    | "price"
-    | "percent"
-    | "icon"
-    | "date"
-    | "tool"
-    | "custom";
+      | "image"
+      | "list"
+      | "url"
+      | "switch"
+      | "input"
+      | "price"
+      | "percent"
+      | "icon"
+      | "date"
+      | "tool"
+      | "custom";
     /** image模板相关参数 */
     imageWidth?: number;
     /** image模板相关参数 */
@@ -270,7 +312,7 @@ export type IFormItems<T = IComponentType> = Array<{
   /** 属性 */
   attrs?: IObject;
   /** 选项 */
-  options?: Array<{ label: string; value: any;[key: string]: any }> | Ref<any[]>;
+  options?: Array<{ label: string; value: any; [key: string]: any }> | Ref<any[]>;
   /** 规则 */
   rules?: FormItemRule[];
   /** 初始值 */

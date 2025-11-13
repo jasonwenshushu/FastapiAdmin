@@ -60,61 +60,61 @@ export function formatGrowthRate(growthRate: number) {
 //表单生成相关
 
 export function isNumberStr(str: string): boolean {
-  return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
+  return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str);
 }
 
 export function titleCase(str: string): string {
-  return str.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) { return str.toUpperCase(); })
+  return str.replace(/([A-Z])/g, " $1").replace(/^./, function (str) {
+    return str.toUpperCase();
+  });
 }
- 
+
 export function makeMap(str: string, expectsLowerCase?: boolean) {
-  const map = Object.create(null)
-  const list = str.split(',')
+  const map = Object.create(null);
+  const list = str.split(",");
   for (let i = 0; i < list.length; i++) {
-    map[list[i]] = true
+    map[list[i]] = true;
   }
-  return expectsLowerCase
-    ? (val: string) => map[val.toLowerCase()]
-    : (val: string) => map[val]
+  return expectsLowerCase ? (val: string) => map[val.toLowerCase()] : (val: string) => map[val];
 }
 
 export const beautifierConf = {
   html: {
-    indent_size: '2',
-    indent_char: ' ',
-    max_preserve_newlines: '-1',
+    indent_size: "2",
+    indent_char: " ",
+    max_preserve_newlines: "-1",
     preserve_newlines: false,
     keep_array_indentation: false,
     break_chained_methods: false,
-    indent_scripts: 'separate',
-    brace_style: 'end-expand',
+    indent_scripts: "separate",
+    brace_style: "end-expand",
     space_before_conditional: true,
     unescape_strings: false,
     jslint_happy: false,
     end_with_newline: true,
-    wrap_line_length: '110',
+    wrap_line_length: "110",
     indent_inner_html: true,
     comma_first: false,
     e4x: true,
-    indent_empty_lines: true
+    indent_empty_lines: true,
   },
   js: {
-    indent_size: '2',
-    indent_char: ' ',
-    max_preserve_newlines: '-1',
+    indent_size: "2",
+    indent_char: " ",
+    max_preserve_newlines: "-1",
     preserve_newlines: false,
     keep_array_indentation: false,
     break_chained_methods: false,
-    indent_scripts: 'normal',
-    brace_style: 'end-expand',
+    indent_scripts: "normal",
+    brace_style: "end-expand",
     space_before_conditional: true,
     unescape_strings: false,
     jslint_happy: true,
     end_with_newline: true,
-    wrap_line_length: '110',
+    wrap_line_length: "110",
     indent_inner_html: true,
     comma_first: false,
     e4x: true,
-    indent_empty_lines: true
-  }
-}
+    indent_empty_lines: true,
+  },
+};

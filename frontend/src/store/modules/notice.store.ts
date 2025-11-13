@@ -15,7 +15,9 @@ export const useNoticeStore = defineStore("notice", {
       const items = response.data.data.items || [];
       // 过滤掉已读的通知
       const readSet = new Set(this.readIds);
-      const filtered = items.filter((item) => item.id !== undefined && !readSet.has(item.id as number));
+      const filtered = items.filter(
+        (item) => item.id !== undefined && !readSet.has(item.id as number)
+      );
       this.noticeList = filtered;
       this.total = filtered.length;
       this.isNoticeLoaded = true;
@@ -32,13 +34,17 @@ export const useNoticeStore = defineStore("notice", {
     },
     // 标记当前列表全部为已读
     markAllAsRead(ids: number[] = []) {
-      const targets = ids.length ? ids : this.noticeList.map((item) => item.id!).filter((id): id is number => id !== undefined);
+      const targets = ids.length
+        ? ids
+        : this.noticeList.map((item) => item.id!).filter((id): id is number => id !== undefined);
       const readSet = new Set(this.readIds);
       targets.forEach((id) => {
         if (!readSet.has(id)) this.readIds.push(id);
       });
       // 同步过滤当前列表
-      this.noticeList = this.noticeList.filter((item) => item.id !== undefined && !this.readIds.includes(item.id as number));
+      this.noticeList = this.noticeList.filter(
+        (item) => item.id !== undefined && !this.readIds.includes(item.id as number)
+      );
       this.total = this.noticeList.length;
     },
     clearUserInfo() {

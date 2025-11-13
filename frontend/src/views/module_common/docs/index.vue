@@ -11,13 +11,11 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const url = ref(import.meta.env.VITE_APP_BASE_API + "/docs")
+const url = ref(import.meta.env.VITE_APP_BASE_API + "/docs");
 
 onBeforeUnmount(() => {
-    window.onresize = null;
-})
+  window.onresize = null;
+});
 </script>
 
-
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

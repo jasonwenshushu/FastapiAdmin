@@ -2,9 +2,9 @@
 <template>
   <div class="internal-app-container">
     <div class="internal-app-content">
-      <iframe 
+      <iframe
         ref="iframeRef"
-        :src="appUrl" 
+        :src="appUrl"
         class="internal-app-iframe"
         frameborder="0"
         allowfullscreen
@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { Loading } from '@element-plus/icons-vue';
-import { useTagsViewStore } from '@/store';
+import { useRoute } from "vue-router";
+import { Loading } from "@element-plus/icons-vue";
+import { useTagsViewStore } from "@/store";
 
 defineOptions({
   name: "InternalApp",
@@ -45,19 +45,22 @@ function handleIframeLoad() {
 }
 
 // 监听路由变化，更新iframe
-watch(() => route.query.url, (newUrl) => {
-  if (newUrl && iframeRef.value) {
-    loading.value = true;
-    iframeRef.value.src = newUrl as string;
+watch(
+  () => route.query.url,
+  (newUrl) => {
+    if (newUrl && iframeRef.value) {
+      loading.value = true;
+      iframeRef.value.src = newUrl as string;
+    }
   }
-});
+);
 
 // 在组件挂载时设置标签标题
 onMounted(() => {
   if (appName.value) {
     // 查找当前标签并更新标题
     nextTick(() => {
-      const currentTag = tagsViewStore.visitedViews.find(tag => tag.path === route.path);
+      const currentTag = tagsViewStore.visitedViews.find((tag) => tag.path === route.path);
       if (currentTag && currentTag.title !== appName.value) {
         tagsViewStore.updateVisitedView({
           ...currentTag,
@@ -71,19 +74,22 @@ onMounted(() => {
 });
 
 // 监听应用名称变化，更新标签标题
-watch(() => appName.value, (newAppName) => {
-  if (newAppName) {
-    const currentTag = tagsViewStore.visitedViews.find(tag => tag.path === route.path);
-    if (currentTag) {
-      tagsViewStore.updateVisitedView({
-        ...currentTag,
-        title: newAppName,
-        fullPath: route.fullPath,
-        query: route.query,
-      });
+watch(
+  () => appName.value,
+  (newAppName) => {
+    if (newAppName) {
+      const currentTag = tagsViewStore.visitedViews.find((tag) => tag.path === route.path);
+      if (currentTag) {
+        tagsViewStore.updateVisitedView({
+          ...currentTag,
+          title: newAppName,
+          fullPath: route.fullPath,
+          query: route.query,
+        });
+      }
     }
   }
-});
+);
 </script>
 
 <style lang="scss" scoped>
@@ -118,13 +124,13 @@ watch(() => appName.value, (newAppName) => {
   align-items: center;
   background: var(--el-bg-color);
   gap: 12px;
-  
+
   .loading-icon {
     font-size: 24px;
     color: var(--el-color-primary);
     animation: rotate 2s linear infinite;
   }
-  
+
   span {
     color: var(--el-text-color-regular);
     font-size: 14px;

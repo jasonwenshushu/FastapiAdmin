@@ -24,5 +24,4 @@ export const enum ResultEnum {
    * 令牌已过期
    */
   TOKEN_EXPIRED = 10401,
-
 }

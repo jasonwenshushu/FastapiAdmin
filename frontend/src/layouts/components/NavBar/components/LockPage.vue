@@ -1,24 +1,22 @@
 <template>
   <div class="lockpage">
-    <div
-      v-show="showDate"
-      class="unlock-container"
-      @click="handleShowForm(false)"
-    >
+    <div v-show="showDate" class="unlock-container" @click="handleShowForm(false)">
       <el-icon><Lock /></el-icon>
-      <span>{{ t('lock.unlock') }}</span>
+      <span>{{ t("lock.unlock") }}</span>
     </div>
 
     <div class="time-container w-screen h-screen">
       <div class="hour-container mr-5 md:mr-20 w-2/5 h-2/5 md:h-4/5">
         <span>{{ hour }}</span>
-        <span v-show="showDate" class="meridiem  absolute left-5 top-5 text-md xl:text-xl">{{ meridiem }}</span>
+        <span v-show="showDate" class="meridiem absolute left-5 top-5 text-md xl:text-xl">
+          {{ meridiem }}
+        </span>
       </div>
       <div class="minute-container w-2/5 h-2/5 md:h-4/5">
         <span>{{ minute }}</span>
       </div>
     </div>
-    
+
     <transition name="fade-slide">
       <div v-show="!showDate" class="entry-wrapper">
         <div class="entry-content">
@@ -36,7 +34,7 @@
             @keydown.enter="unLock"
           />
           <span v-if="errMsg" class="error-message">
-            {{ t('lock.message') }}
+            {{ t("lock.message") }}
           </span>
           <div class="button-group">
             <el-button
@@ -47,7 +45,7 @@
               :disabled="loading"
               @click="handleShowForm(true)"
             >
-              {{ t('common.back') }}
+              {{ t("common.back") }}
             </el-button>
             <el-button
               type="primary"
@@ -57,7 +55,7 @@
               :disabled="loading"
               @click="goLogin"
             >
-              {{ t('lock.backToLogin') }}
+              {{ t("lock.backToLogin") }}
             </el-button>
             <el-button
               type="primary"
@@ -67,7 +65,7 @@
               :disabled="loading"
               @click="unLock()"
             >
-              {{ t('lock.entrySystem') }}
+              {{ t("lock.entrySystem") }}
             </el-button>
           </div>
         </div>
@@ -76,78 +74,73 @@
 
     <div class="date-container">
       <div v-show="!showDate" class="time-display">
-        {{ hour }}:{{ minute }} <span class="meridiem-display">{{ meridiem }}</span>
+        {{ hour }}:{{ minute }}
+        <span class="meridiem-display">{{ meridiem }}</span>
       </div>
       <div class="full-date">{{ year }}/{{ month }}/{{ day }} {{ week }}</div>
     </div>
   </div>
 </template>
 
-
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useUserStore, useLockStore } from "@/store";
-import { ElInput } from 'element-plus';
-import { useNow } from '@/utils/dateUtil'
-import { useTagsViewStore } from '@/store'
-
+import { ElInput } from "element-plus";
+import { useNow } from "@/utils/dateUtil";
+import { useTagsViewStore } from "@/store";
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
-const tagsViewStore = useTagsViewStore()
+const tagsViewStore = useTagsViewStore();
 
+const { replace } = useRouter();
 
-const { replace } = useRouter()
+const password = ref("");
+const loading = ref(false);
+const errMsg = ref(false);
+const showDate = ref(true);
 
-const password = ref('')
-const loading = ref(false)
-const errMsg = ref(false)
-const showDate = ref(true)
+const lockStore = useLockStore();
 
+const { hour, month, minute, meridiem, year, day, week } = useNow(true);
 
-const lockStore = useLockStore()
-
-const { hour, month, minute, meridiem, year, day, week } = useNow(true)
-
-const { t } = useI18n()
+const { t } = useI18n();
 
 // 解锁
 async function unLock() {
   if (!password.value) {
-    return
+    return;
   }
-  const pwd = password.value
+  const pwd = password.value;
   try {
-    loading.value = true
-    const res = await lockStore.unLock(pwd)
-    errMsg.value = !res
+    loading.value = true;
+    const res = await lockStore.unLock(pwd);
+    errMsg.value = !res;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 // 返回登录
 async function goLogin() {
-  await userStore.logout().catch(() => {})
-  userStore.resetAllState()
-  tagsViewStore.delAllViews()
+  await userStore.logout().catch(() => {});
+  userStore.resetAllState();
+  tagsViewStore.delAllViews();
   router.push(`/login?redirect=${route.fullPath}`);
-  lockStore.resetLockInfo()
-  replace('/login')
+  lockStore.resetLockInfo();
+  replace("/login");
 }
 
-
-
-const passwordInputRef = ref<InstanceType<typeof ElInput>>()
+const passwordInputRef = ref<InstanceType<typeof ElInput>>();
 
 function handleShowForm(show = false) {
-  showDate.value = show
+  showDate.value = show;
   if (!show) {
     requestAnimationFrame(() => {
-      passwordInputRef.value?.focus()
-    })
+      passwordInputRef.value?.focus();
+    });
   }
 }
 </script>
@@ -160,7 +153,7 @@ function handleShowForm(show = false) {
   left: 0;
   inset: 0;
   display: flex;
-  width: 100%;;
+  width: 100%;
   height: 100%;
   background-color: black;
   backdrop-filter: blur(8px);
@@ -193,7 +186,6 @@ function handleShowForm(show = false) {
     }
   }
 
-
   .time-container {
     display: flex;
     justify-content: center;
@@ -214,7 +206,7 @@ function handleShowForm(show = false) {
       align-items: center;
       font-size: 220px;
     }
-    
+
     .minute-container {
       display: flex;
       justify-content: center;
@@ -239,7 +231,6 @@ function handleShowForm(show = false) {
     top: 1.25rem;
     font-size: 1.25rem;
   }
-
 
   .entry-wrapper {
     position: absolute;
@@ -313,11 +304,11 @@ function handleShowForm(show = false) {
     width: 100%;
     color: #d1d5db;
     text-align: center;
-    
+
     @media (min-width: 1280px) {
       font-size: 1.25rem;
     }
-    
+
     @media (min-width: 1536px) {
       font-size: 1.875rem;
     }
@@ -326,7 +317,7 @@ function handleShowForm(show = false) {
   .time-display {
     font-size: 3rem;
     margin-bottom: 1rem;
-    
+
     .meridiem-display {
       font-size: 1.875rem;
     }

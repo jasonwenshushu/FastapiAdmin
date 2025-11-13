@@ -1,11 +1,14 @@
 <template>
-  <el-result :title="t('error.pageError')" sub-title="请确认页面网址是否正确，或者点击下方按钮返回首页。">
+  <el-result
+    :title="t('error.pageError')"
+    sub-title="请确认页面网址是否正确，或者点击下方按钮返回首页。"
+  >
     <template #icon>
       <!-- 此处必须img，如果是el-icon则无法识别 @ -->
       <img class="min-w-[23.4375rem] sm:w-120" src="@/assets/images/404.svg" alt="404" />
     </template>
     <template #extra>
-      <el-button round type="primary" @click="back">{{ t('error.returnToHome') }}</el-button>
+      <el-button round type="primary" @click="back">{{ t("error.returnToHome") }}</el-button>
     </template>
   </el-result>
 </template>

@@ -1,4 +1,4 @@
-  <!-- 布局大小 -->
+<!-- 布局大小 -->
 <template>
   <el-tooltip :content="t('sizeSelect.tooltip')" effect="dark" placement="bottom">
     <el-dropdown trigger="click" @command="handleSizeChange">

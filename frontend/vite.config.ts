@@ -193,7 +193,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         "element-plus/es/components/button-group/style/index",
         "element-plus/es/components/result/style/index",
         "element-plus/es/components/checkbox-button/style/index",
-        "element-plus/es/components/space/style/index"
+        "element-plus/es/components/space/style/index",
       ],
     },
     // 构建配置
@@ -219,29 +219,29 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           //   "vue-i18n": ["vue-i18n"],
           // },
           manualChunks(id) {
-            if (id.includes('node_modules')) {
+            if (id.includes("node_modules")) {
               // 针对大型库进行单独拆分
-              if (id.includes('echarts')) {
-                return 'echarts';
+              if (id.includes("echarts")) {
+                return "echarts";
               }
-              if (id.includes('element-plus')) {
-                return 'element-plus';
+              if (id.includes("element-plus")) {
+                return "element-plus";
               }
-              if (id.includes('@wangeditor-next')) {
-                return 'wangeditor';
+              if (id.includes("@wangeditor-next")) {
+                return "wangeditor";
               }
-              if (id.includes('codemirror')) {
-                return 'codemirror';
+              if (id.includes("codemirror")) {
+                return "codemirror";
               }
-              if (id.includes('exceljs')) {
-                return 'exceljs';
+              if (id.includes("exceljs")) {
+                return "exceljs";
               }
-              
+
 
               // 其他模块保持当前拆分方式
-              const module = id.toString().split('node_modules/')[1].split('/')[0]
-              if (['birpc', 'hookable'].includes(module)) return
-              return module
+              const module = id.toString().split("node_modules/")[1].split("/")[0];
+              if (["birpc", "hookable"].includes(module)) return;
+              return module;
             }
           },
           // 用于从入口点创建的块的打包输出格式[name]表示文件名,[hash]表示该文件内容hash值

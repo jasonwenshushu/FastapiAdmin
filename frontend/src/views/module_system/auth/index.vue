@@ -1,5 +1,12 @@
 <template>
-  <div class="login-container" :style="{ 'background-image': configStore.configData?.sys_login_background?.config_value ? `url(${configStore.configData.sys_login_background.config_value})` : '/background.svg' }">
+  <div
+    class="login-container"
+    :style="{
+      'background-image': configStore.configData?.sys_login_background?.config_value
+        ? `url(${configStore.configData.sys_login_background.config_value})`
+        : '/background.svg',
+    }"
+  >
     <!-- 右侧切换主题、语言按钮  -->
     <div class="action-bar">
       <el-tooltip :content="t('login.themeToggle')" placement="bottom">
@@ -26,11 +33,17 @@
           <!-- 标题 -->
           <!-- 添加小图标用于显示提示信息 -->
           <div class="flex items-center justify-center mb-4">
-            <el-tooltip :content="configStore.configData.sys_web_description.config_value" placement="bottom">
+            <el-tooltip
+              :content="configStore.configData.sys_web_description.config_value"
+              placement="bottom"
+            >
               <el-icon class="cursor-help"><QuestionFilled /></el-icon>
             </el-tooltip>
             <div class="ml-2 text-xl font-bold">
-              <el-badge :value="`v ${configStore.configData.sys_web_version.config_value}`" type="success">
+              <el-badge
+                :value="`v ${configStore.configData.sys_web_version.config_value}`"
+                type="success"
+              >
                 {{ configStore.configData.sys_web_title.config_value }}
               </el-badge>
             </div>
@@ -50,7 +63,9 @@
       </div>
       <!-- 登录页底部版权 -->
       <el-text size="small" class="py-2.5! fixed bottom-0 text-center">
-        <a :href="configStore.configData.sys_git_code.config_value" target="_blank">{{ configStore.configData.sys_web_copyright.config_value }} |</a>
+        <a :href="configStore.configData.sys_git_code.config_value" target="_blank">
+          {{ configStore.configData.sys_web_copyright.config_value }} |
+        </a>
         <a :href="configStore.configData.sys_help_doc.config_value" target="_blank">帮助 |</a>
         <a :href="configStore.configData.sys_web_privacy.config_value" target="_blank">隐私 |</a>
         <a :href="configStore.configData.sys_web_clause.config_value" target="_blank">条款</a>
@@ -81,7 +96,10 @@ const formComponents = {
 };
 
 // 预填登录信息（通过具名 v-model 双向绑定传递）
-const loginPreset = reactive<{ username: string; password: string }>({ username: "admin", password: "123456" });
+const loginPreset = reactive<{ username: string; password: string }>({
+  username: "admin",
+  password: "123456",
+});
 
 onMounted(() => {
   configStore.getConfig();
@@ -145,6 +163,4 @@ onMounted(() => {
   opacity: 0;
   transform: translateX(30px);
 }
-
-
 </style>

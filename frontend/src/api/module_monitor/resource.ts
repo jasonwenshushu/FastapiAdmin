@@ -15,7 +15,6 @@ export const ResourceAPI = {
     });
   },
 
-
   /**
    * 上传文件
    * @param formData 文件数据
@@ -117,8 +116,6 @@ export const ResourceAPI = {
 };
 
 export default ResourceAPI;
-
-
 
 /**
  * 资源列表查询参数

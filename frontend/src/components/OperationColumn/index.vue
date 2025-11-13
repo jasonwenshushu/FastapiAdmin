@@ -49,8 +49,8 @@ const calculateWidth = () => {
 
 // 计算最终宽度
 const finalWidth = computed(() => {
-  const widthNum = typeof props.width === 'number' ? props.width : Number(props.width);
-  const minWidthNum = typeof props.minWidth === 'number' ? props.minWidth : Number(props.minWidth);
+  const widthNum = typeof props.width === "number" ? props.width : Number(props.width);
+  const minWidthNum = typeof props.minWidth === "number" ? props.minWidth : Number(props.minWidth);
   return widthNum || operationWidth.value || minWidthNum;
 });
 

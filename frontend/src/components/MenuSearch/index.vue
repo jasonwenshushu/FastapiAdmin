@@ -296,7 +296,8 @@ function loadRoutes(routes: RouteRecordRaw[], parentPath = "") {
       : `${parentPath}${parentPath.endsWith("/") ? "" : "/"}${route.path}`;
 
     // 检查是否需要排除
-    if (excludedRoutes.value.includes(route.path) || isExternal(route.path) || route.meta?.hidden) return;
+    if (excludedRoutes.value.includes(route.path) || isExternal(route.path) || route.meta?.hidden)
+      return;
 
     // 处理有子路由的情况
     if (route.children) {
@@ -316,7 +317,7 @@ function loadRoutes(routes: RouteRecordRaw[], parentPath = "") {
       }
       // 递归处理子路由
       loadRoutes(route.children, path);
-    } 
+    }
     // 处理没有子路由但有title的情况
     else if (route.meta?.title) {
       const title = route.meta.title === "dashboard" ? "首页" : route.meta.title;

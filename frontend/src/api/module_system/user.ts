@@ -250,7 +250,7 @@ export interface UserForm {
   id?: number;
   username?: string;
   name?: string;
-  dept_id?:  number;
+  dept_id?: number;
   dept_name?: string;
   role_ids?: number[];
   role_names?: string[];

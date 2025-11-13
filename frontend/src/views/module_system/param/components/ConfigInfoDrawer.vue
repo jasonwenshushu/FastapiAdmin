@@ -1,6 +1,12 @@
 <template>
-  <el-drawer v-model="drawerVisible" title="配置中心" :size="drawerSize" destroy-on-close @closed="onDrawerClosed">
-    <el-tabs v-model="activeTabRef" type="border-card" >
+  <el-drawer
+    v-model="drawerVisible"
+    title="配置中心"
+    :size="drawerSize"
+    destroy-on-close
+    @closed="onDrawerClosed"
+  >
+    <el-tabs v-model="activeTabRef" type="border-card">
       <!-- 网站配置 -->
       <el-tab-pane label="网站配置" name="website">
         <el-form :model="configState" label-suffix=":" label-width="auto" label-position="right">
@@ -37,9 +43,8 @@
                 />
               </div>
             </el-form-item>
-          </div>      
+          </div>
         </el-form>
-
       </el-tab-pane>
       <el-tab-pane label="安全隐私" name="securityPrivacy">
         <el-form :model="configState" label-suffix=":" label-width="auto" label-position="right">
@@ -86,17 +91,23 @@
           <div v-for="(item, key) in apiWhitelistConfigs" :key="key">
             <el-form-item :label="item.config_name">
               <div class="space-y-2">
-                <div v-for="listItem in apiWhitelistItems" :key="listItem.id" class="flex items-center gap-2">
+                <div
+                  v-for="listItem in apiWhitelistItems"
+                  :key="listItem.id"
+                  class="flex items-center gap-2"
+                >
                   <el-input
                     v-model="listItem.value"
                     :placeholder="'/api/v1/users/get'"
                     clearable
                     @input="markModified(key)"
-                    @blur="{
-                      if (!isValidApiPath(listItem.value) && listItem.value.trim()) {
-                        ElMessage.warning('请输入有效的接口路径格式（以/开头）');
+                    @blur="
+                      {
+                        if (!isValidApiPath(listItem.value) && listItem.value.trim()) {
+                          ElMessage.warning('请输入有效的接口路径格式（以/开头）');
+                        }
                       }
-                    }"
+                    "
                   />
                   <el-button
                     type="danger"
@@ -130,18 +141,24 @@
           <div v-for="(item, key) in ipBlacklistConfigs" :key="key">
             <el-form-item :label="item.config_name">
               <div class="space-y-2">
-                <div v-for="listItem in ipBlacklistItems" :key="listItem.id" class="flex items-center gap-2">
+                <div
+                  v-for="listItem in ipBlacklistItems"
+                  :key="listItem.id"
+                  class="flex items-center gap-2"
+                >
                   <el-input
                     v-model="listItem.value"
                     :placeholder="'192.168.1.1'"
                     clearable
                     style="flex: 1"
                     @input="markModified(key)"
-                    @blur="{
-                      if (!isValidIp(listItem.value) && listItem.value.trim()) {
-                        ElMessage.warning('请输入有效的IP地址格式');
+                    @blur="
+                      {
+                        if (!isValidIp(listItem.value) && listItem.value.trim()) {
+                          ElMessage.warning('请输入有效的IP地址格式');
+                        }
                       }
-                    }"
+                    "
                   />
                   <el-button
                     type="danger"
@@ -176,17 +193,18 @@
             <el-form-item :label="item.config_name">
               <!-- 演示模式开关 -->
               <template v-if="key === 'demo_enable'">
-                  <el-switch
-                    inline-prompt
-                    active-text="启用"
-                    inactive-text="禁用"
-                    :model-value="item.config_value === 'true'"
-                    @update:model-value="(value) => {
+                <el-switch
+                  inline-prompt
+                  active-text="启用"
+                  inactive-text="禁用"
+                  :model-value="item.config_value === 'true'"
+                  @update:model-value="
+                    (value) => {
                       item.config_value = value ? 'true' : 'false';
                       markModified(key);
-                    }"
-                    
-                  />
+                    }
+                  "
+                />
                 <div class="text-xs text-gray-500 mt-1">
                   配置说明：启用后系统将进入演示模式，部分功能可能受限。
                 </div>
@@ -194,18 +212,24 @@
               <!-- IP白名单 -->
               <template v-else-if="key === 'ip_white_list'">
                 <div class="space-y-2">
-                  <div v-for="listItem in demoIpWhitelistItems" :key="listItem.id" class="flex items-center gap-2">
+                  <div
+                    v-for="listItem in demoIpWhitelistItems"
+                    :key="listItem.id"
+                    class="flex items-center gap-2"
+                  >
                     <el-input
                       v-model="listItem.value"
                       :placeholder="'192.168.1.1'"
                       clearable
                       style="flex: 1"
                       @input="markModified(key)"
-                      @blur="{
-                        if (!isValidIp(listItem.value) && listItem.value.trim()) {
-                          ElMessage.warning('请输入有效的IP地址格式');
+                      @blur="
+                        {
+                          if (!isValidIp(listItem.value) && listItem.value.trim()) {
+                            ElMessage.warning('请输入有效的IP地址格式');
+                          }
                         }
-                      }"
+                      "
                     />
                     <el-button
                       type="danger"
@@ -228,7 +252,6 @@
                     配置说明：演示模式下，只有白名单中的IP地址可以访问系统，支持单个IP配置。
                   </div>
                 </div>
-                
               </template>
               <!-- 其他配置项 -->
               <template v-else>
@@ -245,20 +268,27 @@
         </el-form>
       </el-tab-pane>
     </el-tabs>
-    <template #footer> 
+    <template #footer>
       <el-button @click="handleCloseDialog">取消</el-button>
-      <el-button v-hasPerm="['module_system:config:update']" type="primary" :disabled="!hasChanges" @click="submitChanges">保存</el-button>
+      <el-button
+        v-hasPerm="['module_system:config:update']"
+        type="primary"
+        :disabled="!hasChanges"
+        @click="submitChanges"
+      >
+        保存
+      </el-button>
     </template>
   </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue';
-import ParamsAPI, { type ConfigTable } from '@/api/module_system/params';
+import { ref, reactive, onMounted, computed } from "vue";
+import ParamsAPI, { type ConfigTable } from "@/api/module_system/params";
 import { useConfigStore } from "@/store";
-import { useI18n } from 'vue-i18n';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import SingleImageUpload from '@/components/Upload/SingleImageUpload.vue';
+import { useI18n } from "vue-i18n";
+import { ElMessage, ElMessageBox } from "element-plus";
+import SingleImageUpload from "@/components/Upload/SingleImageUpload.vue";
 import { useAppStore } from "@/store/modules/app.store";
 import { DeviceEnum } from "@/enums/settings/device.enum";
 
@@ -275,7 +305,8 @@ const generateId = () => {
 
 // IP地址验证函数
 const isValidIp = (ip: string): boolean => {
-  const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const ipRegex =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   return ipRegex.test(ip);
 };
 
@@ -283,31 +314,31 @@ const isValidIp = (ip: string): boolean => {
 const isValidApiPath = (path: string): boolean => {
   const pathRegex = /^\/[\w\-/]+$/;
   return pathRegex.test(path);
-}
+};
 
 const appStore = useAppStore();
 const drawerSize = computed(() => (appStore.device === DeviceEnum.DESKTOP ? "60%" : "60%"));
 
 const t = useI18n().t;
 const configStore = useConfigStore();
-const activeTabRef = ref('website')
+const activeTabRef = ref("website");
 
 // 与父组件的 v-model 同步
 const props = defineProps<{ modelValue: boolean }>();
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 const drawerVisible = computed({
   get: () => props.modelValue,
-  set: (val: boolean) => emit('update:modelValue', val)
+  set: (val: boolean) => emit("update:modelValue", val),
 });
 
 // 配置状态管理
 const configState = reactive<ConfigTable>({
   id: undefined,
-  config_name: '',
-  config_key: '',
-  config_value: '',
+  config_name: "",
+  config_key: "",
+  config_value: "",
   config_type: undefined,
-  description: ''
+  description: "",
 });
 
 // 记录修改过的字段
@@ -329,68 +360,72 @@ const submitChanges = async () => {
   try {
     // 准备提交数据
     // 1. 处理接口白名单
-    if ('white_api_list_path' in modifiedFields && apiWhitelistConfigs.value.white_api_list_path?.id) {
+    if (
+      "white_api_list_path" in modifiedFields &&
+      apiWhitelistConfigs.value.white_api_list_path?.id
+    ) {
       const apiWhitelistArray = apiWhitelistItems.value
-        .map(item => item.value.trim())
+        .map((item) => item.value.trim())
         .filter(Boolean);
       // 转换为JSON字符串格式保存
       const apiWhitelistJson = JSON.stringify(apiWhitelistArray);
       await ParamsAPI.updateConfig(apiWhitelistConfigs.value.white_api_list_path.id, {
         ...apiWhitelistConfigs.value.white_api_list_path,
-        config_value: apiWhitelistJson
+        config_value: apiWhitelistJson,
       });
     }
 
     // 2. 处理IP黑名单
-    if ('ip_black_list' in modifiedFields && ipBlacklistConfigs.value.ip_black_list?.id) {
+    if ("ip_black_list" in modifiedFields && ipBlacklistConfigs.value.ip_black_list?.id) {
       const ipBlacklistArray = ipBlacklistItems.value
-        .map(item => item.value.trim())
+        .map((item) => item.value.trim())
         .filter(Boolean);
       // 转换为JSON字符串格式保存
       const ipBlacklistJson = JSON.stringify(ipBlacklistArray);
       await ParamsAPI.updateConfig(ipBlacklistConfigs.value.ip_black_list.id, {
         ...ipBlacklistConfigs.value.ip_black_list,
-        config_value: ipBlacklistJson
+        config_value: ipBlacklistJson,
       });
     }
 
     // 3. 处理演示环境IP白名单
-    if ('ip_white_list' in modifiedFields && demoConfigs.value.ip_white_list?.id) {
+    if ("ip_white_list" in modifiedFields && demoConfigs.value.ip_white_list?.id) {
       const demoIpWhitelistArray = demoIpWhitelistItems.value
-        .map(item => item.value.trim())
+        .map((item) => item.value.trim())
         .filter(Boolean);
       // 转换为JSON字符串格式保存
       const demoIpWhitelistJson = JSON.stringify(demoIpWhitelistArray);
       await ParamsAPI.updateConfig(demoConfigs.value.ip_white_list.id, {
         ...demoConfigs.value.ip_white_list,
-        config_value: demoIpWhitelistJson
+        config_value: demoIpWhitelistJson,
       });
     }
 
     // 4. 处理其他配置项
-    const otherKeys = keysToSubmit.filter(key => 
-      !['white_api_list_path', 'ip_black_list', 'ip_white_list'].includes(key)
+    const otherKeys = keysToSubmit.filter(
+      (key) => !["white_api_list_path", "ip_black_list", "ip_white_list"].includes(key)
     );
-    const otherUpdatePromises = otherKeys.map(key => {
-      const item = systemConfigs.value[key as keyof typeof systemConfigs.value] || 
-                 logoConfigs.value[key as keyof typeof logoConfigs.value] ||
-                 securityPrivacyConfigs.value[key as keyof typeof securityPrivacyConfigs.value] ||
-                 userAgreementConfigs.value[key as keyof typeof userAgreementConfigs.value] ||
-                 demoConfigs.value[key as keyof typeof demoConfigs.value];
+    const otherUpdatePromises = otherKeys.map((key) => {
+      const item =
+        systemConfigs.value[key as keyof typeof systemConfigs.value] ||
+        logoConfigs.value[key as keyof typeof logoConfigs.value] ||
+        securityPrivacyConfigs.value[key as keyof typeof securityPrivacyConfigs.value] ||
+        userAgreementConfigs.value[key as keyof typeof userAgreementConfigs.value] ||
+        demoConfigs.value[key as keyof typeof demoConfigs.value];
       return item && item.id ? ParamsAPI.updateConfig(item.id, { ...item }) : Promise.resolve();
     });
     await Promise.all(otherUpdatePromises);
 
     // 清除已提交的修改标记
-    keysToSubmit.forEach(key => {
+    keysToSubmit.forEach((key) => {
       delete modifiedFields[key];
     });
-    
+
     // 重新加载配置数据
     await configStore.getConfig();
     initializeLists();
   } catch (error) {
-    console.error('保存失败:', error);
+    console.error("保存失败:", error);
   }
 };
 
@@ -398,22 +433,27 @@ const submitChanges = async () => {
 const resetForm = () => {
   // 重置动态列表
   initializeLists();
-  
+
   // 重置其他配置项
   const keysToReset = Object.keys(modifiedFields);
   for (const key of keysToReset) {
     if (systemConfigs.value[key as keyof typeof systemConfigs.value]) {
-      systemConfigs.value[key as keyof typeof systemConfigs.value].config_value = configStore.configData[key as keyof typeof configStore.configData]?.config_value || '';
+      systemConfigs.value[key as keyof typeof systemConfigs.value].config_value =
+        configStore.configData[key as keyof typeof configStore.configData]?.config_value || "";
     } else if (logoConfigs.value[key as keyof typeof logoConfigs.value]) {
-      logoConfigs.value[key as keyof typeof logoConfigs.value].config_value = configStore.configData[key as keyof typeof configStore.configData]?.config_value || '';
+      logoConfigs.value[key as keyof typeof logoConfigs.value].config_value =
+        configStore.configData[key as keyof typeof configStore.configData]?.config_value || "";
     } else if (securityPrivacyConfigs.value[key as keyof typeof securityPrivacyConfigs.value]) {
-      securityPrivacyConfigs.value[key as keyof typeof securityPrivacyConfigs.value].config_value = configStore.configData[key as keyof typeof configStore.configData]?.config_value || '';
+      securityPrivacyConfigs.value[key as keyof typeof securityPrivacyConfigs.value].config_value =
+        configStore.configData[key as keyof typeof configStore.configData]?.config_value || "";
     } else if (userAgreementConfigs.value[key as keyof typeof userAgreementConfigs.value]) {
-      userAgreementConfigs.value[key as keyof typeof userAgreementConfigs.value].config_value = configStore.configData[key as keyof typeof configStore.configData]?.config_value || '';
+      userAgreementConfigs.value[key as keyof typeof userAgreementConfigs.value].config_value =
+        configStore.configData[key as keyof typeof configStore.configData]?.config_value || "";
     } else if (demoConfigs.value[key as keyof typeof demoConfigs.value]) {
       // 除了IP白名单外的演示配置项
-      if (key !== 'ip_white_list') {
-        demoConfigs.value[key as keyof typeof demoConfigs.value].config_value = configStore.configData[key as keyof typeof configStore.configData]?.config_value || '';
+      if (key !== "ip_white_list") {
+        demoConfigs.value[key as keyof typeof demoConfigs.value].config_value =
+          configStore.configData[key as keyof typeof configStore.configData]?.config_value || "";
       }
     }
     delete modifiedFields[key];
@@ -462,130 +502,136 @@ const demoIpWhitelistItems = ref<ListItem[]>([]);
 // 从配置数据初始化列表
 const initializeLists = () => {
   // 初始化接口白名单
-  const apiWhitelistStr = configStore.configData.white_api_list_path?.config_value || '';
+  const apiWhitelistStr = configStore.configData.white_api_list_path?.config_value || "";
   try {
     // 尝试解析为JSON数组
     const apiWhitelistArray = JSON.parse(apiWhitelistStr);
     if (Array.isArray(apiWhitelistArray)) {
       apiWhitelistItems.value = apiWhitelistArray
-        .filter(item => typeof item === 'string' && item.trim())
-        .map(item => ({ id: generateId(), value: item.trim() }));
+        .filter((item) => typeof item === "string" && item.trim())
+        .map((item) => ({ id: generateId(), value: item.trim() }));
     } else {
       // 如果不是数组，回退到按换行符分割
       apiWhitelistItems.value = apiWhitelistStr
-        ? apiWhitelistStr.split('\n')
-            .filter(item => item.trim())
-            .map(item => ({ id: generateId(), value: item.trim() }))
-        : [{ id: generateId(), value: '' }];
+        ? apiWhitelistStr
+            .split("\n")
+            .filter((item) => item.trim())
+            .map((item) => ({ id: generateId(), value: item.trim() }))
+        : [{ id: generateId(), value: "" }];
     }
   } catch {
     // 解析失败，回退到按换行符分割
     apiWhitelistItems.value = apiWhitelistStr
-      ? apiWhitelistStr.split('\n')
-          .filter(item => item.trim())
-          .map(item => ({ id: generateId(), value: item.trim() }))
-      : [{ id: generateId(), value: '' }];
+      ? apiWhitelistStr
+          .split("\n")
+          .filter((item) => item.trim())
+          .map((item) => ({ id: generateId(), value: item.trim() }))
+      : [{ id: generateId(), value: "" }];
   }
 
   // 初始化IP黑名单
-  const ipBlacklistStr = configStore.configData.ip_black_list?.config_value || '';
+  const ipBlacklistStr = configStore.configData.ip_black_list?.config_value || "";
   try {
     // 尝试解析为JSON数组
     const ipBlacklistArray = JSON.parse(ipBlacklistStr);
     if (Array.isArray(ipBlacklistArray)) {
       ipBlacklistItems.value = ipBlacklistArray
-        .filter(item => typeof item === 'string' && item.trim())
-        .map(item => ({ id: generateId(), value: item.trim() }));
+        .filter((item) => typeof item === "string" && item.trim())
+        .map((item) => ({ id: generateId(), value: item.trim() }));
     } else {
       // 如果不是数组，回退到按换行符分割
       ipBlacklistItems.value = ipBlacklistStr
-        ? ipBlacklistStr.split('\n')
-            .filter(item => item.trim())
-            .map(item => ({ id: generateId(), value: item.trim() }))
-        : [{ id: generateId(), value: '' }];
+        ? ipBlacklistStr
+            .split("\n")
+            .filter((item) => item.trim())
+            .map((item) => ({ id: generateId(), value: item.trim() }))
+        : [{ id: generateId(), value: "" }];
     }
   } catch {
     // 解析失败，回退到按换行符分割
     ipBlacklistItems.value = ipBlacklistStr
-      ? ipBlacklistStr.split('\n')
-          .filter(item => item.trim())
-          .map(item => ({ id: generateId(), value: item.trim() }))
-      : [{ id: generateId(), value: '' }];
+      ? ipBlacklistStr
+          .split("\n")
+          .filter((item) => item.trim())
+          .map((item) => ({ id: generateId(), value: item.trim() }))
+      : [{ id: generateId(), value: "" }];
   }
 
   // 初始化演示环境IP白名单
-  const demoIpWhitelistStr = configStore.configData.ip_white_list?.config_value || '';
+  const demoIpWhitelistStr = configStore.configData.ip_white_list?.config_value || "";
   try {
     // 尝试解析为JSON数组
     const demoIpWhitelistArray = JSON.parse(demoIpWhitelistStr);
     if (Array.isArray(demoIpWhitelistArray)) {
       demoIpWhitelistItems.value = demoIpWhitelistArray
-        .filter(item => typeof item === 'string' && item.trim())
-        .map(item => ({ id: generateId(), value: item.trim() }));
+        .filter((item) => typeof item === "string" && item.trim())
+        .map((item) => ({ id: generateId(), value: item.trim() }));
     } else {
       // 如果不是数组，回退到按换行符分割
       demoIpWhitelistItems.value = demoIpWhitelistStr
-        ? demoIpWhitelistStr.split('\n')
-            .filter(item => item.trim())
-            .map(item => ({ id: generateId(), value: item.trim() }))
-        : [{ id: generateId(), value: '' }];
+        ? demoIpWhitelistStr
+            .split("\n")
+            .filter((item) => item.trim())
+            .map((item) => ({ id: generateId(), value: item.trim() }))
+        : [{ id: generateId(), value: "" }];
     }
   } catch {
     // 解析失败，回退到按换行符分割
     demoIpWhitelistItems.value = demoIpWhitelistStr
-      ? demoIpWhitelistStr.split('\n')
-          .filter(item => item.trim())
-          .map(item => ({ id: generateId(), value: item.trim() }))
-      : [{ id: generateId(), value: '' }];
+      ? demoIpWhitelistStr
+          .split("\n")
+          .filter((item) => item.trim())
+          .map((item) => ({ id: generateId(), value: item.trim() }))
+      : [{ id: generateId(), value: "" }];
   }
 };
 
 // 添加接口白名单项
 const addApiWhitelistItem = () => {
-  apiWhitelistItems.value.push({ id: generateId(), value: '' });
-  markModified('white_api_list_path');
+  apiWhitelistItems.value.push({ id: generateId(), value: "" });
+  markModified("white_api_list_path");
 };
 
 // 移除接口白名单项
 const removeApiWhitelistItem = (id: string) => {
   if (apiWhitelistItems.value.length <= 1) {
-    ElMessage.warning('至少需要保留一个接口白名单配置');
+    ElMessage.warning("至少需要保留一个接口白名单配置");
     return;
   }
-  apiWhitelistItems.value = apiWhitelistItems.value.filter(item => item.id !== id);
-  markModified('white_api_list_path');
+  apiWhitelistItems.value = apiWhitelistItems.value.filter((item) => item.id !== id);
+  markModified("white_api_list_path");
 };
 
 // 添加IP黑名单项
 const addIpBlacklistItem = () => {
-  ipBlacklistItems.value.push({ id: generateId(), value: '' });
-  markModified('ip_black_list');
+  ipBlacklistItems.value.push({ id: generateId(), value: "" });
+  markModified("ip_black_list");
 };
 
 // 移除IP黑名单项
 const removeIpBlacklistItem = (id: string) => {
   if (ipBlacklistItems.value.length <= 1) {
-    ElMessage.warning('至少需要保留一个IP黑名单配置');
+    ElMessage.warning("至少需要保留一个IP黑名单配置");
     return;
   }
-  ipBlacklistItems.value = ipBlacklistItems.value.filter(item => item.id !== id);
-  markModified('ip_black_list');
+  ipBlacklistItems.value = ipBlacklistItems.value.filter((item) => item.id !== id);
+  markModified("ip_black_list");
 };
 
 // 添加演示环境IP白名单项
 const addDemoIpWhitelistItem = () => {
-  demoIpWhitelistItems.value.push({ id: generateId(), value: '' });
-  markModified('ip_white_list');
+  demoIpWhitelistItems.value.push({ id: generateId(), value: "" });
+  markModified("ip_white_list");
 };
 
 // 移除演示环境IP白名单项
 const removeDemoIpWhitelistItem = (id: string) => {
   if (demoIpWhitelistItems.value.length <= 1) {
-    ElMessage.warning('至少需要保留一个IP白名单配置');
+    ElMessage.warning("至少需要保留一个IP白名单配置");
     return;
   }
-  demoIpWhitelistItems.value = demoIpWhitelistItems.value.filter(item => item.id !== id);
-  markModified('ip_white_list');
+  demoIpWhitelistItems.value = demoIpWhitelistItems.value.filter((item) => item.id !== id);
+  markModified("ip_white_list");
 };
 
 // 接口白名单配置项
@@ -641,15 +687,14 @@ const handleUploadSuccess = (fileInfo: UploadFilePath, type: string) => {
 
 // 图片上传失败的回调处理
 const handleUploadError = (error: any) => {
-  console.error('上传失败:', error.message || '未知错误');
-  ElMessage.error(`上传失败：${error.message || '请稍后重试'}`);
+  console.error("上传失败:", error.message || "未知错误");
+  ElMessage.error(`上传失败：${error.message || "请稍后重试"}`);
 };
 
 // 生命周期钩子
 onMounted(() => {
   configStore.getConfig();
 });
-
 </script>
 
 <style lang="scss" scoped>

@@ -1,10 +1,6 @@
 <!-- 引导页 -->
 <template>
-  <el-tour
-    v-model="open"
-    :show-close="false"
-    @change="handleChange"
-  >
+  <el-tour v-model="open" :show-close="false" @change="handleChange">
     <el-tour-step
       v-for="(step, index) in steps"
       :key="index"
@@ -13,11 +9,11 @@
       :description="step.description"
       :prev-button-props="{
         children: t('common.prevLabel'),
-        onClick: handlePrevClick
+        onClick: handlePrevClick,
       }"
       :next-button-props="{
         children: nextBtnName(index),
-        onClick: handleNextClick
+        onClick: handleNextClick,
       }"
       :placement="step.placement"
     />
@@ -42,36 +38,35 @@ const props = defineProps({
   },
   teleport: {
     type: [String, Object] as PropType<string | HTMLElement | null>,
-    default: 'body',
-  }
+    default: "body",
+  },
 });
 
-const emit = defineEmits(['update:modelValue', 'change', 'prev', 'next', 'skip']);
+const emit = defineEmits(["update:modelValue", "change", "prev", "next", "skip"]);
 
 const open = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val),
+  set: (val) => emit("update:modelValue", val),
 });
 
 interface TourStep {
   target: string;
   title: string;
   description: string;
-  placement: 'top' | 'bottom' | 'left' | 'right';
-} 
+  placement: "top" | "bottom" | "left" | "right";
+}
 
 const layout = settingStore.layout;
 
 const menuTarget = (): string => {
-  if (layout === 'left') {
-    return '.layout__sidebar';
-  } else if (layout === 'top') {
-    return '.layout__header-left';
+  if (layout === "left") {
+    return ".layout__sidebar";
+  } else if (layout === "top") {
+    return ".layout__header-left";
   } else {
-    return '.layout__header-menu';
+    return ".layout__header-menu";
   }
 };
-
 
 // 内置引导步骤数据
 const steps: TourStep[] = [
@@ -79,19 +74,19 @@ const steps: TourStep[] = [
     target: menuTarget(),
     title: t("common.menu"),
     description: t("common.menuDes"),
-    placement: layout === 'left' ? 'right' : 'bottom'
+    placement: layout === "left" ? "right" : "bottom",
   },
   {
     target: ".navbar-actions",
     title: t("common.tool"),
     description: t("common.toolDes"),
-    placement: "bottom"
+    placement: "bottom",
   },
   {
     target: ".tags-container",
     title: t("common.tagsView"),
     description: t("common.tagsViewDes"),
-    placement: "bottom"
+    placement: "bottom",
   },
 ];
 
@@ -101,33 +96,32 @@ const currentStep = ref(0);
 // 动态设置下一步按钮名称
 const nextBtnName = computed(() => (index: number) => {
   if (index === steps.length - 1) {
-    return t('common.doneLabel');
+    return t("common.doneLabel");
   }
-  return t('common.nextLabel');
+  return t("common.nextLabel");
 });
 
 // 步数切换时触发
 function handleChange(step: number) {
   currentStep.value = step;
-  emit('change', step);
+  emit("change", step);
 }
 
 // 点击跳过按钮时触发
 function handleSkip() {
   open.value = false;
-  emit('skip');
+  emit("skip");
 }
 
 // 点击上一步按钮时触发
 function handlePrevClick() {
-  emit('prev');
+  emit("prev");
 }
 
 // 点击下一步按钮时触发
 function handleNextClick() {
-  emit('next');
+  emit("next");
 }
-
 </script>
 
 <style scoped>
@@ -137,5 +131,4 @@ function handleNextClick() {
   justify-content: flex-end;
   margin-right: 5px;
 }
-
 </style>

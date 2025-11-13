@@ -1,43 +1,54 @@
 <template>
   <div>
     <!-- 导入弹窗 -->
-    <el-dialog 
-      v-model="importModalVisible" 
-      :align-center="true" 
-      :title="props.title" 
-      :width="props.width" 
+    <el-dialog
+      v-model="importModalVisible"
+      :align-center="true"
+      :title="props.title"
+      :width="props.width"
       style="padding-right: 0"
-      @close="handleClose">
+      @close="handleClose"
+    >
       <!-- 滚动 -->
       <el-scrollbar :max-height="props.maxHeight">
         <!-- 表单 -->
-        <el-form 
-          ref="importFormRef" 
-          style="padding-right: var(--el-dialog-padding-primary)" 
-          :model="importFormData" 
-          :rules="importFormRules">
+        <el-form
+          ref="importFormRef"
+          style="padding-right: var(--el-dialog-padding-primary)"
+          :model="importFormData"
+          :rules="importFormRules"
+        >
           <el-form-item prop="files">
-            <el-upload 
-              ref="uploadRef" 
-              v-model:file-list="importFormData.files" 
-              class="w-full" 
-              :accept="props.accept" 
-              :drag="true" 
-              :limit="props.limit" 
-              :auto-upload="false" 
+            <el-upload
+              ref="uploadRef"
+              v-model:file-list="importFormData.files"
+              class="w-full"
+              :accept="props.accept"
+              :drag="true"
+              :limit="props.limit"
+              :auto-upload="false"
               :on-exceed="handleFileExceed"
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
-                {{ props.dropText || '将文件拖到此处，或' }}
-                <em>{{ props.browseText || '点击上传' }}</em>
+                {{ props.dropText || "将文件拖到此处，或" }}
+                <em>{{ props.browseText || "点击上传" }}</em>
               </div>
               <template #tip>
                 <div class="el-upload__tip flex flex-wrap gap-2">
                   <el-text v-if="props.note" type="warning" class="mx-1">{{ props.note }}</el-text>
-                  <el-text v-if="props.fileTypeWarning" type="danger" class="mx-1">{{ props.fileTypeWarning }}</el-text>
-                  <el-link v-if="props.showTemplateDownload" class="mx-1" type="primary" icon="download" underline="never" @click="handleDownloadTemplate">
-                    {{ props.templateDownloadText || '下载模板' }}
+                  <el-text v-if="props.fileTypeWarning" type="danger" class="mx-1">
+                    {{ props.fileTypeWarning }}
+                  </el-text>
+                  <el-link
+                    v-if="props.showTemplateDownload"
+                    class="mx-1"
+                    type="primary"
+                    icon="download"
+                    underline="never"
+                    @click="handleDownloadTemplate"
+                  >
+                    {{ props.templateDownloadText || "下载模板" }}
                   </el-link>
                 </div>
               </template>
@@ -47,14 +58,14 @@
       </el-scrollbar>
       <template #footer>
         <div style="padding-right: var(--el-dialog-padding-primary)">
-          <el-button @click="handleClose">{{ props.cancelButtonText || '取 消' }}</el-button>
+          <el-button @click="handleClose">{{ props.cancelButtonText || "取 消" }}</el-button>
           <el-button
             type="primary"
             :disabled="importFormData.files.length === 0 || loading"
             @click="handleUpload"
           >
             <el-icon v-if="loading"><Loading /></el-icon>
-            {{ props.confirmButtonText || '确 定' }}
+            {{ props.confirmButtonText || "确 定" }}
           </el-button>
         </div>
       </template>
@@ -157,7 +168,8 @@ const props = withDefaults(defineProps<ImportModalProps>(), {
   title: "导入数据",
   width: "600px",
   maxHeight: "60vh",
-  accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+  accept:
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
   limit: 1,
   showTemplateDownload: true,
   note: "注意事项：",
@@ -169,7 +181,7 @@ const props = withDefaults(defineProps<ImportModalProps>(), {
 // 定义模型值（控制弹窗显示/隐藏）
 const importModalVisible = defineModel<boolean>("modelValue", {
   required: true,
-  default: false
+  default: false,
 });
 
 // 定义事件
@@ -195,12 +207,12 @@ const loading = ref(false);
 const importFormData = reactive<{
   files: UploadUserFile[];
 }>({
-  files: []
+  files: [],
 });
 
 // 表单规则
 const importFormRules = {
-  files: [{ required: true, message: "文件不能为空", trigger: "blur" }]
+  files: [{ required: true, message: "文件不能为空", trigger: "blur" }],
 };
 
 // 文件超出个数限制
@@ -264,7 +276,7 @@ const handleUpload = async () => {
     formData.append(props.uploadFileName, file);
 
     // 添加额外参数
-    Object.keys(props.uploadData).forEach(key => {
+    Object.keys(props.uploadData).forEach((key) => {
       formData.append(key, props.uploadData[key]);
     });
 
@@ -288,6 +300,6 @@ const handleClose = () => {
 
 // 提供给父组件的方法
 defineExpose({
-  handleClose
+  handleClose,
 });
 </script>

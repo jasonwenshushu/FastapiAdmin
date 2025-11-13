@@ -11,11 +11,7 @@
         @submit.prevent="handleQuery"
       >
         <el-form-item prop="name" label="任务名称">
-          <el-input
-            v-model="queryFormData.name"
-            placeholder="请输入任务名称"
-            clearable
-          />
+          <el-input v-model="queryFormData.name" placeholder="请输入任务名称" clearable />
         </el-form-item>
         <el-form-item prop="status" label="状态">
           <el-select
@@ -30,30 +26,35 @@
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
         <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
-          <DatePicker
-            v-model="dateRange"
-            @update:model-value="handleDateRangeChange"
-          />
+          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
         <el-form-item v-if="isExpand" prop="creator" label="创建人">
           <UserTableSelect
-              v-model="queryFormData.creator"
-              @confirm-click="handleConfirm"
-              @clear-click="handleQuery"
+            v-model="queryFormData.creator"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
           />
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
         <el-form-item class="search-buttons">
-          <el-button v-hasPerm="['module_application:job:query']" type="primary" icon="search" native-type="submit">查询</el-button>
-          <el-button v-hasPerm="['module_application:job:query']" icon="refresh" @click="handleResetQuery">重置</el-button>
+          <el-button
+            v-hasPerm="['module_application:job:query']"
+            type="primary"
+            icon="search"
+            native-type="submit"
+          >
+            查询
+          </el-button>
+          <el-button
+            v-hasPerm="['module_application:job:query']"
+            icon="refresh"
+            @click="handleResetQuery"
+          >
+            重置
+          </el-button>
           <!-- 展开/收起 -->
           <template v-if="isExpandable">
-            <el-link
-              class="ml-3"
-              type="primary"
-              underline="never"
-              @click="isExpand = !isExpand"
-            >
+            <el-link class="ml-3" type="primary" underline="never" @click="isExpand = !isExpand">
               {{ isExpand ? "收起" : "展开" }}
               <el-icon>
                 <template v-if="isExpand">
@@ -92,7 +93,9 @@
                 type="success"
                 icon="plus"
                 @click="handleOpenDialog('create')"
-              >新增</el-button>
+              >
+                新增
+              </el-button>
             </el-col>
             <el-col :span="1.5">
               <el-button
@@ -101,7 +104,9 @@
                 icon="delete"
                 :disabled="selectIds.length === 0"
                 @click="handleDelete(selectIds)"
-                >批量删除</el-button>
+              >
+                批量删除
+              </el-button>
             </el-col>
           </el-row>
         </div>
@@ -120,7 +125,13 @@
             </el-col>
             <el-col :span="1.5">
               <el-tooltip content="清除">
-                <el-button v-hasPerm="['module_application:job:clear']" type="danger" icon="delete" circle @click="handleClear"/>
+                <el-button
+                  v-hasPerm="['module_application:job:clear']"
+                  type="danger"
+                  icon="delete"
+                  circle
+                  @click="handleClear"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
@@ -160,24 +171,29 @@
           </template>
         </el-table-column>
         <el-table-column label="任务名称" prop="name" min-width="140" />
-        <el-table-column label="执行函数" prop="func" min-width="140" >
+        <el-table-column label="执行函数" prop="func" min-width="140">
           <template #default="scope">
-            {{ (dictStore.getDictLabel('sys_job_function',scope.row.func) as any)?.dict_label || scope.row.func }}
+            {{
+              (dictStore.getDictLabel("sys_job_function", scope.row.func) as any)?.dict_label ||
+              scope.row.func
+            }}
           </template>
         </el-table-column>
         <el-table-column label="触发器" prop="trigger" min-width="100" show-overflow-tooltip>
           <template #default="scope">
-            {{ (dictStore.getDictLabel('sys_job_trigger',scope.row.trigger) as any)?.dict_label }}
+            {{ (dictStore.getDictLabel("sys_job_trigger", scope.row.trigger) as any)?.dict_label }}
           </template>
         </el-table-column>
         <el-table-column label="存储器" prop="jobstore" min-width="120" show-overflow-tooltip>
           <template #default="scope">
-            {{ (dictStore.getDictLabel('sys_job_store',scope.row.jobstore) as any)?.dict_label }}
+            {{ (dictStore.getDictLabel("sys_job_store", scope.row.jobstore) as any)?.dict_label }}
           </template>
         </el-table-column>
         <el-table-column label="执行器" prop="executor" min-width="100">
           <template #default="scope">
-            {{ (dictStore.getDictLabel('sys_job_executor',scope.row.executor) as any)?.dict_label }}
+            {{
+              (dictStore.getDictLabel("sys_job_executor", scope.row.executor) as any)?.dict_label
+            }}
           </template>
         </el-table-column>
         <el-table-column label="并发执行" prop="coalesce" min-width="100">
@@ -195,18 +211,8 @@
           </template>
         </el-table-column>
         <el-table-column label="描述" prop="description" min-width="100" />
-        <el-table-column
-          label="创建时间"
-          prop="created_at"
-          min-width="200"
-          sortable
-        />
-        <el-table-column
-          label="更新时间"
-          prop="updated_at"
-          min-width="200"
-          sortable
-        />
+        <el-table-column label="创建时间" prop="created_at" min-width="200" sortable />
+        <el-table-column label="更新时间" prop="updated_at" min-width="200" sortable />
 
         <OperationColumn :list-data-length="pageTableData.length">
           <template #default="scope">
@@ -295,30 +301,50 @@
       <!-- 详情 -->
       <template v-if="dialogVisible.type === 'detail'">
         <el-descriptions :column="4" border>
-          <el-descriptions-item label="序号" :span="2">{{
-            detailFormData.id
-          }}</el-descriptions-item>
-          <el-descriptions-item label="任务名称" :span="2">{{
-            detailFormData.name
-          }}</el-descriptions-item>
-          <el-descriptions-item label="任务函数" :span="2">{{
-            (detailFormData.func ? dictStore.getDictLabel('sys_job_function', detailFormData.func) as any : undefined)?.dict_label || detailFormData.func
-          }}</el-descriptions-item>
-          <el-descriptions-item label="存储器" :span="2">{{
-            (detailFormData.jobstore ? dictStore.getDictLabel('sys_job_store', detailFormData.jobstore) as any : undefined)?.dict_label || detailFormData.jobstore
-          }}</el-descriptions-item>
-          <el-descriptions-item label="执行器" :span="2">{{
-            (detailFormData.executor ? dictStore.getDictLabel('sys_job_executor', detailFormData.executor) as any : undefined)?.dict_label || detailFormData.executor
-          }}</el-descriptions-item>
-          <el-descriptions-item label="触发器" :span="2">{{
-            (detailFormData.trigger ? dictStore.getDictLabel('sys_job_trigger', detailFormData.trigger) as any : undefined)?.dict_label || detailFormData.trigger
-          }}</el-descriptions-item>
-          <el-descriptions-item label="位置参数" :span="2">{{
-            detailFormData.args
-          }}</el-descriptions-item>
-          <el-descriptions-item label="关键字参数" :span="2">{{
-            detailFormData.kwargs
-          }}</el-descriptions-item>
+          <el-descriptions-item label="序号" :span="2">
+            {{ detailFormData.id }}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务名称" :span="2">
+            {{ detailFormData.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="任务函数" :span="2">
+            {{
+              (detailFormData.func
+                ? (dictStore.getDictLabel("sys_job_function", detailFormData.func) as any)
+                : undefined
+              )?.dict_label || detailFormData.func
+            }}
+          </el-descriptions-item>
+          <el-descriptions-item label="存储器" :span="2">
+            {{
+              (detailFormData.jobstore
+                ? (dictStore.getDictLabel("sys_job_store", detailFormData.jobstore) as any)
+                : undefined
+              )?.dict_label || detailFormData.jobstore
+            }}
+          </el-descriptions-item>
+          <el-descriptions-item label="执行器" :span="2">
+            {{
+              (detailFormData.executor
+                ? (dictStore.getDictLabel("sys_job_executor", detailFormData.executor) as any)
+                : undefined
+              )?.dict_label || detailFormData.executor
+            }}
+          </el-descriptions-item>
+          <el-descriptions-item label="触发器" :span="2">
+            {{
+              (detailFormData.trigger
+                ? (dictStore.getDictLabel("sys_job_trigger", detailFormData.trigger) as any)
+                : undefined
+              )?.dict_label || detailFormData.trigger
+            }}
+          </el-descriptions-item>
+          <el-descriptions-item label="位置参数" :span="2">
+            {{ detailFormData.args }}
+          </el-descriptions-item>
+          <el-descriptions-item label="关键字参数" :span="2">
+            {{ detailFormData.kwargs }}
+          </el-descriptions-item>
           <el-descriptions-item label="并发执行" :span="2">
             <el-tag :type="detailFormData.coalesce ? 'success' : 'danger'">
               {{ detailFormData.coalesce ? "是" : "否" }}
@@ -329,30 +355,30 @@
               {{ detailFormData.status ? "运行中" : "暂停" }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="最大实例数" :span="2">{{
-            detailFormData.max_instances
-          }}</el-descriptions-item>
-          <el-descriptions-item label="触发器参数" :span="2">{{
-            detailFormData.trigger_args
-          }}</el-descriptions-item>
-          <el-descriptions-item label="开始时间" :span="2">{{
-            detailFormData.start_date
-          }}</el-descriptions-item>
-          <el-descriptions-item label="结束时间" :span="2">{{
-            detailFormData.end_date
-          }}</el-descriptions-item>
-          <el-descriptions-item label="创建人" :span="2">{{
-            detailFormData.creator?.name
-          }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间" :span="2">{{
-            detailFormData.created_at
-          }}</el-descriptions-item>
-          <el-descriptions-item label="更新时间" :span="2">{{
-            detailFormData.updated_at
-          }}</el-descriptions-item>
-          <el-descriptions-item label="描述" :span="4">{{
-            detailFormData.description
-          }}</el-descriptions-item>
+          <el-descriptions-item label="最大实例数" :span="2">
+            {{ detailFormData.max_instances }}
+          </el-descriptions-item>
+          <el-descriptions-item label="触发器参数" :span="2">
+            {{ detailFormData.trigger_args }}
+          </el-descriptions-item>
+          <el-descriptions-item label="开始时间" :span="2">
+            {{ detailFormData.start_date }}
+          </el-descriptions-item>
+          <el-descriptions-item label="结束时间" :span="2">
+            {{ detailFormData.end_date }}
+          </el-descriptions-item>
+          <el-descriptions-item label="创建人" :span="2">
+            {{ detailFormData.creator?.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间" :span="2">
+            {{ detailFormData.created_at }}
+          </el-descriptions-item>
+          <el-descriptions-item label="更新时间" :span="2">
+            {{ detailFormData.updated_at }}
+          </el-descriptions-item>
+          <el-descriptions-item label="描述" :span="4">
+            {{ detailFormData.description }}
+          </el-descriptions-item>
         </el-descriptions>
       </template>
       <!-- 新增、编辑表单 -->
@@ -366,55 +392,43 @@
           inline
         >
           <el-form-item label="任务名称" prop="name" style="width: 40%">
-            <el-input
-              v-model="formData.name"
-              placeholder="请输入任务名称"
-              :maxlength="50"
-            />
+            <el-input v-model="formData.name" placeholder="请输入任务名称" :maxlength="50" />
           </el-form-item>
           <el-form-item label="任务函数" prop="func" style="width: 40%">
             <el-select v-model="formData.func" placeholder="请选择任务函数">
-                <el-option
-                  v-for="item in dictStore.getDictArray('sys_job_function')"
-                  :key="item.dict_value"
-                  :label="item.dict_label"
-                  :value="item.dict_value"
-                />
-              </el-select>
+              <el-option
+                v-for="item in dictStore.getDictArray('sys_job_function')"
+                :key="item.dict_value"
+                :label="item.dict_label"
+                :value="item.dict_value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="存储器" prop="jobstore" style="width: 40%">
             <el-select v-model="formData.jobstore" placeholder="请选择存储器">
-                <el-option 
-                  v-for="item in dictStore.getDictArray('sys_job_store')"
-                  :key="item.dict_value"
-                  :label="item.dict_label"
-                  :value="item.dict_value"
-                />
-              </el-select>
+              <el-option
+                v-for="item in dictStore.getDictArray('sys_job_store')"
+                :key="item.dict_value"
+                :label="item.dict_label"
+                :value="item.dict_value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="执行器" prop="executor" style="width: 40%">
             <el-select v-model="formData.executor" placeholder="请选择执行器">
-                <el-option 
-                  v-for="item in dictStore.getDictArray('sys_job_executor')"
-                  :key="item.dict_value"
-                  :label="item.dict_label"
-                  :value="item.dict_value"
-                />
-              </el-select>
+              <el-option
+                v-for="item in dictStore.getDictArray('sys_job_executor')"
+                :key="item.dict_value"
+                :label="item.dict_label"
+                :value="item.dict_value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="位置参数" prop="args" style="width: 40%">
-            <el-input
-              v-model="formData.args"
-              placeholder="请输入位置参数"
-              :maxlength="50"
-            />
+            <el-input v-model="formData.args" placeholder="请输入位置参数" :maxlength="50" />
           </el-form-item>
           <el-form-item label="关键字参数" prop="kwargs" style="width: 40%">
-            <el-input
-              v-model="formData.kwargs"
-              placeholder="请输入关键字参数"
-              :maxlength="50"
-            />
+            <el-input v-model="formData.kwargs" placeholder="请输入关键字参数" :maxlength="50" />
           </el-form-item>
           <el-form-item label="并发执行" prop="coalesce" style="width: 40%">
             <el-radio-group v-model="formData.coalesce">
@@ -422,11 +436,7 @@
               <el-radio :value="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item
-            label="最大实例数"
-            prop="max_instances"
-            style="width: 40%"
-          >
+          <el-form-item label="最大实例数" prop="max_instances" style="width: 40%">
             <el-input-number
               v-model="formData.max_instances"
               controls-position="right"
@@ -436,13 +446,13 @@
           </el-form-item>
           <el-form-item label="触发器" prop="trigger" style="width: 40%">
             <el-select v-model="formData.trigger" placeholder="请选择触发器">
-                <el-option
-                  v-for="item in dictStore.getDictArray('sys_job_trigger')"
-                  :key="item.dict_value"
-                  :label="item.dict_label"
-                  :value="item.dict_value"
-                />
-              </el-select>
+              <el-option
+                v-for="item in dictStore.getDictArray('sys_job_trigger')"
+                :key="item.dict_value"
+                :label="item.dict_label"
+                :value="item.dict_value"
+              />
+            </el-select>
           </el-form-item>
           <!-- 运行日期、间隔时间或 Cron 表达式 -->
           <el-form-item
@@ -464,9 +474,7 @@
             v-else-if="formData.trigger === 'interval'"
             label="间隔时间"
             prop="trigger_args"
-            :rules="[
-              { required: true, message: '请输入间隔时间', trigger: 'change' },
-            ]"
+            :rules="[{ required: true, message: '请输入间隔时间', trigger: 'change' }]"
             style="width: 40%"
           >
             <el-popover
@@ -532,9 +540,7 @@
             v-if="formData.trigger && formData.trigger != 'date'"
             label="开始日期"
             prop="start_date"
-            :rules="[
-              { required: false, message: '请选择开始日期', trigger: 'blur' },
-            ]"
+            :rules="[{ required: false, message: '请选择开始日期', trigger: 'blur' }]"
             style="width: 40%"
           >
             <el-date-picker
@@ -549,9 +555,7 @@
             v-if="formData.trigger && formData.trigger != 'date'"
             label="结束日期"
             prop="end_date"
-            :rules="[
-              { required: false, message: '请选择结束日期', trigger: 'blur' },
-            ]"
+            :rules="[{ required: false, message: '请选择结束日期', trigger: 'blur' }]"
             style="width: 40%"
           >
             <el-date-picker
@@ -580,12 +584,26 @@
         <div class="dialog-footer">
           <!-- 详情弹窗不需要确定按钮的提交逻辑 -->
           <el-button @click="handleCloseDialog">取消</el-button>
-          <el-button v-if="dialogVisible.type !== 'detail'" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button v-else v-hasPerm="['module_application:job:detail']" type="primary" @click="handleCloseDialog" >确定</el-button>
+          <el-button v-if="dialogVisible.type !== 'detail'" type="primary" @click="handleSubmit">
+            确定
+          </el-button>
+          <el-button
+            v-else
+            v-hasPerm="['module_application:job:detail']"
+            type="primary"
+            @click="handleCloseDialog"
+          >
+            确定
+          </el-button>
         </div>
       </template>
     </el-dialog>
-    <JobLogDrawer v-if="drawerVisible" v-model="drawerVisible" :job-id="currentJobId" :job-name="currentJobName" />
+    <JobLogDrawer
+      v-if="drawerVisible"
+      v-model="drawerVisible"
+      :job-id="currentJobId"
+      :job-name="currentJobName"
+    />
     <ExportModal
       v-model="exportsDialogVisible"
       :content-config="curdContentConfig"
@@ -607,7 +625,7 @@ import IntervalTab from "@/components/IntervalTab/index.vue";
 import { useDictStore } from "@/store/index";
 import { vue3CronPlus } from "vue3-cron-plus";
 import "vue3-cron-plus/dist/index.css"; // 引入样式
-import  JobLogDrawer from "@/views/module_application/job/components/JobLogDrawer.vue"
+import JobLogDrawer from "@/views/module_application/job/components/JobLogDrawer.vue";
 import OperationColumn from "@/components/OperationColumn/index.vue";
 import ExportModal from "@/components/CURD/ExportModal.vue";
 import type { IContentConfig } from "@/components/CURD/types";
@@ -690,7 +708,6 @@ const rules = reactive({
   executor: [{ required: true, message: "请选择执行器", trigger: "blur" }],
 });
 
-
 // 日期范围临时变量
 const dateRange = ref<[Date, Date] | []>([]);
 
@@ -764,7 +781,7 @@ const initialFormData: JobForm = {
   end_date: undefined,
   status: undefined,
   description: undefined,
-}
+};
 
 // 重置表单
 async function resetForm() {
@@ -789,10 +806,7 @@ async function handleCloseDialog() {
 }
 
 // 打开弹窗
-async function handleOpenDialog(
-  type: "create" | "update" | "detail",
-  id?: number
-) {
+async function handleOpenDialog(type: "create" | "update" | "detail", id?: number) {
   dialogVisible.type = type;
   if (id) {
     const response = await JobAPI.getJobDetail(id);
@@ -928,25 +942,25 @@ function handleOpenLogDrawer(jobId: number, jobName: string) {
 
 // 导出字段
 const exportColumns = [
-  { prop: 'name', label: '任务名称' },
-  { prop: 'func', label: '执行函数' },
-  { prop: 'trigger', label: '触发器' },
-  { prop: 'jobstore', label: '存储器' },
-  { prop: 'executor', label: '执行器' },
-  { prop: 'coalesce', label: '并发执行' },
-  { prop: 'status', label: '状态' },
-  { prop: 'description', label: '描述' },
-  { prop: 'created_at', label: '创建时间' },
-  { prop: 'updated_at', label: '更新时间' },
+  { prop: "name", label: "任务名称" },
+  { prop: "func", label: "执行函数" },
+  { prop: "trigger", label: "触发器" },
+  { prop: "jobstore", label: "存储器" },
+  { prop: "executor", label: "执行器" },
+  { prop: "coalesce", label: "并发执行" },
+  { prop: "status", label: "状态" },
+  { prop: "description", label: "描述" },
+  { prop: "created_at", label: "创建时间" },
+  { prop: "updated_at", label: "更新时间" },
 ];
 
 // 导出配置（用于导出弹窗）
 const curdContentConfig = {
-  permPrefix: 'module_application:job',
+  permPrefix: "module_application:job",
   cols: exportColumns as any,
   exportsAction: async (params: any) => {
     const query: any = { ...params };
-    if (typeof query.status === 'string') query.status = query.status === 'true';
+    if (typeof query.status === "string") query.status = query.status === "true";
     query.page_no = 1;
     query.page_size = 1000;
     const all: any[] = [];
@@ -964,11 +978,15 @@ const curdContentConfig = {
 
 onMounted(async () => {
   // 加载字典数据
-  await dictStore.getDict(['sys_job_function','sys_job_executor','sys_job_store', 'sys_job_trigger']);
+  await dictStore.getDict([
+    "sys_job_function",
+    "sys_job_executor",
+    "sys_job_store",
+    "sys_job_trigger",
+  ]);
   // 加载表格数据
   loadingData();
 });
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -50,10 +50,10 @@ const FileAPI = {
     // 这里应该是实际的文件上传逻辑
     // 暂时返回一个mock数据
     return Promise.resolve({
-      url: 'https://example.com/image.jpg',
-      name: file.name
+      url: "https://example.com/image.jpg",
+      name: file.name,
     });
-  }
+  },
 };
 
 defineProps({

@@ -14,15 +14,15 @@ export function setupPermission() {
     try {
       const isLoggedIn = Auth.isLoggedIn();
 
-    if (isLoggedIn) {
-      // 如果已登录但访问登录页，重定向到首页
-      if (to.path === "/login") {
-        next({ path: "/" });
-        return;
-      }
+      if (isLoggedIn) {
+        // 如果已登录但访问登录页，重定向到首页
+        if (to.path === "/login") {
+          next({ path: "/" });
+          return;
+        }
 
-      // 处理已登录用户的路由访问
-      await handleAuthenticatedUser(to, from, next);
+        // 处理已登录用户的路由访问
+        await handleAuthenticatedUser(to, from, next);
       } else {
         // 未登录用户的处理
         if (whiteList.includes(to.path)) {
@@ -32,7 +32,7 @@ export function setupPermission() {
           NProgress.done();
         }
       }
-    }catch (error) {
+    } catch (error) {
       // 错误处理：重置状态并跳转登录
       console.error("Route guard error:", error);
       await useUserStore().resetAllState();
@@ -62,9 +62,9 @@ async function handleAuthenticatedUser(
     // 检查路由是否已生成
     if (!permissionStore.isRouteGenerated) {
       if (!userStore.basicInfo?.roles?.length) {
-          await userStore.getUserInfo();
-        }
-      
+        await userStore.getUserInfo();
+      }
+
       const dynamicRoutes = await permissionStore.generateRoutes();
       // 添加路由到路由器
       dynamicRoutes.forEach((route: RouteRecordRaw) => {
@@ -95,7 +95,7 @@ async function handleAuthenticatedUser(
     // 强制跳转到登录页
     next("/login");
     NProgress.done();
-  } 
+  }
   router.afterEach(() => {
     NProgress.done();
   });

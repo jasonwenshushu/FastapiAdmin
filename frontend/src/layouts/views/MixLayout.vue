@@ -3,7 +3,6 @@
     <!-- 顶部菜单栏 -->
     <div class="layout__header">
       <div class="layout__header-content">
-
         <!-- 顶部菜单区域 -->
         <div class="layout__header-menu">
           <!-- Logo区域 -->
@@ -119,7 +118,8 @@ watch(
   () => route.path,
   (newPath) => {
     // 获取顶级路径
-    const topMenuPath = newPath.split("/").filter(Boolean).length > 1 ? newPath.match(/^\/[^/]+/)?.[0] || "/" : "/";
+    const topMenuPath =
+      newPath.split("/").filter(Boolean).length > 1 ? newPath.match(/^\/[^/]+/)?.[0] || "/" : "/";
 
     // 如果当前路径属于当前激活的顶部菜单
     if (newPath.startsWith(activeTopMenuPath.value)) {

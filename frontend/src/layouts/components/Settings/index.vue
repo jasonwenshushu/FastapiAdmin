@@ -80,12 +80,9 @@
             <div class="color-options">
               <!-- 预设颜色选项 -->
               <div
-                v-for="(color) in displayColorPresets"
+                v-for="color in displayColorPresets"
                 :key="color"
-                :class="[
-                  'color-option',
-                  { 'is-active': selectedThemeColor === color }
-                ]"
+                :class="['color-option', { 'is-active': selectedThemeColor === color }]"
                 :style="{ backgroundColor: color }"
                 @click="handleColorSelect(color)"
               >
@@ -108,9 +105,8 @@
         </div>
       </section>
 
-
       <!-- 导航主题 -->
-      <section v-if="!isDark" class="config-section ">
+      <section v-if="!isDark" class="config-section">
         <el-divider>{{ t("settings.navigation") }}</el-divider>
         <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("settings.sidebarColorScheme") }}</span>
@@ -171,7 +167,7 @@
           <span class="text-xs">{{ t("settings.showNotification") }}</span>
           <el-switch v-model="settingsStore.showNotification" />
         </div>
-        
+
         <!-- 修改此部分为引导开关，关闭以后登录以后不再启动引导 -->
         <div class="flex-x-between">
           <span class="text-xs">{{ t("settings.showGuide") }}</span>
@@ -216,8 +212,6 @@
       </div>
     </div>
   </el-drawer>
-
-  
 </template>
 
 <script setup lang="ts">
@@ -311,7 +305,6 @@ const handleLayoutChange = (layout: LayoutMode) => {
 const handleColorSelect = (color: string) => {
   selectedThemeColor.value = color;
 };
-
 
 /**
  * 复制当前配置
@@ -742,21 +735,21 @@ const handleCloseDrawer = () => {
   }
 
   .color-picker-wrapper {
-      .custom-color-picker {
-        :deep(.el-color-picker__trigger) {
-          width: 22px;
-          height: 22px;
-          border: 2px solid var(--el-border-color-light);
-          border-radius: 6px;
-          transition: all 0.3s var(--el-transition-duration);
-          box-shadow: var(--el-box-shadow-light);
+    .custom-color-picker {
+      :deep(.el-color-picker__trigger) {
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--el-border-color-light);
+        border-radius: 6px;
+        transition: all 0.3s var(--el-transition-duration);
+        box-shadow: var(--el-box-shadow-light);
 
-          &:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: var(--el-box-shadow);
-            border-color: var(--el-color-primary-light-3);
-          }
+        &:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: var(--el-box-shadow);
+          border-color: var(--el-color-primary-light-3);
         }
+      }
 
       :deep(.el-color-picker__color) {
         border: none;
@@ -773,7 +766,6 @@ const handleCloseDrawer = () => {
     }
   }
 }
-
 
 /* 深色模式适配 */
 .dark {
@@ -804,7 +796,6 @@ const handleCloseDrawer = () => {
   }
 }
 
-
 /* 复制配置对话框样式 */
 :deep(.copy-config-dialog) {
   .el-message-box__content {
@@ -813,4 +804,3 @@ const handleCloseDrawer = () => {
   }
 }
 </style>
-

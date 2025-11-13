@@ -13,7 +13,7 @@ interface SettingsState {
   showWatermark: boolean;
   showSettings: boolean;
   showGuide: boolean; // 引导功能开关
-  
+
   // 桌面端工具显示设置
   showMenuSearch: boolean;
   showFullscreen: boolean;
@@ -39,21 +39,48 @@ export const useSettingsStore = defineStore("setting", () => {
   const settingsVisible = ref<boolean>(false);
 
   // 🎯 界面显示设置 - 持久化
-  const showTagsView = useStorage<boolean>(SETTINGS_KEYS.SHOW_TAGS_VIEW, defaultSettings.showTagsView);
+  const showTagsView = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_TAGS_VIEW,
+    defaultSettings.showTagsView
+  );
   const showAppLogo = useStorage<boolean>(SETTINGS_KEYS.SHOW_APP_LOGO, defaultSettings.showAppLogo);
-  const showWatermark = useStorage<boolean>(SETTINGS_KEYS.SHOW_WATERMARK, defaultSettings.showWatermark);
-  const showSettings = useStorage<boolean>(SETTINGS_KEYS.SHOW_SETTINGS, defaultSettings.showSettings);
+  const showWatermark = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_WATERMARK,
+    defaultSettings.showWatermark
+  );
+  const showSettings = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_SETTINGS,
+    defaultSettings.showSettings
+  );
   const showGuide = useStorage<boolean>(SETTINGS_KEYS.SHOW_GUIDE, defaultSettings.showGuide); // 引导功能开关
 
   // 🎯 桌面端工具设置 - 持久化
-  const showMenuSearch = useStorage<boolean>(SETTINGS_KEYS.SHOW_MENU_SEARCH, defaultSettings.showMenuSearch);
-  const showFullscreen = useStorage<boolean>(SETTINGS_KEYS.SHOW_FULLSCREEN, defaultSettings.showFullscreen);
-  const showSizeSelect = useStorage<boolean>(SETTINGS_KEYS.SHOW_SIZE_SELECT, defaultSettings.showSizeSelect);
-  const showLangSelect = useStorage<boolean>(SETTINGS_KEYS.SHOW_LANG_SELECT, defaultSettings.showLangSelect);
-  const showNotification = useStorage<boolean>(SETTINGS_KEYS.SHOW_NOTIFICATION, defaultSettings.showNotification);
+  const showMenuSearch = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_MENU_SEARCH,
+    defaultSettings.showMenuSearch
+  );
+  const showFullscreen = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_FULLSCREEN,
+    defaultSettings.showFullscreen
+  );
+  const showSizeSelect = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_SIZE_SELECT,
+    defaultSettings.showSizeSelect
+  );
+  const showLangSelect = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_LANG_SELECT,
+    defaultSettings.showLangSelect
+  );
+  const showNotification = useStorage<boolean>(
+    SETTINGS_KEYS.SHOW_NOTIFICATION,
+    defaultSettings.showNotification
+  );
 
   // 🎯 布局和主题设置 - 持久化
-  const sidebarColorScheme = useStorage<string>(SETTINGS_KEYS.SIDEBAR_COLOR_SCHEME, defaultSettings.sidebarColorScheme);
+  const sidebarColorScheme = useStorage<string>(
+    SETTINGS_KEYS.SIDEBAR_COLOR_SCHEME,
+    defaultSettings.sidebarColorScheme
+  );
   const layout = useStorage<LayoutMode>(SETTINGS_KEYS.LAYOUT, defaultSettings.layout as LayoutMode);
   const themeColor = useStorage<string>(SETTINGS_KEYS.THEME_COLOR, defaultSettings.themeColor);
   const theme = useStorage<ThemeMode>(SETTINGS_KEYS.THEME, defaultSettings.theme);
@@ -140,14 +167,14 @@ export const useSettingsStore = defineStore("setting", () => {
     showWatermark.value = defaultSettings.showWatermark;
     showSettings.value = defaultSettings.showSettings;
     showGuide.value = defaultSettings.showGuide;
-    
+
     // 桌面端工具设置
     showMenuSearch.value = defaultSettings.showMenuSearch;
     showFullscreen.value = defaultSettings.showFullscreen;
     showSizeSelect.value = defaultSettings.showSizeSelect;
     showLangSelect.value = defaultSettings.showLangSelect;
     showNotification.value = defaultSettings.showNotification;
-    
+
     // 布局和主题设置
     sidebarColorScheme.value = defaultSettings.sidebarColorScheme;
     layout.value = defaultSettings.layout as LayoutMode;
@@ -158,21 +185,21 @@ export const useSettingsStore = defineStore("setting", () => {
   return {
     // 🎯 基础状态
     settingsVisible,
-    
+
     // 🎯 界面显示状态
     showTagsView,
     showAppLogo,
     showWatermark,
     showSettings,
     showGuide,
-    
+
     // 🎯 桌面端工具状态
     showMenuSearch,
     showFullscreen,
     showSizeSelect,
     showLangSelect,
     showNotification,
-    
+
     // 🎯 布局和主题状态
     sidebarColorScheme,
     layout,

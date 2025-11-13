@@ -12,7 +12,7 @@ const ExampleAPI = {
   },
 
   getExampleDetail(query: number) {
-    return request<ApiResponse<ExampleTable>>({ 
+    return request<ApiResponse<ExampleTable>>({
       url: `${API_PATH}/detail/${query}`,
       method: "get",
     });

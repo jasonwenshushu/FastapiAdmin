@@ -11,12 +11,11 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const url = ref(import.meta.env.VITE_APP_BASE_API + "/redoc")
+const url = ref(import.meta.env.VITE_APP_BASE_API + "/redoc");
 
 onBeforeUnmount(() => {
-    window.onresize = null;
-})
+  window.onresize = null;
+});
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -3,34 +3,55 @@
   <div class="app-container">
     <!-- 搜索区域 -->
     <div class="search-container">
-      <el-form ref="queryFormRef" :model="queryFormData" :inline="true"  label-suffix=":" @submit.prevent="handleQuery" >
+      <el-form
+        ref="queryFormRef"
+        :model="queryFormData"
+        :inline="true"
+        label-suffix=":"
+        @submit.prevent="handleQuery"
+      >
         <el-form-item prop="name" label="角色名称">
           <el-input v-model="queryFormData.name" placeholder="请输入角色名称" clearable />
         </el-form-item>
         <el-form-item prop="status" label="状态">
-          <el-select v-model="queryFormData.status" placeholder="请选择状态" style="width: 167.5px" clearable>
+          <el-select
+            v-model="queryFormData.status"
+            placeholder="请选择状态"
+            style="width: 167.5px"
+            clearable
+          >
             <el-option value="true" label="启用" />
             <el-option value="false" label="停用" />
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
         <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
-          <DatePicker
-            v-model="dateRange"
-            @update:model-value="handleDateRangeChange"
-          />
+          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
         <el-form-item v-if="isExpand" prop="creator" label="创建人">
           <UserTableSelect
-              v-model="queryFormData.creator"
-              @confirm-click="handleConfirm"
-              @clear-click="handleQuery"
+            v-model="queryFormData.creator"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
           />
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
         <el-form-item class="search-buttons">
-          <el-button v-hasPerm="['module_system:role:query']" type="primary" icon="search" native-type="submit">查询</el-button>
-          <el-button v-hasPerm="['module_system:role:query']" icon="refresh" @click="handleResetQuery">重置</el-button>
+          <el-button
+            v-hasPerm="['module_system:role:query']"
+            type="primary"
+            icon="search"
+            native-type="submit"
+          >
+            查询
+          </el-button>
+          <el-button
+            v-hasPerm="['module_system:role:query']"
+            icon="refresh"
+            @click="handleResetQuery"
+          >
+            重置
+          </el-button>
           <!-- 展开/收起 -->
           <template v-if="isExpandable">
             <el-link class="ml-3" type="primary" underline="never" @click="isExpand = !isExpand">
@@ -67,10 +88,25 @@
         <div class="data-table__toolbar--left">
           <el-row :gutter="10">
             <el-col :span="1.5">
-              <el-button v-hasPerm="['module_system:role:create']" type="success" icon="plus" @click="handleOpenDialog('create')">新增</el-button>
+              <el-button
+                v-hasPerm="['module_system:role:create']"
+                type="success"
+                icon="plus"
+                @click="handleOpenDialog('create')"
+              >
+                新增
+              </el-button>
             </el-col>
             <el-col :span="1.5">
-              <el-button v-hasPerm="['module_system:role:delete']" type="danger" icon="delete" :disabled="selectIds.length === 0" @click="handleDelete(selectIds)">批量删除</el-button>
+              <el-button
+                v-hasPerm="['module_system:role:delete']"
+                type="danger"
+                icon="delete"
+                :disabled="selectIds.length === 0"
+                @click="handleDelete(selectIds)"
+              >
+                批量删除
+              </el-button>
             </el-col>
             <el-col :span="1.5">
               <el-dropdown v-hasPerm="['module_system:role:patch']" trigger="click">
@@ -79,8 +115,12 @@
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu v-hasPerm="['module_system:role:filter']">
-                    <el-dropdown-item icon="Check" @click="handleMoreClick(true)">批量启用</el-dropdown-item>
-                    <el-dropdown-item icon="CircleClose" @click="handleMoreClick(false)">批量停用</el-dropdown-item>
+                    <el-dropdown-item icon="Check" @click="handleMoreClick(true)">
+                      批量启用
+                    </el-dropdown-item>
+                    <el-dropdown-item icon="CircleClose" @click="handleMoreClick(false)">
+                      批量停用
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -91,12 +131,24 @@
           <el-row :gutter="10">
             <el-col :span="1.5">
               <el-tooltip content="导出">
-                <el-button v-hasPerm="['module_system:role:export']" type="warning" icon="download" circle @click="handleOpenExportsModal" />
+                <el-button
+                  v-hasPerm="['module_system:role:export']"
+                  type="warning"
+                  icon="download"
+                  circle
+                  @click="handleOpenExportsModal"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
               <el-tooltip content="刷新">
-                <el-button v-hasPerm="['module_system:role:refresh']" type="primary" icon="refresh" circle @click="handleRefresh" />
+                <el-button
+                  v-hasPerm="['module_system:role:refresh']"
+                  type="primary"
+                  icon="refresh"
+                  circle
+                  @click="handleRefresh"
+                />
               </el-tooltip>
             </el-col>
             <el-col :span="1.5">
@@ -115,128 +167,268 @@
         </div>
       </div>
 
-      <el-table ref="dataTableRef" v-loading="loading" :data="pageTableData" highlight-current-row class="data-table__content" :height="450" border stripe @selection-change="handleSelectionChange">
+      <el-table
+        ref="dataTableRef"
+        v-loading="loading"
+        :data="pageTableData"
+        highlight-current-row
+        class="data-table__content"
+        :height="450"
+        border
+        stripe
+        @selection-change="handleSelectionChange"
+      >
         <template #empty>
           <el-empty :image-size="80" description="暂无数据" />
         </template>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'selection')?.show" type="selection" width="55" align="center" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'index')?.show" type="index" fixed label="序号" width="60" >
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'selection')?.show"
+          type="selection"
+          width="55"
+          align="center"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'index')?.show"
+          type="index"
+          fixed
+          label="序号"
+          width="60"
+        >
           <template #default="scope">
             {{ (queryFormData.page_no - 1) * queryFormData.page_size + scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'name')?.show" key="name" label="角色名称" prop="name" min-width="100" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'code')?.show" key="code" label="角色编码" prop="code" min-width="100" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'data_scope')?.show" key="data_scope" label="数据权限" prop="data_scope" min-width="200">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'name')?.show"
+          key="name"
+          label="角色名称"
+          prop="name"
+          min-width="100"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'code')?.show"
+          key="code"
+          label="角色编码"
+          prop="code"
+          min-width="100"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'data_scope')?.show"
+          key="data_scope"
+          label="数据权限"
+          prop="data_scope"
+          min-width="200"
+        >
           <template #default="scope">
             <el-tag v-if="scope.row.data_scope === 1" type="primary">仅本人数据权限</el-tag>
             <el-tag v-else-if="scope.row.data_scope === 2" type="info">本部门数据权限</el-tag>
-            <el-tag v-else-if="scope.row.data_scope === 3" type="warning">本部门及以下数据权限</el-tag>
+            <el-tag v-else-if="scope.row.data_scope === 3" type="warning">
+              本部门及以下数据权限
+            </el-tag>
             <el-tag v-else-if="scope.row.data_scope === 4" type="success">全部数据权限</el-tag>
-            <el-tag v-else type="danger" >自定义数据权限</el-tag>
+            <el-tag v-else type="danger">自定义数据权限</el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'order')?.show" key="order" label="排序" prop="order" min-width="80" show-overflow-tooltip />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'status')?.show" key="status" label="状态" prop="status" min-width="80">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'order')?.show"
+          key="order"
+          label="排序"
+          prop="order"
+          min-width="80"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'status')?.show"
+          key="status"
+          label="状态"
+          prop="status"
+          min-width="80"
+        >
           <template #default="scope">
             <el-tag :type="scope.row.status === true ? 'success' : 'danger'">
               {{ scope.row.status === true ? "启用" : "停用" }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'description')?.show" key="description" label="描述" prop="description" min-width="100" />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'created_at')?.show" key="created_at" label="创建时间" prop="created_at" min-width="200" sortable />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'updated_at')?.show" key="updated_at" label="更新时间" prop="updated_at" min-width="200" sortable />
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'creator')?.show" key="creator" label="创建人" min-width="120">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'description')?.show"
+          key="description"
+          label="描述"
+          prop="description"
+          min-width="100"
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'created_at')?.show"
+          key="created_at"
+          label="创建时间"
+          prop="created_at"
+          min-width="200"
+          sortable
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'updated_at')?.show"
+          key="updated_at"
+          label="更新时间"
+          prop="updated_at"
+          min-width="200"
+          sortable
+        />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'creator')?.show"
+          key="creator"
+          label="创建人"
+          min-width="120"
+        >
           <template #default="scope">
             {{ scope.row.creator?.name }}
           </template>
         </el-table-column>
 
-        <el-table-column v-if="tableColumns.find(col => col.prop === 'operation')?.show" fixed="right" label="操作" align="center" min-width="280">
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'operation')?.show"
+          fixed="right"
+          label="操作"
+          align="center"
+          min-width="280"
+        >
           <template #default="scope">
-            <el-button 
-              v-hasPerm="['module_system:role:permission']" 
-              type="warning" 
-              size="small" 
-              link 
-              icon="position" 
+            <el-button
+              v-hasPerm="['module_system:role:permission']"
+              type="warning"
+              size="small"
+              link
+              icon="position"
               :disabled="scope.row.id === 1"
-              @click="scope.row.id === 1 ? ElMessage.warning('系统默认角色，不可操作') : handleOpenAssignPermDialog(scope.row.id, scope.row.name)"
-            >分配权限</el-button>
-            <el-button 
+              @click="
+                scope.row.id === 1
+                  ? ElMessage.warning('系统默认角色，不可操作')
+                  : handleOpenAssignPermDialog(scope.row.id, scope.row.name)
+              "
+            >
+              分配权限
+            </el-button>
+            <el-button
               v-hasPerm="['module_system:role:detail']"
-              type="info" 
-              size="small" 
-              link 
-              icon="document" 
+              type="info"
+              size="small"
+              link
+              icon="document"
               @click="handleOpenDialog('detail', scope.row.id)"
-            >详情</el-button>
-            <el-button 
-              v-hasPerm="['module_system:role:update']" 
-              type="primary" 
-              size="small" 
-              link 
-              icon="edit" 
+            >
+              详情
+            </el-button>
+            <el-button
+              v-hasPerm="['module_system:role:update']"
+              type="primary"
+              size="small"
+              link
+              icon="edit"
               :disabled="scope.row.id === 1"
-              @click="scope.row.id === 1 ? ElMessage.warning('系统默认角色，不可操作') : handleOpenDialog('update', scope.row.id)"
-            >编辑</el-button>
-            <el-button 
-              v-hasPerm="['module_system:role:delete']" 
-              type="danger" 
-              size="small" 
-              link 
-              icon="delete" 
+              @click="
+                scope.row.id === 1
+                  ? ElMessage.warning('系统默认角色，不可操作')
+                  : handleOpenDialog('update', scope.row.id)
+              "
+            >
+              编辑
+            </el-button>
+            <el-button
+              v-hasPerm="['module_system:role:delete']"
+              type="danger"
+              size="small"
+              link
+              icon="delete"
               :disabled="scope.row.id === 1"
-              @click="scope.row.id === 1 ? ElMessage.warning('系统默认角色，不可操作') : handleDelete([scope.row.id])"
-            >删除</el-button>
+              @click="
+                scope.row.id === 1
+                  ? ElMessage.warning('系统默认角色，不可操作')
+                  : handleDelete([scope.row.id])
+              "
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
       <template #footer>
-        <pagination v-model:total="total" v-model:page="queryFormData.page_no" v-model:limit="queryFormData.page_size" @pagination="loadingData" />
+        <pagination
+          v-model:total="total"
+          v-model:page="queryFormData.page_no"
+          v-model:limit="queryFormData.page_size"
+          @pagination="loadingData"
+        />
       </template>
     </el-card>
 
     <!-- 角色表单弹窗 -->
-    <el-dialog v-model="dialogVisible.visible" :title="dialogVisible.title" @close="handleCloseDialog">
+    <el-dialog
+      v-model="dialogVisible.visible"
+      :title="dialogVisible.title"
+      @close="handleCloseDialog"
+    >
       <!-- 详情 -->
       <template v-if="dialogVisible.type === 'detail'">
         <el-descriptions :column="4" border>
-          <el-descriptions-item label="角色名称" :span="2">{{ detailFormData.name }}</el-descriptions-item>
+          <el-descriptions-item label="角色名称" :span="2">
+            {{ detailFormData.name }}
+          </el-descriptions-item>
           <el-descriptions-item label="排序" :span="2">
             {{ detailFormData.order }}
           </el-descriptions-item>
-          <el-descriptions-item label="角色编码" :span="2">{{ detailFormData.code }}</el-descriptions-item>
+          <el-descriptions-item label="角色编码" :span="2">
+            {{ detailFormData.code }}
+          </el-descriptions-item>
           <el-descriptions-item label="数据权限" :span="2">
             <el-tag v-if="detailFormData.data_scope === 1" type="primary">仅本人数据权限</el-tag>
             <el-tag v-else-if="detailFormData.data_scope === 2" type="info">本部门数据权限</el-tag>
-            <el-tag v-else-if="detailFormData.data_scope === 3" type="warning">本部门及以下数据权限</el-tag>
+            <el-tag v-else-if="detailFormData.data_scope === 3" type="warning">
+              本部门及以下数据权限
+            </el-tag>
             <el-tag v-else-if="detailFormData.data_scope === 4" type="success">全部数据权限</el-tag>
-            <el-tag v-else type="danger" >自定义数据权限</el-tag>
+            <el-tag v-else type="danger">自定义数据权限</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status ? 'success' : 'danger'">
-              {{ detailFormData.status ? '启用' : '停用' }}
+              {{ detailFormData.status ? "启用" : "停用" }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="创建人" :span="2">{{ detailFormData.creator?.name }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间" :span="2">{{ detailFormData.created_at }}</el-descriptions-item>
-          <el-descriptions-item label="更新时间" :span="2">{{ detailFormData.updated_at }}</el-descriptions-item>
-          <el-descriptions-item label="描述" :span="4">{{ detailFormData.description }}</el-descriptions-item>
+          <el-descriptions-item label="创建人" :span="2">
+            {{ detailFormData.creator?.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间" :span="2">
+            {{ detailFormData.created_at }}
+          </el-descriptions-item>
+          <el-descriptions-item label="更新时间" :span="2">
+            {{ detailFormData.updated_at }}
+          </el-descriptions-item>
+          <el-descriptions-item label="描述" :span="4">
+            {{ detailFormData.description }}
+          </el-descriptions-item>
         </el-descriptions>
       </template>
       <!-- 新增、编辑表单 -->
       <template v-else>
-        <el-form ref="dataFormRef" :model="formData" :rules="rules" label-suffix=":" label-width="auto" label-position="right">
+        <el-form
+          ref="dataFormRef"
+          :model="formData"
+          :rules="rules"
+          label-suffix=":"
+          label-width="auto"
+          label-position="right"
+        >
           <el-form-item label="角色名称" prop="name">
             <el-input v-model="formData.name" placeholder="请输入角色名称" />
           </el-form-item>
 
           <el-form-item label="排序" prop="order">
-            <el-input-number v-model="formData.order" controls-position="right" :min="0" style="width: 100px" />
+            <el-input-number
+              v-model="formData.order"
+              controls-position="right"
+              :min="0"
+              style="width: 100px"
+            />
           </el-form-item>
 
           <el-form-item label="角色编码" prop="code">
@@ -251,24 +443,38 @@
           </el-form-item>
 
           <el-form-item label="描述" prop="description">
-            <el-input v-model="formData.description" :rows="4" :maxlength="100" show-word-limit type="textarea" placeholder="请输入描述" />
+            <el-input
+              v-model="formData.description"
+              :rows="4"
+              :maxlength="100"
+              show-word-limit
+              type="textarea"
+              placeholder="请输入描述"
+            />
           </el-form-item>
         </el-form>
-
       </template>
 
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="handleCloseDialog">取 消</el-button>
-          <el-button v-hasPerm="['module_system:role:submit']" type="primary" @click="handleSubmit">确 定</el-button>
+          <el-button v-hasPerm="['module_system:role:submit']" type="primary" @click="handleSubmit">
+            确 定
+          </el-button>
         </div>
       </template>
     </el-dialog>
 
-    <PermissonDrawer v-if="drawerVisible" v-model="drawerVisible" :role-name="checkedRole.name" :role-id="checkedRole.id" @saved="handleRefresh" />
+    <PermissonDrawer
+      v-if="drawerVisible"
+      v-model="drawerVisible"
+      :role-name="checkedRole.name"
+      :role-id="checkedRole.id"
+      @saved="handleRefresh"
+    />
 
     <!-- 导出弹窗 -->
-    <ExportModal 
+    <ExportModal
       v-model="exportsDialogVisible"
       :content-config="curdContentConfig"
       :query-params="queryFormData"
@@ -309,19 +515,19 @@ const drawerVisible = ref(false);
 
 // 表格列配置
 const tableColumns = ref([
-  { prop: 'selection', label: '选择框', show: true },
-  { prop: 'index', label: '序号', show: true },
-  { prop: 'name', label: '角色名称', show: true },
-  { prop: 'data_scope', label: '数据权限', show: true },
-  { prop: 'order', label: '排序', show: true },
-  { prop: 'code', label: '角色编码', show: true },
-  { prop: 'status', label: '状态', show: true },
-  { prop: 'description', label: '描述', show: true },
-  { prop: 'created_at', label: '创建时间', show: true },
-  { prop: 'updated_at', label: '更新时间', show: true },
-  { prop: 'creator', label: '创建人', show: true },
-  { prop: 'operation', label: '操作', show: true }
-])
+  { prop: "selection", label: "选择框", show: true },
+  { prop: "index", label: "序号", show: true },
+  { prop: "name", label: "角色名称", show: true },
+  { prop: "data_scope", label: "数据权限", show: true },
+  { prop: "order", label: "排序", show: true },
+  { prop: "code", label: "角色编码", show: true },
+  { prop: "status", label: "状态", show: true },
+  { prop: "description", label: "描述", show: true },
+  { prop: "created_at", label: "创建时间", show: true },
+  { prop: "updated_at", label: "更新时间", show: true },
+  { prop: "creator", label: "创建人", show: true },
+  { prop: "operation", label: "操作", show: true },
+]);
 
 // 详情表单
 const detailFormData = ref<RoleTable>({} as RoleTable);
@@ -332,7 +538,7 @@ const checkedRole = ref<RoleTable>({} as RoleTable);
 const queryFormData = reactive<TablePageQuery>({
   page_no: 1,
   page_size: 10,
-  name: '',
+  name: "",
   status: undefined,
   start_time: undefined,
   end_time: undefined,
@@ -354,7 +560,7 @@ const formData = reactive<RoleForm>({
 const dialogVisible = reactive({
   title: "",
   visible: false,
-  type: 'create' as 'create' | 'update' | 'detail',
+  type: "create" as "create" | "update" | "detail",
 });
 
 // 表单验证规则
@@ -364,7 +570,6 @@ const rules = reactive({
   status: [{ required: true, message: "请选择状态", trigger: "blur" }],
 });
 
-
 // 加载表格数据
 async function loadingData() {
   loading.value = true;
@@ -372,19 +577,17 @@ async function loadingData() {
     const response = await RoleAPI.getRoleList(queryFormData);
     pageTableData.value = response.data.data.items;
     total.value = response.data.data.total;
-  }
-  catch (error: any) {
+  } catch (error: any) {
     console.error(error);
-  }
-  finally {
+  } finally {
     loading.value = false;
   }
 }
 
 // 列表刷新
-async function handleRefresh () {
+async function handleRefresh() {
   await loadingData();
-};
+}
 
 // 查询（重置页码后获取数据）
 async function handleQuery() {
@@ -422,7 +625,7 @@ const initialFormData: RoleForm = {
   code: undefined,
   status: true,
   description: undefined,
-}
+};
 
 // 日期范围临时变量
 const dateRange = ref<[Date, Date] | []>([]);
@@ -456,14 +659,14 @@ async function handleCloseDialog() {
 }
 
 // 打开系统配置弹窗
-async function handleOpenDialog(type: 'create' | 'update' | 'detail', id?: number) {
+async function handleOpenDialog(type: "create" | "update" | "detail", id?: number) {
   dialogVisible.type = type;
   if (id) {
     const response = await RoleAPI.getRoleDetail(id);
-    if (type === 'detail') {
+    if (type === "detail") {
       dialogVisible.title = "角色详情";
       Object.assign(detailFormData.value, response.data.data);
-    } else if (type === 'update') {
+    } else if (type === "update") {
       dialogVisible.title = "修改角色";
       Object.assign(formData, response.data.data);
     }
@@ -484,9 +687,9 @@ async function handleSubmit() {
       const id = formData.id;
       try {
         if (id) {
-          await RoleAPI.updateRole(id, { id, ...formData })
+          await RoleAPI.updateRole(id, { id, ...formData });
         } else {
-          await RoleAPI.createRole(formData)
+          await RoleAPI.createRole(formData);
         }
         dialogVisible.visible = false;
         resetForm();
@@ -509,19 +712,21 @@ async function handleDelete(ids: number[]) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(async () => {
-    try {
-      loading.value = true;
-      await RoleAPI.deleteRole(ids);
-      handleResetQuery();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  }).catch(() => {
-    ElMessageBox.close();
-  });
+  })
+    .then(async () => {
+      try {
+        loading.value = true;
+        await RoleAPI.deleteRole(ids);
+        handleResetQuery();
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 
 // 导出已改为通过导出弹窗 ExportModal 统一处理
@@ -532,23 +737,25 @@ function handleOpenExportsModal() {
 // 批量启用/停用
 async function handleMoreClick(status: boolean) {
   if (selectIds.value.length) {
-    ElMessageBox.confirm(`确认${status ? '启用' : '停用'}该项数据?`, "警告", {
+    ElMessageBox.confirm(`确认${status ? "启用" : "停用"}该项数据?`, "警告", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
       type: "warning",
-    }).then(async () => {
-      try {
-        loading.value = true;
-        await RoleAPI.batchAvailableRole({ ids: selectIds.value, status });
-        handleResetQuery();
-      } catch (error: any) {
-        console.error(error);
-      } finally {
-        loading.value = false;
-      }
-    }).catch(() => {
-      ElMessageBox.close();
-    });
+    })
+      .then(async () => {
+        try {
+          loading.value = true;
+          await RoleAPI.batchAvailableRole({ ids: selectIds.value, status });
+          handleResetQuery();
+        } catch (error: any) {
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      })
+      .catch(() => {
+        ElMessageBox.close();
+      });
   }
 }
 
@@ -566,24 +773,24 @@ const exportsDialogVisible = ref(false);
 const selectionRows = ref<RoleTable[]>([]);
 // 导出字段
 const exportColumns = [
-  { prop: 'name', label: '角色名称' },
-  { prop: 'code', label: '角色编码' },
-  { prop: 'data_scope', label: '数据权限' },
-  { prop: 'order', label: '排序' },
-  { prop: 'status', label: '状态' },
-  { prop: 'description', label: '描述' },
-  { prop: 'created_at', label: '创建时间' },
-  { prop: 'updated_at', label: '更新时间' },
+  { prop: "name", label: "角色名称" },
+  { prop: "code", label: "角色编码" },
+  { prop: "data_scope", label: "数据权限" },
+  { prop: "order", label: "排序" },
+  { prop: "status", label: "状态" },
+  { prop: "description", label: "描述" },
+  { prop: "created_at", label: "创建时间" },
+  { prop: "updated_at", label: "更新时间" },
 ];
 
 // 导入/导出配置
 const curdContentConfig = {
-  permPrefix: 'module_system:role',
+  permPrefix: "module_system:role",
   cols: exportColumns as any,
   exportsAction: async (params: any) => {
     const query: any = { ...params };
-    if (typeof query.status === 'string') {
-      query.status = query.status === 'true';
+    if (typeof query.status === "string") {
+      query.status = query.status === "true";
     }
     query.page_no = 1;
     query.page_size = 1000;

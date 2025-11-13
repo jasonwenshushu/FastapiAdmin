@@ -1,16 +1,20 @@
 <!-- 角色授权 -->
 <template>
   <!-- 分配权限弹窗 -->
-  <el-drawer v-model="drawerVisible" :title="'【' + props.roleName + '】权限分配'" :size="drawerSize">
+  <el-drawer
+    v-model="drawerVisible"
+    :title="'【' + props.roleName + '】权限分配'"
+    :size="drawerSize"
+  >
     <el-container>
       <!-- 数据权限 -->
-      <el-aside >
+      <el-aside>
         <div class="border-r-1 border-r-[#f0f0f0] b-r-solid h-[100%] p-[20px] box-border">
           <div class="flex items-center">
-            <div style="display: flex; gap: 10px; ">
-              <div style="width: 10px; background-color: #409eff;"></div>
+            <div style="display: flex; gap: 10px">
+              <div style="width: 10px; background-color: #409eff"></div>
               <div>
-                <span style="font-size: 16px;">数据授权</span>
+                <span style="font-size: 16px">数据授权</span>
                 <el-tooltip placement="right">
                   <template #content>
                     <span>授权用户可操作的数据范围</span>
@@ -32,38 +36,41 @@
                   <el-option :key="4" label="全部数据权限" :value="4" />
                   <el-option :key="5" label="自定义数据权限" :value="5" />
                 </el-select>
-                </el-form-item>
-              </el-form>
-              
-              <div v-if="permissionState.data_scope === 5 && deptTreeData.length" class="mt-5 max-h-[60vh] b-1 b-solid b-[#e5e7eb] p-10px overflow-auto box-border">
-                <el-input v-model="deptFilterText" placeholder="部门名称" />
-                <el-tree 
-                  ref="deptTreeRef"
-                  node-key="value"
-                  show-checkbox
-                  :data="deptTreeData"
-                  :filter-node-method="handleFilter"
-                  default-expand-all
-                  :highlight-current="true"
-                  :check-strictly="!parentChildLinked"
-                  style="height: calc(100% - 60px); overflow-y: auto; margin-top: 10px;"
-                  @check="deptTreeCheck"
-                  >
-                  <template #empty>
-                    <el-empty :image-size="80" description="暂无数据" />
-                  </template>
-                </el-tree>
-              </div>
+              </el-form-item>
+            </el-form>
+
+            <div
+              v-if="permissionState.data_scope === 5 && deptTreeData.length"
+              class="mt-5 max-h-[60vh] b-1 b-solid b-[#e5e7eb] p-10px overflow-auto box-border"
+            >
+              <el-input v-model="deptFilterText" placeholder="部门名称" />
+              <el-tree
+                ref="deptTreeRef"
+                node-key="value"
+                show-checkbox
+                :data="deptTreeData"
+                :filter-node-method="handleFilter"
+                default-expand-all
+                :highlight-current="true"
+                :check-strictly="!parentChildLinked"
+                style="height: calc(100% - 60px); overflow-y: auto; margin-top: 10px"
+                @check="deptTreeCheck"
+              >
+                <template #empty>
+                  <el-empty :image-size="80" description="暂无数据" />
+                </template>
+              </el-tree>
+            </div>
           </div>
         </div>
       </el-aside>
 
       <!-- 菜单权限 -->
       <el-main>
-        <div style="display: flex; gap: 10px; ">
-          <div style="width: 10px; background-color: #409eff;"></div>
+        <div style="display: flex; gap: 10px">
+          <div style="width: 10px; background-color: #409eff"></div>
           <div>
-            <span style="font-size: 16px;">菜单授权</span>
+            <span style="font-size: 16px">菜单授权</span>
             <el-tooltip placement="right">
               <template #content>
                 <span>授权用户可操作的菜单权限</span>
@@ -83,7 +90,11 @@
               </template>
               {{ isExpanded ? "收缩" : "展开" }}
             </el-button>
-            <el-checkbox v-model="parentChildLinked" class="ml-5" @change="handleParentChildLinkedChange">
+            <el-checkbox
+              v-model="parentChildLinked"
+              class="ml-5"
+              @change="handleParentChildLinkedChange"
+            >
               父子联动
             </el-checkbox>
 
@@ -99,16 +110,16 @@
         </div>
 
         <div class="mt-5 max-h-[65vh] b-1 b-solid b-[#e5e7eb] p-10px overflow-auto box-border">
-          <el-tree 
-            ref="permTreeRef" 
-            node-key="value" 
-            show-checkbox 
+          <el-tree
+            ref="permTreeRef"
+            node-key="value"
+            show-checkbox
             :data="menuTreeData"
-            :filter-node-method="handleFilter" 
+            :filter-node-method="handleFilter"
             default-expand-all
             :highlight-current="true"
             :check-strictly="!parentChildLinked"
-            style="height: calc(100% - 60px); overflow: auto; margin-top: 10px;"
+            style="height: calc(100% - 60px); overflow: auto; margin-top: 10px"
             @check="menuTreeCheck"
           >
             <template #empty>
@@ -133,46 +144,50 @@
 const props = defineProps({
   roleName: {
     type: String,
-    required: true
+    required: true,
   },
   roleId: {
     type: Number,
-    required: true
+    required: true,
   },
   modelValue: {
     type: Boolean,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 import { listToTree, formatTree } from "@/utils/common";
-import RoleAPI, { permissionDataType, permissionDeptType, permissionMenuType } from "@/api/module_system/role";
+import RoleAPI, {
+  permissionDataType,
+  permissionDeptType,
+  permissionMenuType,
+} from "@/api/module_system/role";
 import DeptAPI from "@/api/module_system/dept";
 import MenuAPI from "@/api/module_system/menu";
-import type { TreeInstance } from 'element-plus'
+import type { TreeInstance } from "element-plus";
 import { useAppStore } from "@/store/modules/app.store";
 import { DeviceEnum } from "@/enums/settings/device.enum";
 import { useUserStore } from "@/store";
 
 const appStore = useAppStore();
 const drawerSize = computed(() => (appStore.device === DeviceEnum.DESKTOP ? "800px" : "90%"));
-const emit = defineEmits(['update:modelValue', 'saved'])
+const emit = defineEmits(["update:modelValue", "saved"]);
 
 const permTreeRef = ref<TreeInstance>();
-const deptTreeRef = ref<TreeInstance>()
-const deptFilterText = ref("")
+const deptTreeRef = ref<TreeInstance>();
+const deptFilterText = ref("");
 const permFilterText = ref("");
 const dataFormRef = ref();
 const drawerVisible = computed({
   get() {
-    return props.modelValue
+    return props.modelValue;
   },
   set(value) {
-    emit('update:modelValue', value)
-  }
-})
+    emit("update:modelValue", value);
+  },
+});
 const isExpanded = ref(true);
-const parentChildLinked = ref(false)
+const parentChildLinked = ref(false);
 const loading = ref<boolean>(false);
 const deptTreeData = ref<permissionDeptType[]>([]);
 const menuTreeData = ref<permissionMenuType[]>([]);
@@ -180,7 +195,7 @@ const permissionState = ref<permissionDataType>({
   role_ids: [],
   menu_ids: [],
   data_scope: 1,
-  dept_ids: []
+  dept_ids: [],
 });
 
 // 初始化方法,用于打开抽屉并加载数据
@@ -202,13 +217,16 @@ const init = async () => {
     // 更新权限状态
     permissionState.value = {
       role_ids: [props.roleId],
-      menu_ids: roleResponse.data.data.menus?.map(menu => menu.id) || [],
+      menu_ids: roleResponse.data.data.menus?.map((menu) => menu.id) || [],
       data_scope: roleResponse.data.data.data_scope || 1,
-      dept_ids: roleResponse.data.data.depts?.map(dept => dept.id) || []
+      dept_ids: roleResponse.data.data.depts?.map((dept) => dept.id) || [],
     };
 
     // 根据保存的权限数据判断是否应该开启父子联动
-    parentChildLinked.value = checkParentChildLinked(permissionState.value.menu_ids, menuTreeData.value);
+    parentChildLinked.value = checkParentChildLinked(
+      permissionState.value.menu_ids,
+      menuTreeData.value
+    );
 
     // 回显菜单树选中项
     if (permTreeRef.value) {
@@ -220,14 +238,13 @@ const init = async () => {
       // await 一定不能丢，否则到导致初始化时候deptTreeRef.value 为 undefined
       await deptTreeRef.value.setCheckedKeys(permissionState.value.dept_ids);
     }
-
   } catch (error: any) {
-    ElMessage.error('获取权限数据失败: ' + error.message);
+    ElMessage.error("获取权限数据失败: " + error.message);
   } finally {
     loading.value = false;
     // handleCancel()
   }
-}
+};
 
 // 取消按钮处理函数
 function handleCancel() {
@@ -235,30 +252,30 @@ function handleCancel() {
 }
 
 // 保存权限分配
-async function handleDrawerSave () {
+async function handleDrawerSave() {
   try {
     if (props.roleId === 1) {
-      ElMessage.warning('系统默认角色，不可操作');
+      ElMessage.warning("系统默认角色，不可操作");
       return;
     }
     loading.value = true;
 
     // 构造提交数据
-    const submitData : permissionDataType = {
+    const submitData: permissionDataType = {
       role_ids: [props.roleId],
-      menu_ids: (permTreeRef.value?.getCheckedKeys() || []).map(key => Number(key)),
+      menu_ids: (permTreeRef.value?.getCheckedKeys() || []).map((key) => Number(key)),
       data_scope: permissionState.value.data_scope,
-      dept_ids: (deptTreeRef.value?.getCheckedKeys() || []).map(key => Number(key))
+      dept_ids: (deptTreeRef.value?.getCheckedKeys() || []).map((key) => Number(key)),
     };
 
-    await RoleAPI.setPermission(submitData)
-    
+    await RoleAPI.setPermission(submitData);
+
     // 更新全局用户状态，刷新权限信息
     const userStore = useUserStore();
     await userStore.getUserInfo();
-    
+
     drawerVisible.value = false;
-    emit('saved');
+    emit("saved");
   } catch (error: any) {
     console.error(error);
   } finally {
@@ -269,12 +286,12 @@ async function handleDrawerSave () {
 // 部门树选择回调
 const deptTreeCheck = (checkedIds: number[]) => {
   permissionState.value.dept_ids = checkedIds;
-}
+};
 
 // 菜单选择变更回调
 const menuTreeCheck = (checkedIds: number[]) => {
   permissionState.value.menu_ids = checkedIds;
-}
+};
 
 // 展开/收缩 菜单权限树
 function togglePermTree() {
@@ -293,7 +310,7 @@ function togglePermTree() {
 // 部门筛选
 watch(deptFilterText, (val) => {
   deptTreeRef.value!.filter(val);
-})
+});
 
 // 菜单筛选
 watch(permFilterText, (val) => {
@@ -301,10 +318,7 @@ watch(permFilterText, (val) => {
 });
 
 // 树节点过滤
-function handleFilter(
-  value: string,
-  data: {[key: string]: any;}
-) {
+function handleFilter(value: string, data: { [key: string]: any }) {
   if (!value) return true;
   return data.label.includes(value);
 }
@@ -312,11 +326,11 @@ function handleFilter(
 // 检查权限数据是否遵循父子联动模式
 function checkParentChildLinked(menuIds: number[], menuTreeData: permissionMenuType[]): boolean {
   if (!menuIds.length || !menuTreeData.length) return false;
-  
+
   // 创建一个映射来快速查找菜单项
   const menuMap = new Map<number, permissionMenuType>();
   const buildMenuMap = (menus: permissionMenuType[]) => {
-    menus.forEach(menu => {
+    menus.forEach((menu) => {
       menuMap.set(menu.id, menu);
       if (menu.children) {
         buildMenuMap(menu.children);
@@ -324,23 +338,23 @@ function checkParentChildLinked(menuIds: number[], menuTreeData: permissionMenuT
     });
   };
   buildMenuMap(menuTreeData);
-  
+
   let hasParentChildConflict = false;
-  
+
   // 检查每个选中的菜单项
   for (const menuId of menuIds) {
     const menu = menuMap.get(menuId);
     if (!menu) continue;
-    
+
     // 如果选中了父菜单，检查是否有子菜单未被选中
     if (menu.children && menu.children.length > 0) {
-      const hasUnselectedChildren = menu.children.some(child => !menuIds.includes(child.id));
+      const hasUnselectedChildren = menu.children.some((child) => !menuIds.includes(child.id));
       if (hasUnselectedChildren) {
         hasParentChildConflict = true;
         break; // 发现冲突，直接返回false
       }
     }
-    
+
     // 如果选中了子菜单，检查父菜单是否也被选中
     const parentMenu = findParentMenu(menuId, menuTreeData);
     if (parentMenu && !menuIds.includes(parentMenu.id)) {
@@ -348,13 +362,16 @@ function checkParentChildLinked(menuIds: number[], menuTreeData: permissionMenuT
       break; // 发现冲突，直接返回false
     }
   }
-  
+
   // 如果没有发现父子冲突，说明是父子联动模式
   return !hasParentChildConflict;
 }
 
 // 查找父菜单
-function findParentMenu(menuId: number, menuTreeData: permissionMenuType[]): permissionMenuType | null {
+function findParentMenu(
+  menuId: number,
+  menuTreeData: permissionMenuType[]
+): permissionMenuType | null {
   for (const menu of menuTreeData) {
     if (menu.children) {
       for (const child of menu.children) {
@@ -377,7 +394,7 @@ function handleParentChildLinkedChange(val: any) {
 
 onMounted(async () => {
   await init();
-})
+});
 </script>
 
 <style lang="scss" scoped></style>

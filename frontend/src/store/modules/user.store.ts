@@ -1,7 +1,7 @@
 import { store, useTagsViewStore, usePermissionStoreHook, useDictStoreHook } from "@/store";
 
-import AuthAPI, {type LoginFormData } from "@/api/module_system/auth";
-import UserAPI, {type UserInfo }  from "@/api/module_system/user";
+import AuthAPI, { type LoginFormData } from "@/api/module_system/auth";
+import UserAPI, { type UserInfo } from "@/api/module_system/user";
 import type { MenuTable } from "@/api/module_system/menu";
 import { Auth } from "@/utils/auth";
 
@@ -48,10 +48,10 @@ export const useUserStore = defineStore("user", {
       // 设置路由后自动更新权限
       this.setPermissions(routers);
     },
-    
+
     setPermissions(menus: MenuTable[]) {
       this.prems = []; // 先清空现有权限
-      
+
       // 确保 basicInfo.roles 存在，避免空值错误
       if (!this.basicInfo.roles) {
         return;
@@ -59,13 +59,13 @@ export const useUserStore = defineStore("user", {
 
       // 合并所有角色的菜单列表，使用数组扁平化方法简化代码并过滤undefined
       const roleMenus = this.basicInfo.roles
-        .filter(role => role.menus && role.menus.length > 0)
-        .flatMap(role => role.menus)
+        .filter((role) => role.menus && role.menus.length > 0)
+        .flatMap((role) => role.menus)
         .filter((menu): menu is MenuTable => menu !== undefined);
-      
+
       // 合并传入的菜单和角色菜单
       const allMenus = [...menus, ...roleMenus];
-      
+
       const permissionSet = new Set<string>();
       const collect = (items: MenuTable[]) => {
         items.forEach((item) => {
@@ -73,14 +73,14 @@ export const useUserStore = defineStore("user", {
           if (item.permission) {
             permissionSet.add(item.permission);
           }
-          
+
           // 递归收集子菜单的权限，确保子菜单不包含undefined
           if (item.children && item.children.length > 0) {
             collect(item.children.filter((child): child is MenuTable => child !== undefined));
           }
         });
       };
-      
+
       // 收集所有权限
       collect(allMenus);
       this.prems = Array.from(permissionSet);
@@ -93,17 +93,21 @@ export const useUserStore = defineStore("user", {
       this.routeList = [];
       this.hasGetRoute = false;
     },
-    
+
     // 登录
     async login(LoginFormData: LoginFormData) {
-      const response =  await AuthAPI.login(LoginFormData)
+      const response = await AuthAPI.login(LoginFormData);
       this.rememberMe = LoginFormData.remember;
-      Auth.setTokens(response.data.data.access_token, response.data.data.refresh_token, this.rememberMe);
+      Auth.setTokens(
+        response.data.data.access_token,
+        response.data.data.refresh_token,
+        this.rememberMe
+      );
     },
 
     // 登出
     async logout() {
-      await AuthAPI.logout({token: Auth.getAccessToken()});
+      await AuthAPI.logout({ token: Auth.getAccessToken() });
       this.resetAllState();
     },
 
@@ -118,7 +122,7 @@ export const useUserStore = defineStore("user", {
       // 清除标签视图
       useTagsViewStore().delAllViews();
       // 重置字典
-      useDictStoreHook().clearDictData()
+      useDictStoreHook().clearDictData();
 
       return Promise.resolve();
     },
@@ -132,23 +136,25 @@ export const useUserStore = defineStore("user", {
       }
 
       return new Promise<void>((resolve, reject) => {
-        AuthAPI.refreshToken({refresh_token: refreshToken})
+        AuthAPI.refreshToken({ refresh_token: refreshToken })
           .then((response) => {
             // 更新令牌，保持当前记住我状态
-            Auth.setTokens(response.data.data.access_token, response.data.data.refresh_token, Auth.getRememberMe());
+            Auth.setTokens(
+              response.data.data.access_token,
+              response.data.data.refresh_token,
+              Auth.getRememberMe()
+            );
             resolve();
           })
           .catch((error) => {
             reject(error);
           });
       });
-    }
+    },
   },
 
-  persist: true
-
+  persist: true,
 });
-
 
 /**
  * 在组件外部使用UserStore的钩子函数

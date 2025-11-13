@@ -7,97 +7,97 @@ const GencodeAPI = {
   listTable(query: GenTablePageQuery) {
     return request<ApiResponse<PageResult<GenTableSchema[]>>>({
       url: `${API_PATH}/list`,
-      method: 'get',
-      params: query
-    })
+      method: "get",
+      params: query,
+    });
   },
 
   // 查询db数据库列表
   listDbTable(query: DBTablePageQuery) {
     return request<ApiResponse<PageResult<DBTableSchema[]>>>({
       url: `${API_PATH}/db/list`,
-      method: 'get',
-      params: query
-    })
+      method: "get",
+      params: query,
+    });
   },
 
   // 导入表
   importTable(table_names: string[]) {
     return request<ApiResponse>({
       url: `${API_PATH}/import`,
-      method: 'post',
-      data: table_names
-    })
+      method: "post",
+      data: table_names,
+    });
   },
 
   // 查询表详细信息
   getGenTableDetail(table_id: number) {
     return request<ApiResponse<GenTableSchema>>({
       url: `${API_PATH}/detail/${table_id}`,
-      method: 'get'
-    })
+      method: "get",
+    });
   },
 
   // 创建表
   createTable(sql: string) {
     return request<ApiResponse>({
       url: `${API_PATH}/create`,
-      method: 'post',
-      data: sql
-    })
+      method: "post",
+      data: sql,
+    });
   },
 
   // 更新表信息
   updateTable(data: GenTableSchema, table_id: number) {
     return request<ApiResponse>({
       url: `${API_PATH}/update/${table_id}`,
-      method: 'put',
-      data
-    })
+      method: "put",
+      data,
+    });
   },
 
   // 删除表数据
   deleteTable(table_ids: number[]) {
     return request<ApiResponse>({
       url: `${API_PATH}/delete`,
-      method: 'delete',
-      data: table_ids
-    })
+      method: "delete",
+      data: table_ids,
+    });
   },
 
   // 批量生成代码
   batchGenCode(table_names: string[]) {
     return request<Blob>({
       url: `${API_PATH}/batch/output`,
-      method: 'patch',
+      method: "patch",
       data: table_names,
-      responseType: 'blob'
-    })
+      responseType: "blob",
+    });
   },
 
   // 生成代码到指定路径
   genCodeToPath(table_name: string) {
     return request<ApiResponse>({
       url: `${API_PATH}/output/${table_name}`,
-      method: 'post'
-    })
+      method: "post",
+    });
   },
 
   // 预览生成代码
   previewTable(id: number) {
     return request<ApiResponse<Record<string, string>>>({
       url: `${API_PATH}/preview/${id}`,
-      method: 'get'
-    })
+      method: "get",
+    });
   },
 
   // 同步数据库
   syncDb(table_name: string) {
     return request<ApiResponse>({
       url: `${API_PATH}/sync_db/${table_name}`,
-      method: 'post'
-    })
-  }
+      method: "post",
+    });
+  },
 };
 
 export default GencodeAPI;
@@ -219,4 +219,3 @@ export interface GenTableColumnSchema {
   /** 功能描述 */
   description?: string;
 }
-

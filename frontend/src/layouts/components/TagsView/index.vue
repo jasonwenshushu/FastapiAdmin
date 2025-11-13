@@ -10,16 +10,20 @@
       <el-scrollbar ref="scrollbarRef" class="scroll-container" @wheel="handleScroll">
         <VueDraggable v-model="visitedViews" :animation="150">
           <router-link
-            v-for="tag in displayedViews" :key="tag.fullPath"
-            :class="['tags-item', { active: tagsViewStore.isActive(tag) }]" :to="{ path: tag.path, query: tag.query }"
+            v-for="tag in displayedViews"
+            :key="tag.fullPath"
+            :class="['tags-item', { active: tagsViewStore.isActive(tag) }]"
+            :to="{ path: tag.path, query: tag.query }"
             @click="tagSwitchSource = 'tab'"
-            @click.middle="handleMiddleClick(tag)">
+            @click.middle="handleMiddleClick(tag)"
+          >
             <!-- 为所有标签添加右键菜单 -->
-            <el-dropdown 
+            <el-dropdown
               v-if="tagsViewStore.isActive(tag)"
               trigger="contextmenu"
               @visible-change="(visible) => onContextMenuVisibleChange(visible, tag)"
-              @click.stop>
+              @click.stop
+            >
               <span class="tag-text">{{ translateRouteTitle(tag.title) }}</span>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -32,7 +36,8 @@
 
                   <el-dropdown-item
                     :disabled="tag.affix || visitedViews.length <= 1"
-                    @click="closeSelectedTag(tag)">
+                    @click="closeSelectedTag(tag)"
+                  >
                     <el-icon>
                       <Close />
                     </el-icon>
@@ -41,7 +46,8 @@
 
                   <el-dropdown-item
                     :disabled="isFirstView || !tagsViewStore.isActive(tag)"
-                    @click="closeLeftTags">
+                    @click="closeLeftTags"
+                  >
                     <el-icon>
                       <Back />
                     </el-icon>
@@ -50,7 +56,8 @@
 
                   <el-dropdown-item
                     :disabled="isLastView || !tagsViewStore.isActive(tag)"
-                    @click="closeRightTags">
+                    @click="closeRightTags"
+                  >
                     <el-icon>
                       <Right />
                     </el-icon>
@@ -59,16 +66,15 @@
 
                   <el-dropdown-item
                     :disabled="visitedViews.length <= 1 || !tagsViewStore.isActive(tag)"
-                    @click="closeOtherTags">
+                    @click="closeOtherTags"
+                  >
                     <el-icon>
                       <Remove />
                     </el-icon>
                     {{ t("navbar.closeOther") }}
                   </el-dropdown-item>
 
-                  <el-dropdown-item
-                    :disabled="visitedViews.length <= 1"
-                    @click="closeAllTags(tag)">
+                  <el-dropdown-item :disabled="visitedViews.length <= 1" @click="closeAllTags(tag)">
                     <el-icon>
                       <Minus />
                     </el-icon>
@@ -81,21 +87,24 @@
                       <Star v-if="!isQuickLinkExists(tag)" />
                       <StarFilled v-else />
                     </el-icon>
-                    {{ isQuickLinkExists(tag) ? '取消收藏' : '收藏' }}
+                    {{ isQuickLinkExists(tag) ? "取消收藏" : "收藏" }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
             <span v-else class="tag-text">{{ translateRouteTitle(tag.title) }}</span>
-            
-            <span v-if="!tag.affix" class="tag-close-btn" @click.prevent.stop="closeSelectedTag(tag)">
+
+            <span
+              v-if="!tag.affix"
+              class="tag-close-btn"
+              @click.prevent.stop="closeSelectedTag(tag)"
+            >
               <el-icon>
                 <Close />
               </el-icon>
             </span>
           </router-link>
         </VueDraggable>
-
       </el-scrollbar>
     </nav>
 
@@ -146,7 +155,10 @@
             {{ t("navbar.closeRight") }}
           </el-dropdown-item>
 
-          <el-dropdown-item :disabled="visitedViews.length <= 1" @click="handleAction('closeOther')">
+          <el-dropdown-item
+            :disabled="visitedViews.length <= 1"
+            @click="handleAction('closeOther')"
+          >
             <el-icon>
               <Remove />
             </el-icon>
@@ -172,7 +184,7 @@ import { translateRouteTitle } from "@/utils/i18n";
 import { refreshAppCaches, usePermissionStore, useTagsViewStore } from "@/store";
 import { VueDraggable } from "vue-draggable-plus";
 import { quickStartManager } from "@/utils/quickStartManager";
-import { ElMessage } from 'element-plus';
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 
@@ -183,12 +195,11 @@ const route = useRoute();
 const permissionStore = usePermissionStore();
 const tagsViewStore = useTagsViewStore();
 
-
 const { visitedViews } = storeToRefs(tagsViewStore);
 
 // 简单的标签显示逻辑
 const displayedViews = computed(() => {
-  return visitedViews.value
+  return visitedViews.value;
 });
 
 // 当前选中的标签
@@ -203,7 +214,7 @@ const activeTag = computed(() => {
 const scrollbarRef = ref();
 
 // 标签切换来源跟踪
-const tagSwitchSource = ref<'menu' | 'tab' | null>(null);
+const tagSwitchSource = ref<"menu" | "tab" | null>(null);
 
 // 路由映射缓存，提升查找性能
 const routePathMap = computed(() => {
@@ -282,14 +293,14 @@ const addCurrentTag = () => {
   if (!route.meta?.title) return;
 
   // 检查标签是否已存在
-  const existingTag = visitedViews.value.find(tag => tag.path === route.path);
+  const existingTag = visitedViews.value.find((tag) => tag.path === route.path);
 
   if (existingTag) {
     // 如果标签已存在，根据来源决定是否移动位置
     if (!existingTag.affix) {
-      if (tagSwitchSource.value === 'menu') {
+      if (tagSwitchSource.value === "menu") {
         // 通过菜单点击：移动到最新位置
-        const index = visitedViews.value.findIndex(tag => tag.path === route.path);
+        const index = visitedViews.value.findIndex((tag) => tag.path === route.path);
         if (index !== -1) {
           const tag = visitedViews.value.splice(index, 1)[0];
           visitedViews.value.push(tag);
@@ -312,7 +323,7 @@ const addCurrentTag = () => {
   }
 
   // 根据来源决定是否滚动
-  if (tagSwitchSource.value === 'menu') {
+  if (tagSwitchSource.value === "menu") {
     // 通过菜单点击：滚动到最新标签
     nextTick(() => {
       autoScrollToLatestTag();
@@ -359,7 +370,6 @@ const handleMiddleClick = (tag: TagView) => {
  * 处理滚轮事件（优化后）
  */
 const handleScroll = (event: WheelEvent) => {
-
   const scrollWrapper = scrollbarRef.value?.wrapRef;
   if (!scrollWrapper) return;
 
@@ -373,8 +383,20 @@ const handleScroll = (event: WheelEvent) => {
   const deltaX = event.deltaX || 0;
 
   // 计算新的滚动位置
-  const newScrollLeft = Math.max(0, Math.min(scrollWrapper.scrollWidth - scrollWrapper.clientWidth, scrollWrapper.scrollLeft + deltaX));
-  const newScrollTop = Math.max(0, Math.min(scrollWrapper.scrollHeight - scrollWrapper.clientHeight, scrollWrapper.scrollTop + deltaY));
+  const newScrollLeft = Math.max(
+    0,
+    Math.min(
+      scrollWrapper.scrollWidth - scrollWrapper.clientWidth,
+      scrollWrapper.scrollLeft + deltaX
+    )
+  );
+  const newScrollTop = Math.max(
+    0,
+    Math.min(
+      scrollWrapper.scrollHeight - scrollWrapper.clientHeight,
+      scrollWrapper.scrollTop + deltaY
+    )
+  );
 
   scrollbarRef.value.setScrollLeft(newScrollLeft);
   scrollbarRef.value.setScrollTop(newScrollTop); // 新增垂直滚动支持
@@ -493,35 +515,35 @@ const handleAction = async (action: string) => {
   if (!currentTag) return;
 
   switch (action) {
-    case 'refresh':
+    case "refresh":
       refreshSelectedTag(currentTag);
       break;
-    case 'close':
+    case "close":
       closeSelectedTag(currentTag);
       break;
-    case 'closeRight':
+    case "closeRight":
       closeRightTags();
       break;
-    case 'closeLeft':
+    case "closeLeft":
       closeLeftTags();
       break;
-    case 'closeOther':
+    case "closeOther":
       closeOtherTags();
       break;
-    case 'closeAll':
+    case "closeAll":
       closeAllTags(currentTag);
       break;
-    case 'refreshCache':
+    case "refreshCache":
       try {
         // 1) 刷新服务端缓存（用户/权限/配置/公告/按需字典）并重建路由
         await refreshAppCaches();
         // 2) 软刷新当前页面，重新加载组件
         refreshSelectedTag(currentTag);
         // 3) 提示成功
-        ElMessage.success(t('navbar.refreshCache') + '完成');
+        ElMessage.success(t("navbar.refreshCache") + "完成");
       } catch (error) {
-        console.error('刷新缓存失败:', error);
-        ElMessage.error('刷新失败');
+        console.error("刷新缓存失败:", error);
+        ElMessage.error("刷新失败");
       }
       break;
     default:
@@ -553,7 +575,7 @@ const toggleQuickStart = (tag: TagView) => {
     if (isExists) {
       // 取消收藏：找到对应的链接并删除
       const links = quickStartManager.getQuickLinks();
-      const targetLink = links.find(link => link.href === href);
+      const targetLink = links.find((link) => link.href === href);
       if (targetLink?.id) {
         quickStartManager.removeQuickLink(targetLink.id);
         ElMessage.success(`已取消收藏：${tag.title}`);
@@ -565,8 +587,8 @@ const toggleQuickStart = (tag: TagView) => {
       ElMessage.success(`已收藏：${tag.title}`);
     }
   } catch (error) {
-    console.error('Failed to toggle quick start:', error);
-    ElMessage.error('操作失败');
+    console.error("Failed to toggle quick start:", error);
+    ElMessage.error("操作失败");
   }
 };
 
@@ -581,102 +603,105 @@ const isQuickLinkExists = (tag: TagView): boolean => {
  * 向左滚动标签页
  */
 const scrollLeft = () => {
-  const scrollWrapper = scrollbarRef.value?.wrapRef
-  if (!scrollWrapper) return
+  const scrollWrapper = scrollbarRef.value?.wrapRef;
+  if (!scrollWrapper) return;
 
-  const newScrollLeft = Math.max(0, scrollWrapper.scrollLeft - 200)
-  scrollbarRef.value.setScrollLeft(newScrollLeft)
-}
+  const newScrollLeft = Math.max(0, scrollWrapper.scrollLeft - 200);
+  scrollbarRef.value.setScrollLeft(newScrollLeft);
+};
 
 /**
  * 向右滚动标签页
  */
 const scrollRight = () => {
-  const scrollWrapper = scrollbarRef.value?.wrapRef
-  if (!scrollWrapper) return
+  const scrollWrapper = scrollbarRef.value?.wrapRef;
+  if (!scrollWrapper) return;
 
-  const maxScrollLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth
-  const newScrollLeft = Math.min(maxScrollLeft, scrollWrapper.scrollLeft + 200)
-  scrollbarRef.value.setScrollLeft(newScrollLeft)
+  const maxScrollLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
+  const newScrollLeft = Math.min(maxScrollLeft, scrollWrapper.scrollLeft + 200);
+  scrollbarRef.value.setScrollLeft(newScrollLeft);
 
   // 如果滚动到最右边，重置滚动状态以允许下次自动滚动
   if (newScrollLeft >= maxScrollLeft - 1) {
-    scrollState.value.hasScrolledToLatest = false
+    scrollState.value.hasScrolledToLatest = false;
   }
-}
+};
 
 /**
  * 重置滚动状态
  */
 const resetScrollState = () => {
-  scrollState.value.hasScrolledToLatest = false
-  scrollState.value.isContainerFull = false
-}
+  scrollState.value.hasScrolledToLatest = false;
+  scrollState.value.isContainerFull = false;
+};
 
 // 滚动状态跟踪
 const scrollState = ref({
   hasScrolledToLatest: false, // 是否已经滚动到最新标签
-  isContainerFull: false      // 容器是否已满
-})
+  isContainerFull: false, // 容器是否已满
+});
 
 /**
  * 自动滚动到最新标签或确保当前激活标签可见
  */
 const autoScrollToLatestTag = () => {
-  const scrollWrapper = scrollbarRef.value?.wrapRef
-  if (!scrollWrapper) return
+  const scrollWrapper = scrollbarRef.value?.wrapRef;
+  if (!scrollWrapper) return;
 
   // 获取容器宽度和内容宽度
-  const containerWidth = scrollWrapper.clientWidth
-  const contentWidth = scrollWrapper.scrollWidth
+  const containerWidth = scrollWrapper.clientWidth;
+  const contentWidth = scrollWrapper.scrollWidth;
 
   // 判断容器是否已满（内容宽度是否超过容器宽度）
-  const isContainerFull = contentWidth > containerWidth
+  const isContainerFull = contentWidth > containerWidth;
 
   // 查找当前激活的标签元素
-  const activeTagElement = document.querySelector('.tags-item.active')
-  
+  const activeTagElement = document.querySelector(".tags-item.active");
+
   if (activeTagElement) {
     // 将Element类型断言为HTMLElement类型以访问offsetWidth属性
     const activeHtmlElement = activeTagElement as HTMLElement;
     // 计算激活标签的位置信息
-    const activeTagRect = activeHtmlElement.getBoundingClientRect()
-    const containerRect = scrollWrapper.getBoundingClientRect()
-    
+    const activeTagRect = activeHtmlElement.getBoundingClientRect();
+    const containerRect = scrollWrapper.getBoundingClientRect();
+
     // 计算标签相对于容器的位置
-    const tagLeft = activeTagRect.left - containerRect.left + scrollWrapper.scrollLeft
-    const tagRight = tagLeft + activeHtmlElement.offsetWidth
-    
+    const tagLeft = activeTagRect.left - containerRect.left + scrollWrapper.scrollLeft;
+    const tagRight = tagLeft + activeHtmlElement.offsetWidth;
+
     // 检查标签是否完全在可见区域内
-    if (tagLeft < scrollWrapper.scrollLeft || tagRight > scrollWrapper.scrollLeft + containerWidth) {
+    if (
+      tagLeft < scrollWrapper.scrollLeft ||
+      tagRight > scrollWrapper.scrollLeft + containerWidth
+    ) {
       // 如果标签不在可见区域内，滚动到使标签居中的位置
-      const targetScrollLeft = tagLeft - (containerWidth - activeHtmlElement.offsetWidth) / 2
-      const maxScrollLeft = contentWidth - containerWidth
-      const minScrollLeft = 0
-      const clampedScrollLeft = Math.max(minScrollLeft, Math.min(maxScrollLeft, targetScrollLeft))
-      
-      scrollbarRef.value.setScrollLeft(clampedScrollLeft)
-      scrollState.value.hasScrolledToLatest = true
-      scrollState.value.isContainerFull = isContainerFull
-      return
+      const targetScrollLeft = tagLeft - (containerWidth - activeHtmlElement.offsetWidth) / 2;
+      const maxScrollLeft = contentWidth - containerWidth;
+      const minScrollLeft = 0;
+      const clampedScrollLeft = Math.max(minScrollLeft, Math.min(maxScrollLeft, targetScrollLeft));
+
+      scrollbarRef.value.setScrollLeft(clampedScrollLeft);
+      scrollState.value.hasScrolledToLatest = true;
+      scrollState.value.isContainerFull = isContainerFull;
+      return;
     }
   }
 
   // 如果没有找到激活标签或激活标签已经在可见区域内，则使用原来的逻辑
   if (isContainerFull && !scrollState.value.hasScrolledToLatest) {
     // 计算需要滚动到的位置，确保最新标签在右侧可见
-    const maxScrollLeft = contentWidth - containerWidth
-    scrollbarRef.value.setScrollLeft(maxScrollLeft)
-    scrollState.value.hasScrolledToLatest = true
-    scrollState.value.isContainerFull = true
+    const maxScrollLeft = contentWidth - containerWidth;
+    scrollbarRef.value.setScrollLeft(maxScrollLeft);
+    scrollState.value.hasScrolledToLatest = true;
+    scrollState.value.isContainerFull = true;
   } else if (!isContainerFull) {
     // 如果内容宽度不超过容器宽度，滚动到最左边
-    scrollbarRef.value.setScrollLeft(0)
+    scrollbarRef.value.setScrollLeft(0);
     // 重置滚动状态
-    scrollState.value.hasScrolledToLatest = false
-    scrollState.value.isContainerFull = false
+    scrollState.value.hasScrolledToLatest = false;
+    scrollState.value.isContainerFull = false;
   }
-}
+};
 
 // 监听路由变化
 watch(
@@ -684,7 +709,7 @@ watch(
   () => {
     // 如果没有设置来源，则默认为菜单点击
     if (tagSwitchSource.value === null) {
-      tagSwitchSource.value = 'menu';
+      tagSwitchSource.value = "menu";
     }
     addCurrentTag();
     updateCurrentTag();
@@ -700,7 +725,7 @@ watch(
   () => visitedViews.value.length,
   () => {
     // 只有在通过菜单添加新标签时才滚动
-    if (tagSwitchSource.value === 'menu') {
+    if (tagSwitchSource.value === "menu") {
       nextTick(() => {
         autoScrollToLatestTag();
       });
@@ -721,9 +746,9 @@ watch(
 // 初始化
 onMounted(() => {
   initAffixTags();
-  
+
   // 监听容器大小变化
-  const tagsContainer = document.querySelector('.tags-container');
+  const tagsContainer = document.querySelector(".tags-container");
   if (tagsContainer && window.ResizeObserver) {
     resizeObserver = new ResizeObserver(() => {
       // 强制重新计算 displayedViews
@@ -741,7 +766,6 @@ onUnmounted(() => {
     resizeObserver.disconnect();
   }
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -764,7 +788,6 @@ onUnmounted(() => {
     height: $tags-view-height;
     cursor: pointer;
     border: 1px solid var(--el-border-color-light);
-    
 
     &:hover {
       background-color: var(--el-fill-color-light);
@@ -860,7 +883,6 @@ onUnmounted(() => {
 
         &:hover {
           color: var(--el-color-white);
-
         }
       }
     }

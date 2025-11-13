@@ -6,7 +6,6 @@ import { MenuTable } from "@/api/module_system/menu";
 const modules = import.meta.glob("../../views/**/**.vue");
 const Layout = () => import("@/layouts/index.vue");
 
-
 export interface Meta {
   /** 【目录】只有一个子路由是否始终显示 */
   alwaysShow?: boolean;
@@ -21,7 +20,7 @@ export interface Meta {
   /** 排序 */
   order?: number;
   /** 参数 */
-  params?: { key: string; value: string; }[];
+  params?: { key: string; value: string }[];
   /** 是否固定路由 */
   affix?: boolean;
 }
@@ -43,31 +42,30 @@ export interface RouteVO {
 }
 
 export const generator = (routers: MenuTable[]): RouteVO[] => {
-    return routers.map((item) => {
-      const currentRouter: RouteVO = {
-        children: [],
-        path: item.route_path,
-        name: item.route_name,
-        component: item.component_path,
-        redirect: item.redirect,
-        meta: {
-          title: item.title,
-          icon: item.icon || undefined,
-          keepAlive: item.keep_alive,
-          hidden: item.hidden,
-          order: item.order,
-          alwaysShow: item.always_show,
-          params: item.params,
-          affix: item.affix,
-        },
-      };
-      if (item.children && item.children.length > 0) {
-        currentRouter.children = item.children ? generator(item.children) : [];
-      }
-      return currentRouter;
-    });
+  return routers.map((item) => {
+    const currentRouter: RouteVO = {
+      children: [],
+      path: item.route_path,
+      name: item.route_name,
+      component: item.component_path,
+      redirect: item.redirect,
+      meta: {
+        title: item.title,
+        icon: item.icon || undefined,
+        keepAlive: item.keep_alive,
+        hidden: item.hidden,
+        order: item.order,
+        alwaysShow: item.always_show,
+        params: item.params,
+        affix: item.affix,
+      },
+    };
+    if (item.children && item.children.length > 0) {
+      currentRouter.children = item.children ? generator(item.children) : [];
+    }
+    return currentRouter;
+  });
 };
-
 
 export const usePermissionStore = defineStore("permission", () => {
   // 存储所有路由，包括静态路由和动态路由
@@ -82,7 +80,7 @@ export const usePermissionStore = defineStore("permission", () => {
    *
    * @returns Promise<RouteRecordRaw[]> 解析后的动态路由列表
    */
-  async function generateRoutes():Promise<RouteRecordRaw[]> {
+  async function generateRoutes(): Promise<RouteRecordRaw[]> {
     try {
       const userStore = useUserStore();
       // 确保获取用户信息和路由列表
@@ -96,7 +94,7 @@ export const usePermissionStore = defineStore("permission", () => {
       const dynamicRoutes = transformRoutes(data);
 
       routes.value = [...constantRoutes, ...dynamicRoutes];
-      
+
       isRouteGenerated.value = true;
 
       return dynamicRoutes;
@@ -157,17 +155,16 @@ const transformRoutes = (routes: RouteVO[]): RouteRecordRaw[] => {
     const normalizedRoute = { ...route } as RouteRecordRaw;
 
     // 处理组件路径映射
-    normalizedRoute.component =
-      !normalizedRoute.component
-        ? Layout
-        : modules[`../../views/${normalizedRoute.component}.vue`] ||
-          modules["../../views/error/404.vue"];
+    normalizedRoute.component = !normalizedRoute.component
+      ? Layout
+      : modules[`../../views/${normalizedRoute.component}.vue`] ||
+        modules["../../views/error/404.vue"];
 
     // 递归处理子路由
     if (normalizedRoute.children && normalizedRoute.children.length > 0) {
       normalizedRoute.children = transformRoutes(route.children);
     }
-    
+
     return normalizedRoute;
   });
 };

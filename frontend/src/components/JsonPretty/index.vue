@@ -13,18 +13,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import VueJsonPretty from 'vue-json-pretty';
-import 'vue-json-pretty/lib/styles.css';
+import { computed } from "vue";
+import VueJsonPretty from "vue-json-pretty";
+import "vue-json-pretty/lib/styles.css";
 
 const props = defineProps({
-  value: { type: [String, Object, Array, Number, Boolean], default: '' },
-  height: { type: String, default: '240px' },
+  value: { type: [String, Object, Array, Number, Boolean], default: "" },
+  height: { type: String, default: "240px" },
 });
 
 const parsed = computed(() => {
   const v: any = props.value;
-  if (typeof v === 'string') {
+  if (typeof v === "string") {
     try {
       return JSON.parse(v);
     } catch {
@@ -34,10 +34,10 @@ const parsed = computed(() => {
   return v;
 });
 
-const isJson = computed(() => typeof parsed.value === 'object' && parsed.value !== null);
+const isJson = computed(() => typeof parsed.value === "object" && parsed.value !== null);
 const displayText = computed(() => {
   const v: any = props.value;
-  return typeof v === 'string' ? v : JSON.stringify(v, null, 2);
+  return typeof v === "string" ? v : JSON.stringify(v, null, 2);
 });
 </script>
 
@@ -54,7 +54,9 @@ const displayText = computed(() => {
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   font-size: 12px;
 }
 </style>
