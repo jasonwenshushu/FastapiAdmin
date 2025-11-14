@@ -3,12 +3,13 @@
     <!-- 顶部菜单栏 -->
     <div class="layout__header">
       <div class="layout__header-content">
+        <!-- Logo区域 -->
+        <div v-if="isShowLogo" class="layout__header-logo">
+          <AppLogo :collapse="isLogoCollapsed" />
+        </div>
+
         <!-- 顶部菜单区域 -->
         <div class="layout__header-menu">
-          <!-- Logo区域 -->
-          <div v-if="isShowLogo" class="layout__header-logo">
-            <AppLogo :collapse="isLogoCollapsed" />
-          </div>
           <MixTopMenu />
         </div>
 
@@ -107,11 +108,10 @@ function resolvePath(routePath: string) {
     return routePath;
   }
 
-  // if (routePath.startsWith("/")) {
-  //   return activeTopMenuPath.value + routePath;
-  // }
-  // return `${activeTopMenuPath.value}/${routePath}`;
-  return routePath;
+  if (routePath.startsWith("/")) {
+    return routePath;
+  }
+  return `${activeTopMenuPath.value}/${routePath}`;
 }
 
 watch(

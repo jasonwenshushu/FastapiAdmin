@@ -426,8 +426,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="内容" prop="notice_content">
-            <WangEditor v-model="formData.notice_content" height="300px" />
-            <!-- <el-input v-model="formData.notice_content" :rows="4" :maxlength="100" show-word-limit type="textarea" placeholder="请输入内容" /> -->
+            <WangEditor v-model="formData.notice_content" />
           </el-form-item>
         </el-form>
       </template>

@@ -59,7 +59,7 @@ const FileAPI = {
 defineProps({
   height: {
     type: String,
-    default: "200px",
+    default: "300px",
   },
 });
 // 双向绑定

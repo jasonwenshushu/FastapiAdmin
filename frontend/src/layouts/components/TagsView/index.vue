@@ -19,7 +19,6 @@
           >
             <!-- 为所有标签添加右键菜单 -->
             <el-dropdown
-              v-if="tagsViewStore.isActive(tag)"
               trigger="contextmenu"
               @visible-change="(visible) => onContextMenuVisibleChange(visible, tag)"
               @click.stop
@@ -44,20 +43,14 @@
                     {{ t("navbar.close") }}
                   </el-dropdown-item>
 
-                  <el-dropdown-item
-                    :disabled="isFirstView || !tagsViewStore.isActive(tag)"
-                    @click="closeLeftTags"
-                  >
+                  <el-dropdown-item :disabled="isFirstView(tag)" @click="closeLeftTags(tag)">
                     <el-icon>
                       <Back />
                     </el-icon>
                     {{ t("navbar.closeLeft") }}
                   </el-dropdown-item>
 
-                  <el-dropdown-item
-                    :disabled="isLastView || !tagsViewStore.isActive(tag)"
-                    @click="closeRightTags"
-                  >
+                  <el-dropdown-item :disabled="isLastView(tag)" @click="closeRightTags(tag)">
                     <el-icon>
                       <Right />
                     </el-icon>
@@ -65,8 +58,8 @@
                   </el-dropdown-item>
 
                   <el-dropdown-item
-                    :disabled="visitedViews.length <= 1 || !tagsViewStore.isActive(tag)"
-                    @click="closeOtherTags"
+                    :disabled="visitedViews.length <= 1"
+                    @click="closeOtherTags(tag)"
                   >
                     <el-icon>
                       <Remove />
@@ -92,7 +85,6 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <span v-else class="tag-text">{{ translateRouteTitle(tag.title) }}</span>
 
             <span
               v-if="!tag.affix"
@@ -141,14 +133,20 @@
             {{ t("navbar.close") }}
           </el-dropdown-item>
 
-          <el-dropdown-item :disabled="isFirstView" @click="handleAction('closeLeft')">
+          <el-dropdown-item
+            :disabled="isFirstView(routePathMap.get(route.path))"
+            @click="handleAction('closeLeft')"
+          >
             <el-icon>
               <Back />
             </el-icon>
             {{ t("navbar.closeLeft") }}
           </el-dropdown-item>
 
-          <el-dropdown-item :disabled="isLastView" @click="handleAction('closeRight')">
+          <el-dropdown-item
+            :disabled="isLastView(routePathMap.get(route.path))"
+            @click="handleAction('closeRight')"
+          >
             <el-icon>
               <Right />
             </el-icon>
@@ -205,11 +203,6 @@ const displayedViews = computed(() => {
 // 当前选中的标签
 const selectedTag = ref<TagView | null>(null);
 
-// 基于当前激活路由的回退标签（当未选中右键标签时）
-const activeTag = computed(() => {
-  return selectedTag.value || routePathMap.value.get(route.path) || null;
-});
-
 // 滚动条引用
 const scrollbarRef = ref();
 
@@ -217,28 +210,41 @@ const scrollbarRef = ref();
 const tagSwitchSource = ref<"menu" | "tab" | null>(null);
 
 // 路由映射缓存，提升查找性能
-const routePathMap = computed(() => {
-  const map = new Map<string, TagView>();
+const routePathMap = new Map<string, TagView>();
+
+// 更新路由映射缓存
+const updateRoutePathMap = () => {
+  routePathMap.clear();
   visitedViews.value.forEach((tag) => {
-    map.set(tag.path, tag);
+    routePathMap.set(tag.path, tag);
   });
-  return map;
-});
+};
 
 // 判断是否为第一个标签
-const isFirstView = computed(() => {
-  if (!activeTag.value) return false;
-  return (
-    activeTag.value.path === "/dashboard" ||
-    activeTag.value.fullPath === visitedViews.value[1]?.fullPath
-  );
-});
+const isFirstView = (tag?: TagView) => {
+  if (tag) {
+    // 传入特定标签时使用传入的标签
+    return tag.path === "/" || tag.fullPath === visitedViews.value[1]?.fullPath;
+  } else {
+    // 未传入标签时使用当前激活标签（向后兼容）
+    const currentTag = routePathMap.get(route.path);
+    if (!currentTag) return false;
+    return currentTag.path === "/" || currentTag.fullPath === visitedViews.value[1]?.fullPath;
+  }
+};
 
 // 判断是否为最后一个标签
-const isLastView = computed(() => {
-  if (!activeTag.value) return false;
-  return activeTag.value.fullPath === visitedViews.value[visitedViews.value.length - 1]?.fullPath;
-});
+const isLastView = (tag?: TagView) => {
+  if (tag) {
+    // 传入特定标签时使用传入的标签
+    return tag.fullPath === visitedViews.value[visitedViews.value.length - 1]?.fullPath;
+  } else {
+    // 未传入标签时使用当前激活标签（向后兼容）
+    const currentTag = routePathMap.get(route.path);
+    if (!currentTag) return false;
+    return currentTag.fullPath === visitedViews.value[visitedViews.value.length - 1]?.fullPath;
+  }
+};
 
 /**
  * 递归提取固定标签
@@ -340,7 +346,7 @@ const addCurrentTag = () => {
  */
 const updateCurrentTag = () => {
   nextTick(() => {
-    const currentTag = routePathMap.value.get(route.path);
+    const currentTag = routePathMap.get(route.path);
 
     if (currentTag && currentTag.fullPath !== route.fullPath) {
       tagsViewStore.updateVisitedView({
@@ -422,7 +428,7 @@ const refreshSelectedTag = (tag: TagView | null) => {
  */
 const closeSelectedTag = (tag: TagView | null) => {
   // 如果传入了具体的标签，使用传入的标签；否则使用当前路由对应的标签
-  const targetTag = tag || routePathMap.value.get(route.path);
+  const targetTag = tag || routePathMap.get(route.path);
   if (!targetTag) return;
 
   tagsViewStore.delView(targetTag).then((result: any) => {
@@ -439,8 +445,8 @@ const closeSelectedTag = (tag: TagView | null) => {
 /**
  * 关闭左侧标签
  */
-const closeLeftTags = () => {
-  const targetTag = selectedTag.value || routePathMap.value.get(route.path);
+const closeLeftTags = (tag?: TagView) => {
+  const targetTag = tag || selectedTag.value || routePathMap.get(route.path);
   if (!targetTag) return;
 
   tagsViewStore.delLeftViews(targetTag).then((result: any) => {
@@ -459,8 +465,8 @@ const closeLeftTags = () => {
 /**
  * 关闭右侧标签
  */
-const closeRightTags = () => {
-  const targetTag = selectedTag.value || routePathMap.value.get(route.path);
+const closeRightTags = (tag?: TagView) => {
+  const targetTag = tag || selectedTag.value || routePathMap.get(route.path);
   if (!targetTag) return;
 
   tagsViewStore.delRightViews(targetTag).then((result: any) => {
@@ -479,8 +485,8 @@ const closeRightTags = () => {
 /**
  * 关闭其他标签
  */
-const closeOtherTags = () => {
-  const targetTag = selectedTag.value || routePathMap.value.get(route.path);
+const closeOtherTags = (tag?: TagView) => {
+  const targetTag = tag || selectedTag.value || routePathMap.get(route.path);
   if (!targetTag) return;
 
   router.push(targetTag);
@@ -496,7 +502,7 @@ const closeOtherTags = () => {
 /**
  * 关闭所有标签
  */
-const closeAllTags = (tag: TagView | null) => {
+const closeAllTags = (tag?: TagView) => {
   tagsViewStore.delAllViews().then((result: any) => {
     tagsViewStore.toLastView(result.visitedViews, tag || undefined);
     // 关闭所有标签后重置滚动状态
@@ -511,7 +517,7 @@ const closeAllTags = (tag: TagView | null) => {
  */
 const handleAction = async (action: string) => {
   // 总是使用当前路由对应的标签
-  const currentTag = routePathMap.value.get(route.path);
+  const currentTag = routePathMap.get(route.path);
   if (!currentTag) return;
 
   switch (action) {
@@ -557,7 +563,7 @@ const handleAction = async (action: string) => {
 const onContextMenuVisibleChange = (visible: boolean, tag?: TagView) => {
   if (visible) {
     // 设置当前右键点击的标签
-    selectedTag.value = tag || routePathMap.value.get(route.path) || null;
+    selectedTag.value = tag || routePathMap.get(route.path) || null;
   } else {
     // 关闭菜单时清空选择
     selectedTag.value = null;
@@ -713,6 +719,7 @@ watch(
     }
     addCurrentTag();
     updateCurrentTag();
+    updateRoutePathMap();
   },
   { immediate: true }
 );
@@ -724,6 +731,9 @@ let resizeObserver: ResizeObserver | null = null;
 watch(
   () => visitedViews.value.length,
   () => {
+    // 更新路由映射缓存
+    updateRoutePathMap();
+
     // 只有在通过菜单添加新标签时才滚动
     if (tagSwitchSource.value === "menu") {
       nextTick(() => {
@@ -746,6 +756,9 @@ watch(
 // 初始化
 onMounted(() => {
   initAffixTags();
+
+  // 初始化路由映射缓存
+  updateRoutePathMap();
 
   // 监听容器大小变化
   const tagsContainer = document.querySelector(".tags-container");

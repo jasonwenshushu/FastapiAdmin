@@ -69,7 +69,12 @@
     <el-card shadow="hover" class="app-grid-card">
       <template #header>
         <div class="card-header">
-          <span>应用市场</span>
+          <span>
+            <el-tooltip content="点击卡片，打开应用">
+              <QuestionFilled class="w-4 h-4 mx-1" />
+            </el-tooltip>
+            应用市场
+          </span>
           <el-button
             v-hasPerm="['application:myapp:create']"
             type="primary"
@@ -81,92 +86,82 @@
         </div>
       </template>
 
-      <!-- 应用网格 -->
-      <div v-loading="loading" class="app-grid">
-        <el-card
-          v-for="app in applicationList"
-          :key="app.id"
-          class="app-card-el"
-          :body-style="{ padding: '12px' }"
-          shadow="hover"
-        >
-          <template #header>
-            <div class="app-card-header-el">
-              <div class="app-info-header">
-                <el-avatar :size="40" :src="app.icon_url" class="app-avatar-el">
-                  <el-icon size="20"><Monitor /></el-icon>
-                </el-avatar>
-                <div class="app-title-section">
-                  <h3 class="app-name-el">{{ app.name }}</h3>
-                  <el-tag
-                    :type="app.status ? 'success' : 'danger'"
-                    size="small"
-                    class="app-status-tag"
-                  >
-                    {{ app.status ? "启用" : "停用" }}
-                  </el-tag>
-                </div>
-              </div>
-              <el-dropdown
-                v-hasPerm="['application:myapp:update']"
-                trigger="click"
-                @command="(command) => handleAppAction(command, app)"
-              >
-                <el-button type="text" icon="MoreFilled" size="small" class="app-menu-btn" />
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item command="edit" icon="Edit">编辑</el-dropdown-item>
-                    <el-dropdown-item command="delete" icon="Delete" divided>删除</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-          </template>
+      <!-- 应用网格 - 优化布局 -->
+      <div v-loading="loading" class="app-grid-container">
+        <div class="grid-wrapper">
+          <div
+            v-for="app in applicationList"
+            :key="app.id"
+            class="app-grid-item"
+            @mouseenter="app.id && (hoveredCard = app.id)"
+            @mouseleave="hoveredCard = null"
+            @click="app.status && app.id && openAppInternal(app)"
+          >
+            <el-card shadow="hover" class="app-card" :class="{ 'card-disabled': !app.status }">
+              <!-- 卡片头部 -->
+              <template #header>
+                <div class="app-info-header">
+                  <el-avatar :size="42" :src="app.icon_url" class="app-avatar">
+                    <el-icon size="20"><Monitor /></el-icon>
+                  </el-avatar>
+                  <div class="app-title-wrap">
+                    <h3 class="app-name" :title="app.name">{{ app.name }}</h3>
+                    <el-tag
+                      :type="app.status ? 'success' : 'info'"
+                      size="small"
+                      effect="plain"
+                      class="status-tag"
+                    >
+                      {{ app.status ? "启用" : "停用" }}
+                    </el-tag>
+                  </div>
 
-          <div class="app-card-content">
-            <p class="app-description">{{ app.description || "暂无描述" }}</p>
+                  <!-- 操作按钮 -->
+                  <div v-if="hoveredCard === app.id" class="card-actions" @click.stop>
+                    <el-button
+                      v-hasPerm="['application:myapp:update']"
+                      type="primary"
+                      link
+                      icon="Edit"
+                      @click="handleAppAction('edit', app)"
+                    ></el-button>
+                    <el-button
+                      v-hasPerm="['application:myapp:delete']"
+                      type="danger"
+                      link
+                      icon="Delete"
+                      @click="handleAppAction('delete', app)"
+                    ></el-button>
+                  </div>
+                </div>
+              </template>
 
-            <div class="app-meta-info">
-              <div class="app-meta-row">
-                <div class="meta-item left">
-                  <el-icon size="14" class="meta-icon"><User /></el-icon>
-                  <span>{{ app.creator?.name || "未知" }}</span>
+              <!-- 卡片内容 -->
+              <template #default>
+                <div class="app-content">
+                  <p class="app-description" :title="app.description">
+                    {{ app.description || "暂无描述" }}
+                  </p>
                 </div>
-                <div class="meta-item right">
-                  <el-icon size="14" class="meta-icon"><Clock /></el-icon>
-                  <span>{{ formatTime(app.created_at) }}</span>
+              </template>
+
+              <!-- 卡片底部 -->
+              <template #footer>
+                <div class="card-footer">
+                  <div class="footer-item">
+                    <el-icon size="14" class="footer-icon"><User /></el-icon>
+                    <span class="footer-text">{{ app.creator?.name || "未知" }}</span>
+                  </div>
+                  <div class="footer-item">
+                    <el-icon size="14" class="footer-icon"><Clock /></el-icon>
+                    <span class="footer-text">{{ formatTime(app.created_at) }}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </template>
+            </el-card>
           </div>
-
-          <div class="app-card-actions">
-            <el-button
-              v-hasPerm="['application:myapp:open_external']"
-              type="primary"
-              icon="Link"
-              size="small"
-              :disabled="!app.status"
-              class="action-btn"
-              @click="openAppExternal(app.access_url)"
-            >
-              外部打开
-            </el-button>
-            <el-button
-              v-hasPerm="['application:myapp:open_internal']"
-              type="default"
-              icon="View"
-              size="small"
-              :disabled="!app.status"
-              class="action-btn"
-              @click="openAppInternal(app)"
-            >
-              内部打开
-            </el-button>
-          </div>
-        </el-card>
+        </div>
       </div>
-
       <!-- 空状态 -->
       <div v-if="applicationList.length === 0 && !loading">
         <el-empty :image-size="80" description="暂无数据" />
@@ -273,6 +268,7 @@ const dialogType = ref<"create" | "edit">("create");
 const currentApp = ref<ApplicationInfo | null>(null);
 const isExpand = ref(false);
 const isExpandable = ref(true);
+const hoveredCard = ref<number | null>(null);
 
 // 分页查询参数
 const queryFormData = reactive<ApplicationPageQuery>({
@@ -400,17 +396,14 @@ async function handleAppAction(command: string, app: ApplicationInfo) {
   }
 }
 
-// 外部打开应用
-function openAppExternal(url: string | undefined) {
-  if (url) {
-    window.open(url, "_blank");
-  }
-}
-
 // 内部打开应用
 function openAppInternal(app: ApplicationInfo) {
-  if (!app.status) {
-    ElMessage.warning("应用已停用，无法打开");
+  if (!app.status || !app.id) {
+    if (!app.status) {
+      ElMessage.warning("应用已停用，无法打开");
+    } else {
+      ElMessage.warning("应用ID不存在，无法打开");
+    }
     return;
   }
 
@@ -428,7 +421,7 @@ function openAppInternal(app: ApplicationInfo) {
   router
     .push({
       path: appPath,
-      query: { url: app.access_url, appId: app.id?.toString() || "", appName: appTitle },
+      query: { url: app.access_url, appId: app.id.toString(), appName: appTitle },
     })
     .then(() => {
       // 导航完成后，手动添加或更新标签视图
@@ -450,11 +443,11 @@ function openAppInternal(app: ApplicationInfo) {
             path: appPath,
             fullPath:
               appPath +
-              `?url=${encodeURIComponent(app.access_url || "")}&appId=${app.id || ""}&appName=${encodeURIComponent(appTitle)}`,
+              `?url=${encodeURIComponent(app.access_url || "")}&appId=${app.id}&appName=${encodeURIComponent(appTitle)}`,
             icon: "Monitor",
             affix: false,
             keepAlive: false,
-            query: { url: app.access_url, appId: app.id?.toString() || "", appName: appTitle },
+            query: { url: app.access_url, appId: app?.id?.toString(), appName: appTitle },
           });
         }
       });
@@ -524,124 +517,258 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.app-grid {
+// 网格容器
+.app-grid-container {
+  flex: 1;
+  padding: 2px 0;
+}
+
+.grid-wrapper {
   display: grid;
-  flex: 1;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  padding: 0 2px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
-.app-card-el {
+// 卡片项
+.app-grid-item {
+  height: fit-content;
+}
+
+// 卡片样式
+.app-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(145deg, var(--el-bg-color) 0%, var(--el-bg-color-page) 100%);
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    border-color: var(--el-color-primary);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.card-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover {
+      border-color: var(--el-border-color-lighter);
+      box-shadow: none;
+      transform: none;
+    }
+  }
+
+  :deep(.el-card__header) {
+    padding: 16px 18px 14px;
+    background: linear-gradient(
+      90deg,
+      rgba(var(--el-color-primary-rgb), 0.02) 0%,
+      transparent 100%
+    );
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+
+  :deep(.el-card__body) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  :deep(.el-card__footer) {
+    padding: 12px 18px 16px;
+    background: rgba(var(--el-fill-color-light-rgb), 0.3);
+    border-top: 1px solid var(--el-border-color-lighter);
+  }
 }
 
-.app-card-header-el {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
+// 头部信息
 .app-info-header {
+  position: relative;
   display: flex;
-  flex: 1;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
 }
 
-.app-name-el {
-  margin: 0 0 4px 0;
+.app-avatar {
+  flex-shrink: 0;
+  background: var(--el-fill-color-light);
+  border: 2px solid var(--el-border-color-lighter);
+  transition: all 0.3s ease;
+
+  .app-card:hover & {
+    background: rgba(var(--el-color-primary-rgb), 0.1);
+    border-color: var(--el-color-primary);
+  }
+}
+
+.app-title-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-name {
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.4;
   color: var(--el-text-color-primary);
   white-space: nowrap;
 }
 
-.app-card-content {
-  margin: 12px 0;
+.status-tag {
+  align-self: flex-start;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+}
+
+// 悬停操作按钮
+.card-actions {
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  z-index: 10;
+  padding: 8px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  transform: translateY(-50%);
+
+  .el-button {
+    padding: 4px 8px;
+    margin: 0 2px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// 内容区域
+.app-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .app-description {
   display: -webkit-box;
+  min-height: 2.8em;
+  margin: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   font-size: 14px;
+  line-height: 1.6;
   color: var(--el-text-color-regular);
   -webkit-box-orient: vertical;
 }
 
-.app-meta-info {
+// 底部信息
+.card-footer {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.footer-item {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.footer-icon {
   color: var(--el-text-color-secondary);
 }
 
-.app-meta-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.meta-item {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.meta-item.left {
-  flex: 1;
-  justify-content: flex-start;
-  min-width: 0;
-}
-
-.meta-item.right {
-  flex: 1;
-  justify-content: flex-end;
-  min-width: 0;
-  text-align: right;
-}
-
-.meta-icon {
-  flex-shrink: 0;
-  color: var(--el-text-color-placeholder);
-}
-
-.meta-item span {
+.footer-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
   white-space: nowrap;
 }
 
-.app-card-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
+// 响应式调整
+@media (max-width: 768px) {
+  .app-name {
+    font-size: 15px;
+  }
 
-  .action-btn {
-    flex: 1;
-    padding: 4px 8px;
-    font-size: 12px;
+  .app-description {
+    font-size: 13px;
+  }
+
+  .card-actions {
+    position: static;
+    align-self: flex-end;
+    margin-top: 8px;
+    transform: none;
+
+    .el-button {
+      padding: 3px 6px;
+      font-size: 12px;
+    }
   }
 }
 
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-}
+@media (max-width: 480px) {
+  .app-card {
+    :deep(.el-card__header) {
+      padding: 14px 16px;
+    }
 
-.dialog-footer {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+    :deep(.el-card__body) {
+      padding: 16px;
+    }
+
+    :deep(.el-card__footer) {
+      padding: 10px 16px 12px;
+    }
+  }
+
+  .app-name {
+    font-size: 14px;
+  }
 }
 </style>
