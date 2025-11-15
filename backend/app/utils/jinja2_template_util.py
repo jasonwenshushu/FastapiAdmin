@@ -121,6 +121,7 @@ class Jinja2TemplateUtil:
             'db_type': settings.DATABASE_TYPE,
             'column_not_add_show': GenConstant.COLUMNNAME_NOT_ADD_SHOW,
             'column_not_edit_show': GenConstant.COLUMNNAME_NOT_EDIT_SHOW,
+            'parent_menu_id': int(gen_table.parent_menu_id) if gen_table.parent_menu_id is not None else int(cls.DEFAULT_PARENT_MENU_ID),
         }
 
         return context
