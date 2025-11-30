@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Dict, List, Optional
-
 from app.core.exceptions import CustomException
 from app.utils.excel_util import ExcelUtil
 
@@ -20,7 +18,7 @@ class OperationLogService:
     """
 
     @classmethod
-    async def get_log_detail_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def get_log_detail_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         获取日志详情
         
@@ -29,24 +27,24 @@ class OperationLogService:
         - id (int): 日志 ID
         
         返回:
-        - Dict: 日志详情字典
+        - dict: 日志详情字典
         """
         log = await OperationLogCRUD(auth).get_by_id_crud(id=id)
         log_dict = OperationLogOutSchema.model_validate(log).model_dump()
         return log_dict
 
     @classmethod
-    async def get_log_list_service(cls, auth: AuthSchema, search: Optional[OperationLogQueryParam], order_by: Optional[List[Dict]] = None) -> List[Dict]:
+    async def get_log_list_service(cls, auth: AuthSchema, search: OperationLogQueryParam | None = None, order_by: list | None = None) -> list[dict]:
         """
         获取日志列表
         
         参数:
         - auth (AuthSchema): 认证信息模型
-        - search (Optional[OperationLogQueryParam]): 日志查询参数模型
-        - order_by (Optional[List[Dict]]): 排序字段列表
+        - search (OperationLogQueryParam | None): 日志查询参数模型
+        - order_by (list | None): 排序字段列表
         
         返回:
-        - List[Dict]: 日志详情字典列表
+        - list[dict]: 日志详情字典列表
         """
             
         log_list = await OperationLogCRUD(auth).get_list_crud(search=search.__dict__, order_by=order_by)
@@ -54,7 +52,7 @@ class OperationLogService:
         return log_dict_list
 
     @classmethod
-    async def create_log_service(cls, auth: AuthSchema, data: OperationLogCreateSchema) -> Dict:
+    async def create_log_service(cls, auth: AuthSchema, data: OperationLogCreateSchema) -> dict:
         """
         创建日志
         
@@ -63,7 +61,7 @@ class OperationLogService:
         - data (OperationLogCreateSchema): 日志创建模型
         
         返回:
-        - Dict: 日志详情字典
+        - dict: 日志详情字典
         """
         new_log = await OperationLogCRUD(auth).create(data=data)
         new_log_dict = OperationLogOutSchema.model_validate(new_log).model_dump()
@@ -86,12 +84,12 @@ class OperationLogService:
         await OperationLogCRUD(auth).delete(ids=ids)
 
     @classmethod
-    async def export_log_list_service(cls, operation_log_list: List[Dict[str, Any]]) -> bytes:
+    async def export_log_list_service(cls, operation_log_list: list[dict]) -> bytes:
         """
         导出日志信息
 
         参数:
-        - operation_log_list (List[Dict[str, Any]]): 操作日志信息列表
+        - operation_log_list (list[dict]): 操作日志信息列表
         
         返回:
         - bytes: 操作日志信息excel的二进制数据
@@ -114,7 +112,7 @@ class OperationLogService:
             'created_time': '创建时间',
             'updated_time': '更新时间',
             'created_id': '创建者ID',
-            'creator': '创建者',
+            'updated_id': '更新者ID',
         }
 
         # 处理数据

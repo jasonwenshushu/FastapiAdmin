@@ -3,21 +3,20 @@
 {% if table.sub %}
 from typing import List, Optional
 {% else %}
-from typing import Optional
 {% endif %}
 from pydantic import BaseModel, ConfigDict, Field
-
 from fastapi import Query
+
 from app.core.validator import DateTimeStr
-from app.core.base_schema import BaseSchema, UserBySchema, TenantSchema, CustomerSchema
+from app.core.base_schema import BaseSchema, UserBySchema
 
 class {{ class_name }}CreateSchema(BaseModel):
     """
     {{ function_name }}新增模型
     """
     {% for column in columns %}
-    {% if column.column_name not in ['id', 'created_id', 'created_time', 'updated_time'] %}
-    {{ column.column_name }}: Optional[{{ column.python_type }}] = Field(default=None, description='{{ column.column_comment }}')
+    {% if column.column_name not in ['id', 'uuid', 'created_time', 'updated_time', 'created_id', 'updated_id'] %}
+    {{ column.column_name }}: {{ column.python_type }} | None = Field(default=None, description='{{ column.column_comment }}')
     {% endif %}
     {% endfor %}
 
@@ -29,7 +28,7 @@ class {{ class_name }}UpdateSchema({{ class_name }}CreateSchema):
     ...
 
 
-class {{ class_name }}OutSchema({{ class_name }}CreateSchema, BaseSchema):
+class {{ class_name }}OutSchema({{ class_name }}CreateSchema, BaseSchema, UserBySchema):
     """
     {{ function_name }}响应模型
     """
@@ -51,8 +50,10 @@ class {{ class_name }}QueryParam:
         {{ column.column_name }}: Optional[{{ column.python_type }}] = Query(None, description="{{ column.column_comment }}"),
         {% endif %}
         {% endfor %}
-        created_id: Optional[int] = Query(None, description="创建人"),
-        created_time: Optional[list[DateTimeStr]] = Query(None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        created_time: list[DateTimeStr] | None = Query(None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        updated_time: list[DateTimeStr] | None = Query(None, description="更新时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        created_id: int | None = Query(None, description="创建人"),
+        updated_id: int | None = Query(None, description="更新人"),
     ) -> None:
         
         # 模糊查询字段
@@ -69,7 +70,10 @@ class {{ class_name }}QueryParam:
         {% endif %}
         {% endfor %}
         self.created_id = created_id
+        self.updated_id = updated_id
 
         # 时间范围查询
         if created_time and len(created_time) == 2:
             self.created_time = ("between", (created_time[0], created_time[1]))
+        if updated_time and len(updated_time) == 2:
+            self.updated_time = ("between", (updated_time[0], updated_time[1]))

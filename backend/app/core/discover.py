@@ -16,14 +16,11 @@
 
 from __future__ import annotations
 
-from ast import List
-from enum import Enum
 import importlib
-import sys
+from enum import Enum
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Optional, Set, Tuple, Union, Any
+from typing import Callable, Iterable, Any
 from functools import wraps
-
 from fastapi import APIRouter
 
 from app.core.logger import log
@@ -66,9 +63,9 @@ class DiscoverRouter:
         self,
         module_prefix: str = "module_",
         base_package: str = "app.api.v1",
-        prefix_map: Optional[Dict[str, str]] = None,
-        exclude_dirs: Optional[Set[str]] = None,
-        exclude_files: Optional[Set[str]] = None,
+        prefix_map: dict[str, str] | None = None,
+        exclude_dirs: set[str] | None = None,
+        exclude_files: set[str] | None = None,
         auto_discover: bool = True,
         debug: bool = False
     ) -> None:
@@ -91,8 +88,8 @@ class DiscoverRouter:
         self.exclude_files = exclude_files or set()
         self.debug = debug
         self._router = APIRouter()
-        self._seen_router_ids: Set[int] = set()
-        self._discovery_stats: Dict[str, int] = {
+        self._seen_router_ids: set[int] = set()
+        self._discovery_stats: dict[str, int] = {
             "scanned_files": 0,
             "imported_modules": 0,
             "included_routers": 0,
@@ -109,12 +106,12 @@ class DiscoverRouter:
         return self._router
     
     @property
-    def discovery_stats(self) -> Dict[str, int]:
+    def discovery_stats(self) -> dict[str, int]:
         """获取路由发现统计信息"""
         return self._discovery_stats.copy()
     
     @_log_error_handling
-    def _get_base_dir_and_pkg(self) -> Tuple[Path, str]:
+    def _get_base_dir_and_pkg(self) -> tuple[Path, str]:
         """定位基础包的文件系统路径与包名。
 
         返回:
@@ -138,7 +135,7 @@ class DiscoverRouter:
             log.error(f"❌️ 查找控制器文件失败: {str(e)}")
             return []
     
-    def _resolve_prefix(self, top_module: str) -> Optional[str]:
+    def _resolve_prefix(self, top_module: str) -> str | None:
         """将顶级模块目录名解析为容器前缀。"""
         if top_module in self.exclude_dirs:
             if self.debug:
@@ -192,12 +189,12 @@ class DiscoverRouter:
         return added
     
     @_log_error_handling
-    def discover_and_register(self) -> Dict[str, int]:
+    def discover_and_register(self) -> dict[str, int]:
         """
         执行路由发现与注册
         
         返回:
-        - Dict[str, int]: 包含发现统计信息的字典
+        - dict[str, int]: 包含发现统计信息的字典
             - scanned_files: 扫描的文件数量
             - imported_modules: 导入的模块数量
             - included_routers: 注册的路由数量
@@ -205,8 +202,8 @@ class DiscoverRouter:
         """
         log.info("🚀 开始路由发现与注册...")
         base_dir, base_pkg = self._get_base_dir_and_pkg()
-        containers: Dict[str, APIRouter] = {}
-        container_counts: Dict[str, int] = {}
+        containers: dict[str, APIRouter] = {}
+        container_counts: dict[str, int] = {}
 
         scanned_files = 0
         imported_modules = 0
@@ -330,7 +327,7 @@ class DiscoverRouter:
         return self
     
     @_log_error_handling
-    def register_router(self, router: APIRouter, tags: Optional[list[str | Enum]] = None) -> None:
+    def register_router(self, router: APIRouter, tags: list[str | Enum] | None = None) -> None:
         """手动注册一个路由实例
         
         参数:

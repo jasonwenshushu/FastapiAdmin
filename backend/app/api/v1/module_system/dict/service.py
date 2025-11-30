@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-from typing import Any, List, Dict, Optional
 from redis.asyncio.client import Redis
 
 from app.common.enums import RedisInitKeyConfig
@@ -31,7 +30,7 @@ class DictTypeService:
     """
     
     @classmethod
-    async def get_obj_detail_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def get_obj_detail_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         获取数据字典类型详情
         
@@ -40,29 +39,29 @@ class DictTypeService:
         - id (int): 数据字典类型ID
         
         返回:
-        - Dict: 数据字典类型详情字典
+        - dict: 数据字典类型详情字典
         """
         obj = await DictTypeCRUD(auth).get_obj_by_id_crud(id=id)
         return DictTypeOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def get_obj_list_service(cls, auth: AuthSchema, search: Optional[DictTypeQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> List[Dict]:
+    async def get_obj_list_service(cls, auth: AuthSchema, search: DictTypeQueryParam | None = None, order_by: list[dict] | None = None) -> list[dict]:
         """
         获取数据字典类型列表
         
         参数:
         - auth (AuthSchema): 认证信息模型
         - search (DictTypeQueryParam | None): 搜索条件模型
-        - order_by (List[Dict[str, str]] | None): 排序字段列表
+        - order_by (list[dict] | None): 排序字段列表
         
         返回:
-        - List[Dict]: 数据字典类型详情字典列表
+        - list[dict]: 数据字典类型详情字典列表
         """
         obj_list = await DictTypeCRUD(auth).get_obj_list_crud(search=search.__dict__, order_by=order_by)
         return [DictTypeOutSchema.model_validate(obj).model_dump() for obj in obj_list]
     
     @classmethod
-    async def create_obj_service(cls, auth: AuthSchema, redis: Redis, data: DictTypeCreateSchema) -> Dict:
+    async def create_obj_service(cls, auth: AuthSchema, redis: Redis, data: DictTypeCreateSchema) -> dict:
         """
         创建数据字典类型
         
@@ -72,7 +71,7 @@ class DictTypeService:
         - data (DictTypeCreateSchema): 数据字典类型创建模型
         
         返回:
-        - Dict: 数据字典类型详情字典
+        - dict: 数据字典类型详情字典
         """
         exist_obj = await DictTypeCRUD(auth).get(dict_name=data.dict_name)
         if exist_obj:
@@ -96,7 +95,7 @@ class DictTypeService:
         return new_obj_dict
     
     @classmethod
-    async def update_obj_service(cls, auth: AuthSchema, redis: Redis, id:int, data: DictTypeUpdateSchema) -> Dict:
+    async def update_obj_service(cls, auth: AuthSchema, redis: Redis, id:int, data: DictTypeUpdateSchema) -> dict:
         """
         更新数据字典类型
         
@@ -107,7 +106,7 @@ class DictTypeService:
         - data (DictTypeUpdateSchema): 数据字典类型更新模型
         
         返回:
-        - Dict: 数据字典类型详情字典
+        - dict: 数据字典类型详情字典
         """
         exist_obj = await DictTypeCRUD(auth).get_obj_by_id_crud(id=id)
         if not exist_obj:
@@ -210,12 +209,12 @@ class DictTypeService:
         await DictTypeCRUD(auth).set_obj_available_crud(ids=data.ids, status=data.status)
 
     @classmethod
-    async def export_obj_service(cls, data_list: List[Dict[str, Any]]) -> bytes:
+    async def export_obj_service(cls, data_list: list[dict]) -> bytes:
         """
         导出数据字典类型列表
         
         参数:
-        - data_list (List[Dict[str, Any]]): 数据字典类型列表
+        - data_list (list[dict]): 数据字典类型列表
         
         返回:
         - bytes: Excel文件字节流
@@ -229,7 +228,7 @@ class DictTypeService:
             'created_time': '创建时间',
             'updated_time': '更新时间',
             'created_id': '创建者ID',
-            'creator': '创建者',
+            'updated_id': '更新者ID',
         }
 
         # 复制数据并转换状态
@@ -248,7 +247,7 @@ class DictDataService:
     """
     
     @classmethod
-    async def get_obj_detail_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def get_obj_detail_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         获取数据字典数据详情
         
@@ -257,23 +256,23 @@ class DictDataService:
         - id (int): 数据字典数据ID
         
         返回:
-        - Dict: 数据字典数据详情字典
+        - dict: 数据字典数据详情字典
         """
         obj = await DictDataCRUD(auth).get_obj_by_id_crud(id=id)
         return DictDataOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def get_obj_list_service(cls, auth: AuthSchema, search: Optional[DictDataQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> List[Dict]:
+    async def get_obj_list_service(cls, auth: AuthSchema, search: DictDataQueryParam | None = None, order_by: list[dict] | None = None) -> list[dict]:
         """
         获取数据字典数据列表
         
         参数:
         - auth (AuthSchema): 认证信息模型
         - search (DictDataQueryParam | None): 搜索条件模型
-        - order_by (List[Dict[str, str]] | None): 排序字段列表
+        - order_by (list[dict] | None): 排序字段列表
         
         返回:
-        - List[Dict]: 数据字典数据详情字典列表
+        - list[dict]: 数据字典数据详情字典列表
         """
         obj_list = await DictDataCRUD(auth).get_obj_list_crud(search=search.__dict__, order_by=order_by)
         return [DictDataOutSchema.model_validate(obj).model_dump() for obj in obj_list]
@@ -303,12 +302,10 @@ class DictDataService:
                     fail_count = 0
                     
                     for obj in obj_list:
+                        dict_type = obj.dict_type
                         try:
-                            dict_type = obj.dict_type
                             dict_data_list = await DictDataCRUD(auth).get_obj_list_crud(search={'dict_type': dict_type})
-                            
                             dict_data = [DictDataOutSchema.model_validate(row).model_dump() for row in dict_data_list if row]
-                        
                             # 保存到Redis并设置过期时间
                             redis_key = f"{RedisInitKeyConfig.SYSTEM_DICT.key}:{dict_type}"
                             value = json.dumps(dict_data, ensure_ascii=False)
@@ -332,7 +329,7 @@ class DictDataService:
             raise CustomException(msg=f"字典数据初始化失败: {str(e)}")
     
     @classmethod
-    async def get_init_dict_service(cls, redis: Redis, dict_type: str)->List[Dict]:
+    async def get_init_dict_service(cls, redis: Redis, dict_type: str)->list[dict]:
         """
         从缓存获取字典数据列表信息service
         
@@ -341,7 +338,7 @@ class DictDataService:
         - dict_type (str): 字典类型
         
         返回:
-        - List[Dict]: 字典数据列表
+        - list[dict]: 字典数据列表
         """
         try:
             redis_key = f"{RedisInitKeyConfig.SYSTEM_DICT.key}:{dict_type}"
@@ -377,7 +374,7 @@ class DictDataService:
             raise CustomException(msg=f"获取字典数据失败: {str(e)}")
 
     @classmethod
-    async def create_obj_service(cls, auth: AuthSchema, redis: Redis, data: DictDataCreateSchema) -> Dict:
+    async def create_obj_service(cls, auth: AuthSchema, redis: Redis, data: DictDataCreateSchema) -> dict:
         """
         创建数据字典数据
         
@@ -387,7 +384,7 @@ class DictDataService:
         - data (DictDataCreateSchema): 数据字典数据创建模型
         
         返回:
-        - Dict: 数据字典数据详情字典
+        - dict: 数据字典数据详情字典
         """
         exist_obj = await DictDataCRUD(auth).get(dict_label=data.dict_label)
         if exist_obj:
@@ -413,7 +410,7 @@ class DictDataService:
         return DictDataOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def update_obj_service(cls, auth: AuthSchema, redis: Redis, id:int, data: DictDataUpdateSchema) -> Dict:
+    async def update_obj_service(cls, auth: AuthSchema, redis: Redis, id:int, data: DictDataUpdateSchema) -> dict:
         """
         更新数据字典数据
         
@@ -537,12 +534,12 @@ class DictDataService:
         await DictDataCRUD(auth).set_obj_available_crud(ids=data.ids, status=data.status)
 
     @classmethod
-    async def export_obj_service(cls, data_list: List[Dict[str, Any]]) -> bytes:
+    async def export_obj_service(cls, data_list: list[dict]) -> bytes:
         """
         导出数据字典数据列表
         
         参数:
-        - data_list (List[Dict[str, Any]]): 数据字典数据列表
+        - data_list (list[dict]): 数据字典数据列表
         
         返回:
         - bytes: Excel文件字节流
@@ -561,7 +558,7 @@ class DictDataService:
             'created_time': '创建时间',
             'updated_time': '更新时间',
             'created_id': '创建者ID',
-            'creator': '创建者',
+            'updated_id': '更新者ID',
         }
 
         # 复制数据并转换状态

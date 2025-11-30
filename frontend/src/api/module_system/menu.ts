@@ -56,8 +56,8 @@ export default MenuAPI;
 export interface MenuPageQuery {
   name?: string;
   status?: string;
-  /** 创建时间 */
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface MenuTable extends BaseType {

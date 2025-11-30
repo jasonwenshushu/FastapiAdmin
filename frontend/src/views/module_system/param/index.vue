@@ -31,13 +31,6 @@
         <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
           <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
-          <UserTableSelect
-            v-model="queryFormData.created_id"
-            @confirm-click="handleConfirm"
-            @clear-click="handleQuery"
-          />
-        </el-form-item>
         <el-form-item class="search-buttons">
           <el-button
             v-hasPerm="['module_system:param:query']"
@@ -246,16 +239,6 @@
           sortable
         />
         <el-table-column
-          v-if="tableColumns.find((col) => col.prop === 'creator')?.show"
-          key="creator"
-          label="创建人"
-          min-width="120"
-        >
-          <template #default="scope">
-            {{ scope.row.created_by?.name }}
-          </template>
-        </el-table-column>
-        <el-table-column
           v-if="tableColumns.find((col) => col.prop === 'operation')?.show"
           fixed="right"
           label="操作"
@@ -332,9 +315,6 @@
           </el-descriptions-item>
           <el-descriptions-item label="描述" :span="2">
             {{ detailFormData.description }}
-          </el-descriptions-item>
-          <el-descriptions-item label="创建人" :span="2">
-            {{ detailFormData.created_by?.name }}
           </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="2">
             {{ detailFormData.created_time }}
@@ -421,7 +401,6 @@ defineOptions({
 });
 
 import ParamsAPI, { ConfigTable, ConfigForm, ConfigPageQuery } from "@/api/module_system/params";
-import UserTableSelect from "@/views/module_system/user/components/UserTableSelect.vue";
 import ExportModal from "@/components/CURD/ExportModal.vue";
 import type { IContentConfig } from "@/components/CURD/types";
 import { formatToDateTime } from "@/utils/dateUtil";
@@ -453,12 +432,11 @@ const tableColumns = ref([
   { prop: "description", label: "描述", show: true },
   { prop: "created_time", label: "创建时间", show: true },
   { prop: "updated_time", label: "更新时间", show: true },
-  { prop: "creator", label: "创建人", show: true },
   { prop: "operation", label: "操作", show: true },
 ]);
 
 // 详情表单
-const detailFormData = ref<ConfigTable>({});
+const detailFormData = ref<ConfigTable>({} as ConfigTable);
 
 // 分页查询参数
 const queryFormData = reactive<ConfigPageQuery>({
@@ -468,7 +446,6 @@ const queryFormData = reactive<ConfigPageQuery>({
   config_key: undefined,
   config_type: undefined,
   created_time: undefined,
-  created_id: undefined,
 });
 
 // 编辑表单
@@ -532,11 +509,6 @@ async function loadingData() {
 async function handleQuery() {
   queryFormData.page_no = 1;
   loadingData();
-}
-
-// 选择创建人后触发查询
-function handleConfirm() {
-  handleQuery();
 }
 
 // 重置查询

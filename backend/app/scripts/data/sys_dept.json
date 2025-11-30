@@ -8,7 +8,6 @@
     "phone": "1582112620",
     "email": "deptadmin@example.com",
     "description": "集团总公司",
-    "tenant_id": 1,
     "parent_id": null,
     "children": []
   }

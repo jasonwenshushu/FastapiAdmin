@@ -5,13 +5,12 @@ from fastapi.responses import JSONResponse, StreamingResponse
 import urllib.parse
 
 from app.common.response import StreamResponse, SuccessResponse
+from app.core.router_class import OperationLogRoute
 from app.utils.common_util import bytes2file_response
 from app.core.base_params import PaginationQueryParam
 from app.core.dependencies import AuthPermission
-from app.core.router_class import OperationLogRoute
 from app.core.base_schema import BatchSetAvailable
 from app.core.logger import log
-
 from app.api.v1.module_system.auth.schema import AuthSchema
 from .service import DemoService
 from .schema import (

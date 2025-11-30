@@ -3,31 +3,19 @@
 from sqlalchemy import String, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.base_model import ModelMixin, UserMixin, TenantMixin, CustomerMixin
+from app.core.base_model import ModelMixin, UserMixin
 
 
-class OperationLogModel(ModelMixin, UserMixin, TenantMixin, CustomerMixin):
+class OperationLogModel(ModelMixin, UserMixin):
     """
     系统日志模型
-    
-    日志隔离策略:
-    ===========
-    - 日志记录操作人的实际租户和客户信息
-    - tenant_id: 记录操作人所属租户(必填)
-    - customer_id: 记录操作人所属客户(如果是客户用户)
-    
-    用于审计和追踪:
-    - 系统用户操作: tenant_id=1, customer_id=NULL
-    - 租户用户操作: tenant_id>1, customer_id=NULL
-    - 客户用户操作: tenant_id>1, customer_id>1
-    
     日志类型:
     - 1: 登录日志
     - 2: 操作日志
     """
     __tablename__: str = "sys_log"
     __table_args__: dict[str, str] = ({'comment': '系统日志表'})
-    __loader_options__: list[str] = ["created_by", "updated_by", "tenant", "customer"]
+    __loader_options__: list[str] = ["created_by", "updated_by"]
 
     type: Mapped[int] = mapped_column(Integer, comment="日志类型(1登录日志 2操作日志)")
     request_path: Mapped[str] = mapped_column(String(255), comment="请求路径")

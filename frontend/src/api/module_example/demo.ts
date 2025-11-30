@@ -82,22 +82,18 @@ const DemoAPI = {
 export default DemoAPI;
 
 export interface DemoPageQuery extends PageQuery {
-  /** 示例标题 */
   name?: string;
-  /** 示例状态 */
   status?: string;
-  /** 创建时间 */
   created_time?: string[];
-  // 创建人ID
+  updated_time?: string[];
   created_id?: number;
+  updated_id?: number;
 }
 
 export interface DemoTable extends BaseType {
   name?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }
 
 export interface DemoForm extends BaseFormType {

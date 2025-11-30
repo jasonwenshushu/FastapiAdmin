@@ -5,10 +5,10 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 from app.common.response import StreamResponse, SuccessResponse
 from app.common.request import PaginationService
+from app.core.router_class import OperationLogRoute
 from app.utils.common_util import bytes2file_response
 from app.core.base_params import PaginationQueryParam
 from app.core.dependencies import AuthPermission
-from app.core.router_class import OperationLogRoute
 from app.core.logger import log
 
 from app.api.v1.module_system.auth.schema import AuthSchema
@@ -211,7 +211,7 @@ async def get_job_log_controller():
             "coalesce": i.coalesce,
             "max_instances": i.max_instances,
             "next_run_time": i.next_run_time,
-            "state": SchedulerUtil.get_single_job_status(job_id=i.id, tenant_id=None)
+            "state": SchedulerUtil.get_single_job_status(job_id=i.id)
         }
         for i in SchedulerUtil.get_all_jobs()
     ]

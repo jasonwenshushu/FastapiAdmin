@@ -2,7 +2,6 @@
 
 import re
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from typing import Optional
 from fastapi import Query
 
 from app.core.validator import DateTimeStr
@@ -14,10 +13,10 @@ class DictTypeCreateSchema(BaseModel):
     字典类型表对应pydantic模型
     """
 
-    dict_name: str = Field(..., min_length=1, max_length=100, description='字典名称')
+    dict_name: str = Field(..., min_length=1, max_length=64, description='字典名称')
     dict_type: str = Field(..., min_length=1, max_length=100, description='字典类型')
-    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）')
-    description: Optional[str] = Field(default=None, max_length=255, description="描述")
+    status: str = Field(default='0', description='状态（0正常 1停用）')
+    description: str | None = Field(default=None, max_length=255, description="描述")
 
     @field_validator('dict_name')
     def validate_dict_name(cls, value: str):
@@ -50,10 +49,11 @@ class DictTypeQueryParam:
 
     def __init__(
         self,
-        dict_name: Optional[str] = Query(None, description="字典名称", max_length=100, example="用户"),
-        dict_type: Optional[str] = Query(None, description="字典类型", max_length=100, example="sys_user"),
-        status: Optional[str] = Query(None, description="状态（1正常 0停用）", example=True),
-        created_time: Optional[list[DateTimeStr]] = Query(None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        dict_name: str | None = Query(default=None, description="字典名称", max_length=100, example="用户"),
+        dict_type: str | None = Query(default=None, description="字典类型", max_length=100, example="sys_user"),
+        status: str | None = Query(default=None, description="状态（0正常 1停用）", example=True),
+        created_time: list[DateTimeStr] | None = Query(None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        updated_time: list[DateTimeStr] | None = Query(None, description="更新时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
     ) -> None:
         super().__init__()
         
@@ -67,6 +67,8 @@ class DictTypeQueryParam:
         # 时间范围查询
         if created_time and len(created_time) == 2:
             self.created_time = ("between", (created_time[0], created_time[1]))
+        if updated_time and len(updated_time) == 2:
+            self.updated_time = ("between", (updated_time[0], updated_time[1]))
 
 
 class DictDataCreateSchema(BaseModel):
@@ -78,11 +80,11 @@ class DictDataCreateSchema(BaseModel):
     dict_value: str = Field(..., max_length=100, description='字典键值')
     dict_type: str = Field(..., max_length=100, description='字典类型')
     dict_type_id: int = Field(..., description='字典类型ID')
-    css_class: Optional[str] = Field(default=None, max_length=100, description='样式属性（其他样式扩展）')
-    list_class: Optional[str] = Field(default=None, description='表格回显样式')
-    is_default: Optional[bool] = Field(default=None, description='是否默认（Y是 N否）')
-    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）')
-    description: Optional[str] = Field(default=None, max_length=255, description="描述")
+    css_class: str | None = Field(default=None, max_length=100, description='样式属性（其他样式扩展）')
+    list_class: str | None = Field(default=None, description='表格回显样式')
+    is_default: bool = Field(default=False, description='是否默认（True是 False否）')
+    status: str = Field(default='0', description='状态（0正常 1停用）')
+    description: str | None = Field(default=None, max_length=255, description="描述")
     
     @model_validator(mode='after')
     def validate_after(self):
@@ -118,11 +120,12 @@ class DictDataQueryParam:
 
     def __init__(
         self,
-        dict_label: Optional[str] = Query(None, description="字典标签", max_length=100, example="正常"),
-        dict_type: Optional[str] = Query(None, description="字典类型", max_length=100, example="sys_user_status"),
-        dict_type_id: Optional[int] = Query(None, description="字典类型ID", example=1),
-        status: Optional[str] = Query(None, description="状态（1正常 0停用）", example=True),
-        created_time: Optional[list[DateTimeStr]] = Query(None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        dict_label: str | None = Query(default=None, description="字典标签", max_length=100, example="正常"),
+        dict_type: str | None = Query(default=None, description="字典类型", max_length=100, example="sys_user_status"),
+        dict_type_id: int | None = Query(default=None, description="字典类型ID", example=1),
+        status: str | None = Query(default=None, description="状态（0正常 1停用）", example=True),
+        created_time: list[DateTimeStr] | None = Query(default=None, description="创建时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
+        updated_time: list[DateTimeStr] | None = Query(default=None, description="更新时间范围", example=["2025-01-01 00:00:00", "2025-12-31 23:59:59"]),
     ) -> None:
         
         # 模糊查询字段
@@ -136,3 +139,5 @@ class DictDataQueryParam:
         # 时间范围查询
         if created_time and len(created_time) == 2:
             self.created_time = ("between", (created_time[0], created_time[1]))
+        if updated_time and len(updated_time) == 2:
+            self.updated_time = ("between", (updated_time[0], updated_time[1]))

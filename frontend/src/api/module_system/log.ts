@@ -43,7 +43,9 @@ export interface LogPageQuery extends PageQuery {
   request_path?: string;
   creator_name?: string;
   created_time?: string[];
+  updated_time?: string[];
   created_id?: number;
+  updated_id?: number;
 }
 
 export interface LogTable extends BaseType {
@@ -60,6 +62,4 @@ export interface LogTable extends BaseType {
   process_time?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }

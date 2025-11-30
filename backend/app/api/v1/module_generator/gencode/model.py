@@ -5,25 +5,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.sql import expression
 
 from app.config.setting import settings
-from app.core.base_model import ModelMixin
+from app.core.base_model import ModelMixin, UserMixin
 from app.utils.common_util import SqlalchemyUtil
 
 
-class GenTableModel(ModelMixin):
+class GenTableModel(ModelMixin, UserMixin):
     """
     代码生成表
-    
-    数据隔离策略:
-    ===========
-    - 系统级生成: tenant_id=1 (平台管理员生成系统代码)
-    - 租户级生成: tenant_id>1 (租户管理员生成租户业务代码)
-    - 不需要customer_id: 代码生成是租户级功能,不需要客户隔离
-    
-    用于存储代码生成器的表结构配置
     """
     __tablename__: str = 'gen_table'
     __table_args__: dict[str, str] = ({'comment': '代码生成表'})
-    __loader_options__: list[str] = ["columns", "created_by", "updated_by", "tenant"]
+    __loader_options__: list[str] = ["columns", "created_by", "updated_by"]
     
     table_name: Mapped[str] = mapped_column(String(200), nullable=False, default='', comment='表名称')
     table_comment: Mapped[str | None] = mapped_column(String(500), nullable=True, comment='表描述')
@@ -71,7 +63,7 @@ class GenTableModel(ModelMixin):
         return class_name.strip()
 
 
-class GenTableColumnModel(ModelMixin):
+class GenTableColumnModel(ModelMixin, UserMixin):
     """
     代码生成表字段
     
@@ -83,7 +75,7 @@ class GenTableColumnModel(ModelMixin):
     """
     __tablename__: str = 'gen_table_column'
     __table_args__: dict[str, str] = ({'comment': '代码生成表字段'})
-    __loader_options__: list[str] = ["table", "created_by", "updated_by", "tenant"]
+    __loader_options__: list[str] = ["created_by", "updated_by"]
 
     # 数据库设计表字段
     column_name: Mapped[str] = mapped_column(String(200), nullable=False, comment='列名称')

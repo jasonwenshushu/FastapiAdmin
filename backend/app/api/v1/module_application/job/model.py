@@ -3,26 +3,18 @@
 from sqlalchemy import Boolean, String, Integer, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.base_model import ModelMixin, UserMixin, TenantMixin, CustomerMixin
+from app.core.base_model import ModelMixin, UserMixin
 
 
-class JobModel(ModelMixin, UserMixin, TenantMixin, CustomerMixin):
+class JobModel(ModelMixin, UserMixin):
     """
     定时任务调度表
-    
-    数据隔离策略:
-    ===========
-    - 系统级任务: tenant_id=1, customer_id=NULL (平台定时任务,如系统维护)
-    - 租户级任务: tenant_id>1, customer_id=NULL (租户定时任务,如数据统计)
-    - 客户级任务: tenant_id>1, customer_id>0 (客户专属定时任务)
-    
-    任务状态:
     - 0: 运行中
     - 1: 暂停中
     """
     __tablename__: str = 'app_job'
     __table_args__: dict[str, str] = ({'comment': '定时任务调度表'})
-    __loader_options__: list[str] = ["job_logs", "created_by", "updated_by", "tenant", "customer"]
+    __loader_options__: list[str] = ["job_logs", "created_by", "updated_by"]
 
     name: Mapped[str | None] = mapped_column(String(64), nullable=True, default='', comment='任务名称')
     jobstore: Mapped[str | None] = mapped_column(String(64), nullable=True, default='default', comment='存储器')
@@ -44,12 +36,9 @@ class JobModel(ModelMixin, UserMixin, TenantMixin, CustomerMixin):
     )
 
 
-class JobLogModel(ModelMixin, TenantMixin):
+class JobLogModel(ModelMixin):
     """
     定时任务调度日志表
-    
-    添加tenant_id字段以支持多租户隔离，提高查询性能
-    即使job记录被删除，日志仍然保留租户标识信息
     """
     __tablename__: str = 'app_job_log'
     __table_args__: dict[str, str] = ({'comment': '定时任务调度日志表'})
@@ -73,17 +62,6 @@ class JobLogModel(ModelMixin, TenantMixin):
         comment='任务ID'
     )
     
-    # 索引优化 - 为租户ID创建索引
-    __table_args__ = ({
-        'comment': '定时任务调度日志表',
-    })
-    
-    # 为多租户查询性能优化添加复合索引
-    # 注意：实际索引会在数据库迁移时创建
-    __indexes__ = [
-        'tenant_id_idx',  # 租户ID索引
-        'job_id_tenant_id_idx'  # 任务ID和租户ID的复合索引
-    ]
     job: Mapped["JobModel | None"] = relationship(
         back_populates="job_logs", 
         lazy="selectin"

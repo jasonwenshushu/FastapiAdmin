@@ -48,8 +48,8 @@ const selectConfig: ISelectConfig = {
         },
       },
       options: [
-        { label: "启用", value: true },
-        { label: "停用", value: false },
+        { label: "启用", value: "0" },
+        { label: "停用", value: "1" },
       ],
     },
   ],

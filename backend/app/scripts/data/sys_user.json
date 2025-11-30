@@ -13,13 +13,9 @@
     "github_login": null,
     "wx_login": null,
     "qq_login": null,
-    "user_type": "0",
-    "salt": "123456",
     "dept_id": 1,
     "status": "0",
     "description": "超级管理员",
-    "tenant_id": 1,
-    "customer_id": null,
     "created_id": null,
     "updated_id": null
   }

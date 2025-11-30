@@ -133,14 +133,11 @@ const DictAPI = {
 export default DictAPI;
 
 export interface DictPageQuery extends PageQuery {
-  /** 通知标题 */
   dict_name?: string;
-  /** 通知类型 */
   dict_type?: string;
-  /** 通知状态 */
   status?: string;
-  /** 创建时间 */
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface DictDataPageQuery extends PageQuery {
@@ -149,6 +146,7 @@ export interface DictDataPageQuery extends PageQuery {
   dict_type_id?: number;
   status?: string;
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface DictTable extends BaseType {

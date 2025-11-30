@@ -31,15 +31,15 @@
                 style="width: 167.5px"
                 clearable
               >
-                <el-option value="true" label="启用" />
-                <el-option value="false" label="停用" />
+                <el-option value="0" label="启用" />
+                <el-option value="1" label="停用" />
               </el-select>
             </el-form-item>
             <!-- 时间范围，收起状态下隐藏 -->
             <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
               <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
             </el-form-item>
-            <el-form-item v-if="isExpand" prop="creator" label="创建人">
+            <el-form-item v-if="isExpand" prop="created_id" label="创建人">
               <UserTableSelect
                 v-model="queryFormData.created_id"
                 @confirm-click="handleConfirm"
@@ -246,9 +246,14 @@
             <el-table-column label="邮箱" prop="email" min-width="160" />
             <el-table-column label="创建时间" prop="created_time" min-width="200" />
             <el-table-column label="更新时间" prop="updated_time" min-width="200" />
-            <el-table-column label="创建人" prop="creator" min-width="120">
+            <el-table-column label="创建人" prop="created_id" min-width="120">
               <template #default="scope">
                 {{ scope.row.created_by?.name }}
+              </template>
+            </el-table-column>
+            <el-table-column label="更新人" prop="updated_id" min-width="120">
+              <template #default="scope">
+                {{ scope.row.updated_by?.name }}
               </template>
             </el-table-column>
             <el-table-column fixed="right" label="操作" align="center" min-width="280">
@@ -395,6 +400,9 @@
           <el-descriptions-item label="创建人" :span="2">
             {{ detailFormData.created_by?.name }}
           </el-descriptions-item>
+          <el-descriptions-item label="更新人" :span="2">
+            {{ detailFormData.updated_by?.name }}
+          </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="2">
             {{ detailFormData.created_time }}
           </el-descriptions-item>
@@ -497,8 +505,8 @@
 
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formData.status">
-              <el-radio :value="0">启用</el-radio>
-              <el-radio :value="1">停用</el-radio>
+              <el-radio value="0">启用</el-radio>
+              <el-radio value="1">停用</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -614,6 +622,7 @@ const queryFormData = reactive<UserPageQuery>({
   dept_id: undefined,
   created_time: undefined,
   created_id: undefined,
+  updated_id: undefined,
 });
 
 // 表单
@@ -863,7 +872,7 @@ async function handleOpenDialog(type: "create" | "update" | "detail", id?: numbe
     .map((item) => ({
       value: item.id as number,
       label: item.name as string,
-      disabled: item.status === false || String(item.status) === "false",
+      disabled: item.status === "1",
     }))
     .filter((opt) => !opt.disabled);
 
@@ -874,7 +883,7 @@ async function handleOpenDialog(type: "create" | "update" | "detail", id?: numbe
     .map((item) => ({
       value: item.id as number,
       label: item.name as string,
-      disabled: item.status === false || String(item.status) === "false",
+      disabled: item.status === "1",
     }))
     .filter((opt) => !opt.disabled);
 }

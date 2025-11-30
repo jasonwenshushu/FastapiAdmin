@@ -35,15 +35,15 @@
             style="width: 167.5px"
             clearable
           >
-            <el-option value="true" label="启用" />
-            <el-option value="false" label="停用" />
+            <el-option value="0" label="启用" />
+            <el-option value="1" label="停用" />
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
         <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
           <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
+        <el-form-item v-if="isExpand" prop="created_id" label="创建人">
           <UserTableSelect
             v-model="queryFormData.created_id"
             @confirm-click="handleConfirm"
@@ -278,13 +278,23 @@
           sortable
         />
         <el-table-column
-          v-if="tableColumns.find((col) => col.prop === 'creator')?.show"
-          key="creator"
+          v-if="tableColumns.find((col) => col.prop === 'created_id')?.show"
+          key="created_id"
           label="创建人"
           min-width="100"
         >
           <template #default="scope">
             {{ scope.row.created_by?.name }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'updated_id')?.show"
+          key="updated_id"
+          label="更新人"
+          min-width="100"
+        >
+          <template #default="scope">
+            {{ scope.row.updated_by?.name }}
           </template>
         </el-table-column>
 
@@ -377,6 +387,9 @@
           <el-descriptions-item label="创建人" :span="2">
             {{ detailFormData.created_by?.name }}
           </el-descriptions-item>
+          <el-descriptions-item label="更新人" :span="2">
+            {{ detailFormData.updated_by?.name }}
+          </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="2">
             {{ detailFormData.created_time }}
           </el-descriptions-item>
@@ -421,8 +434,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formData.status">
-              <el-radio :value="0">启用</el-radio>
-              <el-radio :value="1">停用</el-radio>
+              <el-radio value="0">启用</el-radio>
+              <el-radio value="1">停用</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="内容" prop="notice_content">
@@ -491,8 +504,9 @@ const tableColumns = ref([
   { prop: "status", label: "状态", show: true },
   { prop: "description", label: "描述", show: true },
   { prop: "created_time", label: "创建时间", show: true },
+  { prop: "updated_id", label: "更新人", show: true },
   { prop: "updated_time", label: "更新时间", show: true },
-  { prop: "creator", label: "创建人", show: true },
+  { prop: "created_id", label: "创建人", show: true },
   { prop: "operation", label: "操作", show: true },
 ]);
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from app.core.base_model import MappedBase, ModelMixin, UserMixin, TenantMixin, CustomerMixin
+from app.core.base_model import MappedBase, ModelMixin, UserMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.dept.model import DeptModel
@@ -59,47 +59,13 @@ class UserPositionsModel(MappedBase):
     )
 
 
-class UserModel(ModelMixin, UserMixin, TenantMixin, CustomerMixin):
+class UserModel(ModelMixin, UserMixin):
     """
     用户模型
-    
-    用户类型与数据隔离关系：
-    ====================
-    - 系统用户(user_type=0): 
-      * tenant_id=1(系统租户)
-      * customer_id=None
-      * 用于平台管理,可管理所有租户
-    
-    - 租户管理员(user_type=1): 
-      * tenant_id>1
-      * customer_id=None
-      * 可管理本租户内所有数据(包括所有客户)
-    
-    - 租户普通用户(user_type=1):
-      * tenant_id>1
-      * customer_id=None
-      * 数据权限由role.data_scope控制
-    
-    - 客户用户(user_type=2):
-      * tenant_id>1
-      * customer_id>1
-      * 只能访问其所属客户的数据
-    
-    数据权限实现机制：
-    ==================
-    通过角色的data_scope字段和用户-部门-角色关系实现:
-    - 1(仅本人): WHERE created_id = current_user.id
-    - 2(本部门): WHERE user.dept_id = current_user.dept_id
-    - 3(本部门及以下): WHERE dept.tree_path LIKE 'current_user.dept.tree_path%'
-    - 4(全部数据): WHERE tenant_id = current_user.tenant_id (AND customer_id IS NULL OR customer_id = current_user.customer_id)
-    - 5(自定义): WHERE dept_id IN (SELECT dept_id FROM role_depts WHERE role_id IN current_user.role_ids)
-    
-    客户用户额外限制:
-    - 无论data_scope如何,都必须加上: AND customer_id = current_user.customer_id
     """
     __tablename__: str = "sys_user"
     __table_args__: dict[str, str] = ({'comment': '用户表'})
-    __loader_options__: list[str] = ["dept", "roles", "positions", "created_by", "updated_by", "tenant", "customer"]
+    __loader_options__: list[str] = ["dept", "roles", "positions", "created_by", "updated_by"]
 
     username: Mapped[str] = mapped_column(String(32), nullable=False, unique=True, comment="用户名/登录账号")
     password: Mapped[str] = mapped_column(String(255), nullable=False, comment="密码哈希")
@@ -115,8 +81,6 @@ class UserModel(ModelMixin, UserMixin, TenantMixin, CustomerMixin):
     github_login: Mapped[str | None] = mapped_column(String(32), nullable=True, comment="Github登录")
     wx_login: Mapped[str | None] = mapped_column(String(32), nullable=True, comment="微信登录")
     qq_login: Mapped[str | None] = mapped_column(String(32), nullable=True, comment="QQ登录")
-    user_type: Mapped[str] = mapped_column(String(32), nullable=False, default="0", comment="用户类型(0:系统用户 1:租户用户 2:客户用户)")
-    salt: Mapped[str | None] = mapped_column(String(255), nullable=True, comment="加密盐")
     
     dept_id: Mapped[int | None] = mapped_column(
         Integer, 

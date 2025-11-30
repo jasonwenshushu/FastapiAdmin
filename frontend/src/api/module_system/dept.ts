@@ -69,9 +69,6 @@ export interface DeptTable extends BaseType {
   parent_id?: number;
   parent_name?: string;
   children?: DeptTable[];
-  created_by?: creatorType;
-  updated_by?: updatorType;
-  tenant?: CommonType;
 }
 
 export interface DeptForm extends BaseFormType {

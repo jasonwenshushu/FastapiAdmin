@@ -20,8 +20,8 @@
             style="width: 167.5px"
             clearable
           >
-            <el-option value="true" label="启用" />
-            <el-option value="false" label="停用" />
+            <el-option value="0" label="启用" />
+            <el-option value="1" label="停用" />
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
@@ -423,7 +423,7 @@
             <el-input v-model="formData.route_path" placeholder="请输入外链完整路径" />
           </el-form-item>
 
-          <el-form-item prop="route_name">
+          <el-form-item v-if="formData.type !== MenuTypeEnum.BUTTON" prop="route_name">
             <template #label>
               <div class="flex-y-center">
                 路由名称
@@ -631,8 +631,8 @@
 
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formData.status">
-              <el-radio :value="0">启用</el-radio>
-              <el-radio :value="false">禁用</el-radio>
+              <el-radio value="0">启用</el-radio>
+              <el-radio value="1">禁用</el-radio>
             </el-radio-group>
           </el-form-item>
 

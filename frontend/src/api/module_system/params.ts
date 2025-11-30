@@ -71,14 +71,11 @@ const ParamsAPI = {
 export default ParamsAPI;
 
 export interface ConfigPageQuery extends PageQuery {
-  /** 配置名称 */
   config_name?: string;
-  /** 配置键 */
   config_key?: string;
-  /** 配置类型 */
   config_type?: boolean;
-  /** 创建时间 */
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface ConfigTable extends BaseType {

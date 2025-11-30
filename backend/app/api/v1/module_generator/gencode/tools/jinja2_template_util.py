@@ -3,7 +3,7 @@
 from datetime import datetime
 from jinja2.environment import Environment
 from jinja2 import Environment, FileSystemLoader, Template
-from typing import List, Any, Set
+from typing import Any
 
 from app.common.constant import GenConstant
 from app.config.path_conf import TEMPLATE_DIR
@@ -136,7 +136,6 @@ class Jinja2TemplateUtil:
             'python/service.py.j2',
             'python/crud.py.j2',
             'python/schema.py.j2',
-            'python/param.py.j2',
             'python/model.py.j2',
             'sql/sql.sql.j2',
             'ts/api.ts.j2',
@@ -173,7 +172,6 @@ class Jinja2TemplateUtil:
             'service.py.j2': f'{cls.BACKEND_PROJECT_PATH}/app/api/v1/{module_name}/{business_name}/service.py',
             'crud.py.j2': f'{cls.BACKEND_PROJECT_PATH}/app/api/v1/{module_name}/{business_name}/crud.py',
             'model.py.j2': f'{cls.BACKEND_PROJECT_PATH}/app/api/v1/{module_name}/{business_name}/model.py',
-            'param.py.j2': f'{cls.BACKEND_PROJECT_PATH}/app/api/v1/{module_name}/{business_name}/param.py',
             'schema.py.j2': f'{cls.BACKEND_PROJECT_PATH}/app/api/v1/{module_name}/{business_name}/schema.py',
             'sql.sql.j2': f'{cls.BACKEND_PROJECT_PATH}/sql/menu/{module_name}/{business_name}.sql',
             'api.ts.j2': f'{cls.FRONTEND_PROJECT_PATH}/src/api/{module_name}/{business_name}.ts',
@@ -275,16 +273,16 @@ class Jinja2TemplateUtil:
         return column_type
     
     @classmethod
-    def merge_same_imports(cls, imports: List[str], import_start: str) -> List[str]:
+    def merge_same_imports(cls, imports: list[str], import_start: str) -> list[str]:
         """
         合并相同的导入语句。
 
         参数:
-        - imports (List[str]): 导入语句列表。
+        - imports (list[str]): 导入语句列表。
         - import_start (str): 导入语句的起始字符串。
         
         返回:
-        - List[str]: 合并后的导入语句列表。
+        - list[str]: 合并后的导入语句列表。
         """
         merged_imports = []
         _imports = []
@@ -323,16 +321,16 @@ class Jinja2TemplateUtil:
         return ', '.join(dicts)
 
     @classmethod
-    def add_dicts(cls, dicts: Set[str], columns: List[GenTableColumnOutSchema]):
+    def add_dicts(cls, dicts: set[str], columns: list[GenTableColumnOutSchema]):
         """
         添加字典类型到集合。
 
         参数:
-        - dicts (Set[str]): 字典类型集合。
-        - columns (List[GenTableColumnOutSchema]): 字段列表。
+        - dicts (set[str]): 字典类型集合。
+        - columns (list[GenTableColumnOutSchema]): 字段列表。
         
         返回:
-        - Set[str]: 更新后的字典类型集合。
+        - set[str]: 更新后的字典类型集合。
         """
         for column in columns:
             super_column = column.super_column if column.super_column is not None else '0'

@@ -25,12 +25,23 @@
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
-        <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
-          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
+        <el-form-item v-if="isExpand" prop="created_time" label="创建时间">
+          <DatePicker v-model="createdDateRange" @update:model-value="handleCreatedDateRangeChange" />
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
+        <!-- 更新时间范围，收起状态下隐藏 -->
+        <el-form-item v-if="isExpand" prop="updated_time" label="更新时间">
+          <DatePicker v-model="updatedDateRange" @update:model-value="handleUpdatedDateRangeChange" />
+        </el-form-item>
+        <el-form-item v-if="isExpand" prop="created_id" label="创建人">
           <UserTableSelect
             v-model="queryFormData.created_id"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item v-if="isExpand" prop="updated_id" label="更新人">
+          <UserTableSelect
+            v-model="queryFormData.updated_id"
             @confirm-click="handleConfirm"
             @clear-click="handleQuery"
           />
@@ -207,6 +218,7 @@
         <el-table-column label="描述" prop="description" min-width="100" />
         <el-table-column label="创建时间" prop="created_time" min-width="200" sortable />
         <el-table-column label="更新时间" prop="updated_time" min-width="200" sortable />
+        
 
         <OperationColumn :list-data-length="pageTableData.length">
           <template #default="scope">
@@ -701,15 +713,27 @@ const rules = reactive({
 });
 
 // 日期范围临时变量
-const dateRange = ref<[Date, Date] | []>([]);
+const createdDateRange = ref<[Date, Date] | []>([]);
+// 更新时间范围临时变量
+const updatedDateRange = ref<[Date, Date] | []>([]);
 
-// 处理日期范围变化
-function handleDateRangeChange(range: [Date, Date]) {
-  dateRange.value = range;
+// 处理创建时间范围变化
+function handleCreatedDateRangeChange(range: [Date, Date]) {
+  createdDateRange.value = range;
   if (range && range.length === 2) {
     queryFormData.created_time = [formatToDateTime(range[0]), formatToDateTime(range[1])];
   } else {
     queryFormData.created_time = undefined;
+  }
+}
+
+// 处理更新时间范围变化
+function handleUpdatedDateRangeChange(range: [Date, Date]) {
+  updatedDateRange.value = range;
+  if (range && range.length === 2) {
+    queryFormData.updated_time = [formatToDateTime(range[0]), formatToDateTime(range[1])];
+  } else {
+    queryFormData.updated_time = undefined;
   }
 }
 
@@ -748,8 +772,10 @@ async function handleResetQuery() {
   queryFormRef.value.resetFields();
   queryFormData.page_no = 1;
   // 额外清空日期范围与时间查询参数
-  dateRange.value = [];
+  createdDateRange.value = [];
   queryFormData.created_time = undefined;
+  updatedDateRange.value = [];
+  queryFormData.updated_time = undefined;
   loadingData();
 }
 

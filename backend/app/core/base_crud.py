@@ -35,8 +35,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
         self.auth = auth
-        self.db = auth.db
-        self.current_user = auth.user
     
     async def get(self, preload: Optional[List[Union[str, Any]]] = None, **kwargs) -> Optional[ModelType]:
         """
@@ -61,7 +59,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             
             sql = await self.__filter_permissions(sql)
 
-            result: Result = await self.db.execute(sql)
+            result: Result = await self.auth.db.execute(sql)
             obj = result.scalars().first()
             return obj
         except Exception as e:
@@ -90,7 +88,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             for opt in self.__loader_options(preload):
                 sql = sql.options(opt)
             sql = await self.__filter_permissions(sql)
-            result: Result = await self.db.execute(sql)
+            result: Result = await self.auth.db.execute(sql)
             return result.scalars().all()
         except Exception as e:
             raise CustomException(msg=f"列表查询失败: {str(e)}")
@@ -130,7 +128,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 sql = sql.options(opt)
             
             sql = await self.__filter_permissions(sql)
-            result: Result = await self.db.execute(sql)
+            result: Result = await self.auth.db.execute(sql)
             return result.scalars().all()
         except Exception as e:
             raise CustomException(msg=f"树形列表查询失败: {str(e)}")
@@ -168,10 +166,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 count_sql = count_sql.where(*conditions)
             count_sql = await self.__filter_permissions(count_sql)
             
-            total_result = await self.db.execute(count_sql)
+            total_result = await self.auth.db.execute(count_sql)
             total = total_result.scalar() or 0
 
-            result: Result = await self.db.execute(sql.offset(offset).limit(limit))
+            result: Result = await self.auth.db.execute(sql.offset(offset).limit(limit))
             objs = result.scalars().all()
 
             return {
@@ -202,19 +200,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             obj = self.model(**obj_dict)
             
             # 设置字段值（只检查一次current_user）
-            if self.current_user:
+            if self.auth.user:
                 if hasattr(obj, "created_id"):
-                    setattr(obj, "created_id", self.current_user.id)
+                    setattr(obj, "created_id", self.auth.user.id)
                 if hasattr(obj, "updated_id"):
-                    setattr(obj, "updated_id", self.current_user.id)
-                if hasattr(obj, "tenant_id"):
-                    setattr(obj, "tenant_id", self.current_user.tenant_id)
-                if hasattr(obj, "customer_id"):
-                    setattr(obj, "customer_id", self.current_user.customer_id)
+                    setattr(obj, "updated_id", self.auth.user.id)
             
-            self.db.add(obj)
-            await self.db.flush()
-            await self.db.refresh(obj)
+            self.auth.db.add(obj)
+            await self.auth.db.flush()
+            await self.auth.db.refresh(obj)
             return obj
         except Exception as e:
             raise CustomException(msg=f"创建失败: {str(e)}")
@@ -240,16 +234,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 raise CustomException(msg="更新对象不存在")
             
             # 设置字段值（只检查一次current_user）
-            if self.current_user:
+            if self.auth.user:
                 if hasattr(obj, "updated_id"):
-                    setattr(obj, "updated_id", self.current_user.id)
+                    setattr(obj, "updated_id", self.auth.user.id)
             
             for key, value in obj_dict.items():
                 if hasattr(obj, key):
                     setattr(obj, key, value)
                     
-            await self.db.flush()
-            await self.db.refresh(obj)
+            await self.auth.db.flush()
+            await self.auth.db.refresh(obj)
             return obj
         except Exception as e:
             raise CustomException(msg=f"更新失败: {str(e)}")
@@ -272,8 +266,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if len(pk_cols) > 1:
                 raise CustomException(msg="暂不支持复合主键的批量删除")
             sql = delete(self.model).where(pk_cols[0].in_(ids))
-            await self.db.execute(sql)
-            await self.db.flush()
+            await self.auth.db.execute(sql)
+            await self.auth.db.flush()
         except Exception as e:
             raise CustomException(msg=f"删除失败: {str(e)}")
 
@@ -286,8 +280,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         try:
             sql = delete(self.model)
-            await self.db.execute(sql)
-            await self.db.flush()
+            await self.auth.db.execute(sql)
+            await self.auth.db.flush()
         except Exception as e:
             raise CustomException(msg=f"清空失败: {str(e)}")
 
@@ -310,8 +304,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if len(pk_cols) > 1:
                 raise CustomException(msg="暂不支持复合主键的批量更新")
             sql = update(self.model).where(pk_cols[0].in_(ids)).values(**kwargs)
-            await self.db.execute(sql)
-            await self.db.flush()
+            await self.auth.db.execute(sql)
+            await self.auth.db.flush()
         except Exception as e:
             raise CustomException(msg=f"批量更新失败: {str(e)}")
 
@@ -319,16 +313,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         过滤数据权限（仅用于Select）。
         """
-        # 在初始化场景下，如果不需要检查数据权限，则直接返回原始查询
-        if not self.auth.check_data_scope:
-            return sql
-        # 在正常业务场景下，需要确保用户存在
-        # if not self.current_user:
-        #     raise sql
         filter = Permission(
-            db=self.db,
             model=self.model,
-            current_user=self.current_user,
             auth=self.auth
         )
         return await filter.filter_query(sql)

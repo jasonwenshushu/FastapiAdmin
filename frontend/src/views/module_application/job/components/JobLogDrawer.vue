@@ -172,7 +172,8 @@
           show-overflow-tooltip
         />
         <el-table-column label="触发器" prop="job_trigger" min-width="120" show-overflow-tooltip />
-        <el-table-column label="创建时间" prop="create_time" min-width="180" sortable />
+        <el-table-column label="创建时间" prop="created_time" min-width="180" sortable />
+        <el-table-column label="更新时间" prop="updated_time" min-width="180" sortable />
         <el-table-column fixed="right" label="操作" align="center" min-width="150">
           <template #default="scope">
             <el-button
@@ -229,7 +230,7 @@
             {{ detailFormData.job_group }}
           </el-descriptions-item>
           <el-descriptions-item label="执行状态" :span="2">
-            <el-tag :type="detailFormData.status === true ? 'success' : 'danger'">
+            <el-tag :type="detailFormData.status === '0' ? 'success' : 'danger'">
               {{ detailFormData.status ? "成功" : "失败" }}
             </el-tag>
           </el-descriptions-item>
@@ -255,7 +256,10 @@
             {{ detailFormData.job_trigger || "-" }}
           </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="2">
-            {{ detailFormData.create_time }}
+            {{ detailFormData.created_time }}
+          </el-descriptions-item>
+          <el-descriptions-item label="更新时间" :span="2">
+            {{ detailFormData.updated_time }}
           </el-descriptions-item>
         </el-descriptions>
       </template>

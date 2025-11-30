@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Optional, Dict, Union
+from typing import Any
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from pydantic_validation_decorator import FieldValidationError
@@ -23,7 +23,7 @@ class CustomException(Exception):
         msg: str = RET.EXCEPTION.msg,
         code: int = RET.EXCEPTION.code,
         status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
-        data: Optional[Any] = None,
+        data: Any | None = None,
         success: bool = False
     ) -> None:
         """

@@ -4,7 +4,7 @@ import importlib
 import re
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Literal, Union, Sequence, Optional, Generator
+from typing import Any, Literal, Sequence, Generator
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm.collections import InstrumentedList
@@ -81,7 +81,7 @@ def uuid4_str() -> str:
     return str(uuid.uuid4())
 
 
-def get_parent_id_map(model_list: Sequence[DeclarativeBase]) -> Dict[int, int]:
+def get_parent_id_map(model_list: Sequence[DeclarativeBase]) -> dict[int, int]:
     """
     获取父级 ID 映射字典
 
@@ -100,11 +100,11 @@ def get_parent_recursion(id: int, id_map: dict[int, int], ids: list[int] | None 
 
     参数:
     - id (int): 当前 ID。
-    - id_map (Dict[int, int]): ID 映射字典。
-    - ids (List[int] | None): 已收集的 ID 列表。
+    - id_map (dict[int, int]): ID 映射字典。
+    - ids (list[int] | None): 已收集的 ID 列表。
 
     返回:
-    - List[int]: 所有父级 ID 列表。
+    - list[int]: 所有父级 ID 列表。
     """
     ids = ids or []
     if id in ids:
@@ -140,11 +140,11 @@ def get_child_recursion(id: int, id_map: dict[int, list[int]], ids: list[int] | 
 
     参数:
     - id (int): 当前 ID。
-    - id_map (Dict[int, List[int]]): ID 映射字典。
-    - ids (List[int] | None): 已收集的 ID 列表。
+    - id_map (dict[int, list[int]]): ID 映射字典。
+    - ids (list[int] | None): 已收集的 ID 列表。
 
     返回:
-    - List[int]: 所有子级 ID 列表。
+    - list[int]: 所有子级 ID 列表。
     """
     ids = ids or []
     ids.append(id)
@@ -272,7 +272,7 @@ class SqlalchemyUtil:
 
     @classmethod
     def base_to_dict(
-        cls, obj: Union[DeclarativeBase, Dict], transform_case: Literal['no_case', 'snake_to_camel', 'camel_to_snake'] = 'no_case'
+        cls, obj: DeclarativeBase | dict[str, Any], transform_case: Literal['no_case', 'snake_to_camel', 'camel_to_snake'] = 'no_case'
     ):
         """
         将sqlalchemy模型对象转换为字典
@@ -326,7 +326,7 @@ class SqlalchemyUtil:
         return result
 
     @classmethod
-    def get_server_default_null(cls, dialect_name: str, need_explicit_null: bool = True) -> Optional[TextClause]:
+    def get_server_default_null(cls, dialect_name: str, need_explicit_null: bool = True) -> TextClause | None:
         """
         根据数据库方言动态返回值为null的server_default
 

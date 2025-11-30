@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-from typing import Dict, List
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +10,6 @@ from app.core.logger import log
 from app.core.database import async_db_session, async_engine
 from app.core.base_model import MappedBase
 
-from app.api.v1.module_system.tenant.model import TenantModel
 from app.api.v1.module_system.user.model import UserModel, UserRolesModel
 from app.api.v1.module_system.role.model import RoleModel
 from app.api.v1.module_system.dept.model import DeptModel
@@ -31,15 +29,14 @@ class InitializeData:
         """
         # 按照依赖关系排序：先创建基础表，再创建关联表
         self.prepare_init_models = [
-            TenantModel,
             MenuModel,
             ParamsModel,
+            DeptModel,
             DictTypeModel,
             DictDataModel,
-            DeptModel,
             UserModel,
             RoleModel,
-            UserRolesModel
+            UserRolesModel,
         ]
     
     async def __init_create_table(self) -> None:
@@ -120,20 +117,20 @@ class InitializeData:
                 log.error(f"❌️ 初始化 {table_name} 表数据失败: {str(e)}")
                 raise
 
-    def __create_objects_with_children(self, data: List[Dict], model_class) -> List:
+    def __create_objects_with_children(self, data: list[dict], model_class) -> list:
         """
         通用递归创建对象函数，处理嵌套的 children 数据
 
         参数:
-        - data (List[Dict]): 包含嵌套 children 数据的列表。
+        - data (list[dict]): 包含嵌套 children 数据的列表。
         - model_class: 对应的 SQLAlchemy 模型类。
 
         返回:
-        - List: 包含创建的对象的列表。
+        - list: 包含创建的对象的列表。
         """
         objs = []
         
-        def create_object(obj_data: Dict):
+        def create_object(obj_data: dict):
             # 分离 children 数据
             children_data = obj_data.pop('children', [])
             
@@ -151,7 +148,7 @@ class InitializeData:
             
         return objs
 
-    async def __get_data(self, filename: str) -> List[Dict]:
+    async def __get_data(self, filename: str) -> list[dict]:
         """
         读取初始化数据文件
 
@@ -159,7 +156,7 @@ class InitializeData:
         - filename (str): 文件名（不包含扩展名）。
 
         返回:
-        - List[Dict]: 解析后的 JSON 数据列表。
+        - list[dict]: 解析后的 JSON 数据列表。
         """
         json_path = SCRIPT_DIR / f'{filename}.json'
         if not json_path.exists():

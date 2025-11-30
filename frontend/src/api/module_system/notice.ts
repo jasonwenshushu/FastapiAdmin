@@ -74,7 +74,9 @@ export interface NoticePageQuery extends PageQuery {
   notice_type?: string;
   status?: string;
   created_time?: string[];
+  updated_time?: string[];
   created_id?: number;
+  updated_id?: number;
 }
 
 export interface NoticeTable extends BaseType {
@@ -83,8 +85,6 @@ export interface NoticeTable extends BaseType {
   notice_content?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }
 
 export interface NoticeForm extends BaseFormType {

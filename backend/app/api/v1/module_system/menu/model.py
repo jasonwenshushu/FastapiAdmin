@@ -19,23 +19,6 @@ class MenuModel(ModelMixin):
     - 2: 菜单(二级菜单) 
     - 3: 按钮/权限(页面内按钮权限)
     - 4: 外部链接
-    
-    菜单隔离策略:
-    ===========
-    - 系统级菜单(tenant_id=1或NULL): 
-      * 平台基础菜单,所有租户共享
-      * 如:系统管理、用户管理等核心功能
-    
-    - 租户级菜单(tenant_id>1):
-      * 租户自定义菜单,仅本租户可见
-      * 如:租户特有的业务模块
-      * 租户管理员可以为本租户添加自定义菜单
-    
-    - 不需要customer_id:
-      * 菜单是租户级资源,不属于客户
-      * 客户用户的菜单权限通过role控制
-    
-    支持树形结构(通过parent_id自关联)
     """
     __tablename__: str = "sys_menu"
     __table_args__: dict[str, str] = ({'comment': '菜单表'})
@@ -66,7 +49,7 @@ class MenuModel(ModelMixin):
         comment='父菜单ID'
     )
     
-    # 关联关系 (继承自UserMixin和TenantMixin)
+    # 关联关系
     parent: Mapped["MenuModel | None"] = relationship(
         back_populates='children', 
         remote_side="MenuModel.id", 

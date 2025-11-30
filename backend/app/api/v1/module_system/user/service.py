@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import io
-from typing import Any, Dict, List, Optional
+from typing import Any
 from fastapi import UploadFile
 import pandas as pd
 
@@ -19,7 +19,6 @@ from ..menu.crud import MenuCRUD
 from ..dept.crud import DeptCRUD
 from ..auth.schema import AuthSchema
 from ..menu.schema import MenuOutSchema
-from ..tenant.service import TenantService
 from .crud import UserCRUD
 from .schema import (
     CurrentUserUpdateSchema,
@@ -38,7 +37,7 @@ class UserService:
     """用户模块服务层"""
 
     @classmethod
-    async def get_detail_by_id_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def get_detail_by_id_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         根据ID获取用户详情
         
@@ -47,7 +46,7 @@ class UserService:
         - id (int): 用户ID
         
         返回:
-        - Dict: 用户详情字典
+        - dict: 用户详情字典
         """
         user = await UserCRUD(auth).get_by_id_crud(id=id)
         if not user:
@@ -59,22 +58,21 @@ class UserService:
             UserOutSchema.dept_name = dept.name if dept else None
         else:
             UserOutSchema.dept_name = None
-            
-            
+        
         return UserOutSchema.model_validate(user).model_dump()
 
     @classmethod
-    async def get_user_list_service(cls, auth: AuthSchema, search: Optional[UserQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> List[Dict]:
+    async def get_user_list_service(cls, auth: AuthSchema, search: UserQueryParam | None = None, order_by: list[dict[str, str]] | None = None) -> list[dict]:
         """
         获取用户列表
         
         参数:
         - auth (AuthSchema): 认证信息模型
         - search (UserQueryParam | None): 查询参数对象。
-        - order_by (List[Dict[str, str]] | None): 排序参数列表。
+        - order_by (list[dict[str, str]] | None): 排序参数列表。
         
         返回:
-        - List[Dict]: 用户详情字典列表
+        - list[dict]: 用户详情字典列表
         """
         user_list = await UserCRUD(auth).get_list_crud(search=search.__dict__, order_by=order_by)
         user_dict_list = []
@@ -85,7 +83,7 @@ class UserService:
         return user_dict_list
 
     @classmethod
-    async def create_user_service(cls, data: UserCreateSchema, auth: AuthSchema) -> Dict:
+    async def create_user_service(cls, data: UserCreateSchema, auth: AuthSchema) -> dict:
         """
         创建用户
         
@@ -94,7 +92,7 @@ class UserService:
         - auth (AuthSchema): 认证信息模型
         
         返回:
-        - Dict: 创建后的用户详情字典
+        - dict: 创建后的用户详情字典
         """
         if not data.username:
             raise CustomException(msg="用户名不能为空")
@@ -111,32 +109,16 @@ class UserService:
             dept = await DeptCRUD(auth).get_by_id_crud(id=data.dept_id)
             if not dept:
                 raise CustomException(msg='部门不存在')
-
         # 创建用户
         if data.password:
             data.password = PwdUtil.set_password_hash(password=data.password)
         user_dict = data.model_dump(exclude_unset=True, exclude={"role_ids", "position_ids"})
-        
-        # 多租户隔离：确保用户正确关联到创建者的租户和客户
-        # 非系统管理员创建的用户，自动继承创建者的租户和客户信息
-        if auth.user and not auth.user.is_superuser:
-            # 检查是否尝试为其他租户创建用户
-            if data.tenant_id and data.tenant_id != auth.user.tenant_id:
-                raise CustomException(msg='没有权限为其他租户创建用户')
-            # 自动设置租户ID
-            user_dict["tenant_id"] = auth.user.tenant_id
-            # 如果创建者是客户用户，自动设置客户ID
-            if auth.user.customer_id:
-                user_dict["customer_id"] = auth.user.customer_id
-            # 限制用户类型，非系统管理员只能创建普通用户
-            user_dict["user_type"] = "0"
-        
         # 创建用户
         new_user = await UserCRUD(auth).create(data=user_dict)
-
-        # 设置角色和岗位
+        # 设置角色
         if data.role_ids and len(data.role_ids) > 0:
             await UserCRUD(auth).set_user_roles_crud(user_ids=[new_user.id], role_ids=data.role_ids)
+        # 设置岗位
         if data.position_ids and len(data.position_ids) > 0:
             await UserCRUD(auth).set_user_positions_crud(user_ids=[new_user.id], position_ids=data.position_ids)
 
@@ -144,7 +126,7 @@ class UserService:
         return new_user_dict
 
     @classmethod
-    async def update_user_service(cls, id: int, data: UserUpdateSchema, auth: AuthSchema) -> Dict:
+    async def update_user_service(cls, id: int, data: UserUpdateSchema, auth: AuthSchema) -> dict:
         """
         更新用户
         
@@ -157,10 +139,8 @@ class UserService:
         - Dict: 更新后的用户详情字典
         """
         if not data.username:
-            raise CustomException(msg="用户名不能为空")
-        # 检查是否是超级管理员
-        if data.is_superuser:
-            raise CustomException(msg='超级管理员系统唯一')
+            raise CustomException(msg="账号不能为空")
+        
         # 检查用户是否存在
         user = await UserCRUD(auth).get_by_id_crud(id=id)
         if not user:
@@ -169,16 +149,11 @@ class UserService:
         # 检查是否尝试修改超级管理员
         if user.is_superuser:
             raise CustomException(msg='超级管理员不允许修改')
-        
-        # 多租户权限检查：非系统管理员只能修改同租户的用户
-        if auth.user and not auth.user.is_superuser:
-            if user.tenant_id != auth.user.tenant_id:
-                raise CustomException(msg='没有权限修改其他租户的用户')
 
         # 检查用户名是否重复
         exist_user = await UserCRUD(auth).get_by_username_crud(username=data.username)
         if exist_user and exist_user.id != id:
-            raise CustomException(msg='已存在相同的用户名')
+            raise CustomException(msg='已存在相同的账号')
         # 新增：检查手机号是否重复
         if data.mobile:
             exist_mobile_user = await UserCRUD(auth).get_by_mobile_crud(mobile=data.mobile)
@@ -203,7 +178,7 @@ class UserService:
             update_dict['password'] = PwdUtil.set_password_hash(password=data.password)
         
         # 更新用户 - 排除不应被修改的字段
-        user_dict = data.model_dump(exclude_unset=True, exclude={"role_ids", "position_ids", "last_login", "password", "tenant_id", "customer_id", "user_type"})
+        user_dict = data.model_dump(exclude_unset=True, exclude={"role_ids", "position_ids", "last_login", "password"})
         user_dict.update(update_dict)
         new_user = await UserCRUD(auth).update(id=id, data=user_dict)
 
@@ -253,11 +228,6 @@ class UserService:
                 raise CustomException(msg="用户已启用,不能删除")
             if auth.user and auth.user.id == id:
                 raise CustomException(msg="不能删除当前登陆用户")
-            
-            # 多租户权限检查：非系统管理员只能删除同租户的用户
-            if auth.user and not auth.user.is_superuser:
-                if user.tenant_id != auth.user.tenant_id:
-                    raise CustomException(msg='没有权限删除其他租户的用户')
         # 删除用户角色关联数据
         await UserCRUD(auth).set_user_roles_crud(user_ids=ids, role_ids=[])
         
@@ -268,7 +238,7 @@ class UserService:
         await UserCRUD(auth).delete(ids=ids)
 
     @classmethod
-    async def get_current_user_info_service(cls, auth: AuthSchema) -> Dict:
+    async def get_current_user_info_service(cls, auth: AuthSchema) -> dict:
         """
         获取当前用户信息
         
@@ -311,7 +281,7 @@ class UserService:
         return user_dict
 
     @classmethod
-    async def update_current_user_info_service(cls, auth: AuthSchema, data: CurrentUserUpdateSchema) -> Dict:
+    async def update_current_user_info_service(cls, auth: AuthSchema, data: CurrentUserUpdateSchema) -> dict:
         """
         更新当前用户信息
         
@@ -364,7 +334,7 @@ class UserService:
         await UserCRUD(auth).set_available_crud(ids=data.ids, status=data.status)
 
     @classmethod
-    async def upload_avatar_service(cls, base_url: str, file: UploadFile) -> Dict:
+    async def upload_avatar_service(cls, base_url: str, file: UploadFile) -> dict:
         """
         上传用户头像
         
@@ -375,8 +345,6 @@ class UserService:
         返回:
         - Dict: 上传头像响应字典
         """
-        if not file:
-            raise CustomException(msg="请选择要上传的文件")
         filename, filepath, file_url = await UploadUtil.upload_file(file=file, base_url=base_url)
         
         return UploadResponseSchema(
@@ -387,7 +355,7 @@ class UserService:
         ).model_dump()
 
     @classmethod
-    async def change_user_password_service(cls, auth: AuthSchema, data: UserChangePasswordSchema) -> Dict:
+    async def change_user_password_service(cls, auth: AuthSchema, data: UserChangePasswordSchema) -> dict:
         """
         修改用户密码
         
@@ -416,7 +384,7 @@ class UserService:
         return UserOutSchema.model_validate(new_user).model_dump()
     
     @classmethod
-    async def reset_user_password_service(cls, auth: AuthSchema, data: ResetPasswordSchema) -> Dict:
+    async def reset_user_password_service(cls, auth: AuthSchema, data: ResetPasswordSchema) -> dict:
         """
         重置用户密码
         
@@ -445,7 +413,7 @@ class UserService:
         return UserOutSchema.model_validate(new_user).model_dump()
 
     @classmethod
-    async def register_user_service(cls, auth: AuthSchema, data: UserRegisterSchema) -> Dict:
+    async def register_user_service(cls, auth: AuthSchema, data: UserRegisterSchema) -> dict:
         """
         用户注册
         
@@ -471,12 +439,6 @@ class UserService:
         # 设置创建人ID
         if auth.user and auth.user.id:
             create_dict["created_id"] = auth.user.id
-            # 多租户隔离：如果是租户用户注册，自动关联到当前租户
-            if auth.user.tenant_id:
-                create_dict["tenant_id"] = auth.user.tenant_id
-                # 如果是客户用户注册，自动关联到当前客户
-                if auth.user.customer_id:
-                    create_dict["customer_id"] = auth.user.customer_id
         
         result = await UserCRUD(auth).create(data=create_dict)
         if data.role_ids:
@@ -484,7 +446,7 @@ class UserService:
         return UserOutSchema.model_validate(result).model_dump()
 
     @classmethod
-    async def forget_password_service(cls, auth: AuthSchema, data: UserForgetPasswordSchema) -> Dict:
+    async def forget_password_service(cls, auth: AuthSchema, data: UserForgetPasswordSchema) -> dict:
         """
         用户忘记密码
         
@@ -630,7 +592,7 @@ class UserService:
         )
 
     @classmethod
-    async def export_user_list_service(cls, user_list: List[Dict[str, Any]]) -> bytes:
+    async def export_user_list_service(cls, user_list: list[dict[str, Any]]) -> bytes:
         """
         导出用户列表为Excel文件
         
@@ -659,14 +621,14 @@ class UserService:
             'description': '备注',
             'created_time': '创建时间',
             'updated_time': '更新时间',
-            'creator': '创建者',
+            'updated_id': '更新者ID',
         }
 
         # 复制数据并转换
         # creator = {'id': 1, 'name': '管理员', 'username': 'admin'}
         data = user_list.copy()
         for item in data:
-            item['status'] = '启用' if item.get('status') else '停用'
+            item['status'] = '启用' if item.get('status') == "0" else '停用'
             gender = item.get('gender')
             item['gender'] = '男' if gender == '1' else ('女' if gender == '2' else '未知')
             item['is_superuser'] = '是' if item.get('is_superuser') else '否'

@@ -86,6 +86,8 @@ export interface ApplicationPageQuery extends PageQuery {
   status?: string;
   created_id?: number;
   created_time?: string[];
+  updated_id?: number;
+  updated_time?: string[];
 }
 
 /**
@@ -97,8 +99,6 @@ export interface ApplicationInfo extends BaseType {
   icon_url?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }
 
 /**

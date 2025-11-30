@@ -125,7 +125,9 @@ export interface JobPageQuery extends PageQuery {
   name?: string;
   status?: string;
   created_id?: number;
+  updated_id?: number;
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface JobLogPageQuery extends PageQuery {
@@ -133,6 +135,7 @@ export interface JobLogPageQuery extends PageQuery {
   job_name?: string;
   status?: string;
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface JobOptionData {
@@ -155,8 +158,6 @@ export interface JobTable extends BaseType {
   end_date?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }
 
 export interface JobForm extends BaseFormType {
@@ -187,7 +188,6 @@ export interface JobRunLog extends BaseType {
   coalesce: boolean;
   max_instances: number;
   next_run_time: string;
-  tenant?: CommonType;
 }
 
 // 定时任务日志详情接口（对应数据库日志表）
@@ -201,7 +201,6 @@ export interface JobLogDetail extends BaseType {
   job_trigger?: string;
   job_message?: string;
   exception_info?: string;
-  tenant?: CommonType;
 }
 
 // 定时任务日志列表接口（对应数据库日志表）
@@ -215,5 +214,4 @@ export interface JobLogTable extends BaseType {
   job_trigger?: string;
   job_message?: string;
   exception_info?: string;
-  tenant?: CommonType;
 }

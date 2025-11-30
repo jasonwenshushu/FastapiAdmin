@@ -24,9 +24,16 @@
             <el-option label="停用" :value="false" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
+        <el-form-item v-if="isExpand" prop="created_id" label="创建人">
           <UserTableSelect
             v-model="queryFormData.created_id"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item v-if="isExpand" prop="updated_id" label="更新人">
+          <UserTableSelect
+            v-model="queryFormData.updated_id"
             @confirm-click="handleConfirm"
             @clear-click="handleQuery"
           />
@@ -209,8 +216,8 @@
 
         <el-form-item label="应用状态" prop="status">
           <el-radio-group v-model="formData.status">
-            <el-radio :value="0">启用</el-radio>
-            <el-radio :value="1">停用</el-radio>
+            <el-radio value="0">启用</el-radio>
+            <el-radio value="1">停用</el-radio>
           </el-radio-group>
         </el-form-item>
 

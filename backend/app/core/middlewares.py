@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-from typing import Any
 from starlette.middleware.cors import CORSMiddleware
 from starlette.types import ASGIApp
 from starlette.requests import Request
@@ -13,7 +12,6 @@ from app.common.response import ErrorResponse
 from app.config.setting import settings
 from app.core.logger import log
 from app.core.exceptions import CustomException
-
 from app.api.v1.module_system.params.service import ParamsService
 
 

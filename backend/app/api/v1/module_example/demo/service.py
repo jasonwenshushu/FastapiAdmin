@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import io
-from typing import Any, List, Dict, Optional
+from typing import Any
 from fastapi import UploadFile
 import pandas as pd
 
@@ -21,7 +21,7 @@ class DemoService:
     """
     
     @classmethod
-    async def detail_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def detail_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         详情
         
@@ -30,7 +30,7 @@ class DemoService:
         - id (int): 示例ID
         
         返回:
-        - Dict: 示例模型实例字典
+        - dict: 示例模型实例字典
         """
         obj = await DemoCRUD(auth).get_by_id_crud(id=id)
         if not obj:
@@ -38,24 +38,24 @@ class DemoService:
         return DemoOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def list_service(cls, auth: AuthSchema, search: Optional[DemoQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> List[Dict]:
+    async def list_service(cls, auth: AuthSchema, search: DemoQueryParam | None = None, order_by: list[dict[str, str]] | None = None) -> list[dict]:
         """
         列表查询
         
         参数:
         - auth (AuthSchema): 认证信息模型
-        - search (Optional[DemoQueryParam]): 查询参数
-        - order_by (Optional[List[Dict[str, str]]]): 排序参数
+        - search (DemoQueryParam | None): 查询参数
+        - order_by (list[dict[str, str]] | None): 排序参数
         
         返回:
-        - List[Dict]: 示例模型实例字典列表
+        - list[dict]: 示例模型实例字典列表
         """
         search_dict = search.__dict__ if search else None
         obj_list = await DemoCRUD(auth).list_crud(search=search_dict, order_by=order_by)
         return [DemoOutSchema.model_validate(obj).model_dump() for obj in obj_list]
     
     @classmethod
-    async def page_service(cls, auth: AuthSchema, page_no: int, page_size: int, search: Optional[DemoQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> Dict:
+    async def page_service(cls, auth: AuthSchema, page_no: int, page_size: int, search: DemoQueryParam | None = None, order_by: list[dict[str, str]] | None = None) -> dict:
         """
         分页查询
         
@@ -63,11 +63,11 @@ class DemoService:
         - auth (AuthSchema): 认证信息模型
         - page_no (int): 页码
         - page_size (int): 每页数量
-        - search (Optional[DemoQueryParam]): 查询参数
-        - order_by (Optional[List[Dict[str, str]]]): 排序参数
+        - search (DemoQueryParam | None): 查询参数
+        - order_by (list[dict[str, str]] | None): 排序参数
         
         返回:
-        - Dict: 分页数据
+        - dict: 分页数据
         """
         search_dict = search.__dict__ if search else {}
         order_by_list = order_by or [{'id': 'asc'}]
@@ -82,7 +82,7 @@ class DemoService:
         return result
     
     @classmethod
-    async def create_service(cls, auth: AuthSchema, data: DemoCreateSchema) -> Dict:
+    async def create_service(cls, auth: AuthSchema, data: DemoCreateSchema) -> dict:
         """
         创建
         
@@ -91,7 +91,7 @@ class DemoService:
         - data (DemoCreateSchema): 示例创建模型
         
         返回:
-        - Dict: 示例模型实例字典
+        - dict: 示例模型实例字典
         """
         obj = await DemoCRUD(auth).get(name=data.name)
         if obj:
@@ -100,7 +100,7 @@ class DemoService:
         return DemoOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def update_service(cls, auth: AuthSchema, id: int, data: DemoUpdateSchema) -> Dict:
+    async def update_service(cls, auth: AuthSchema, id: int, data: DemoUpdateSchema) -> dict:
         """
         更新
         
@@ -110,7 +110,7 @@ class DemoService:
         - data (DemoUpdateSchema): 示例更新模型
         
         返回:
-        - Dict: 示例模型实例字典
+        - dict: 示例模型实例字典
         """
         # 检查数据是否存在
         obj = await DemoCRUD(auth).get_by_id_crud(id=id)
@@ -126,13 +126,13 @@ class DemoService:
         return DemoOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def delete_service(cls, auth: AuthSchema, ids: List[int]) -> None:
+    async def delete_service(cls, auth: AuthSchema, ids: list[int]) -> None:
         """
         删除
         
         参数:
         - auth (AuthSchema): 认证信息模型
-        - ids (List[int]): 示例ID列表
+        - ids (list[int]): 示例ID列表
         
         返回:
         - None
@@ -163,12 +163,12 @@ class DemoService:
         await DemoCRUD(auth).set_available_crud(ids=data.ids, status=data.status)
     
     @classmethod
-    async def batch_export_service(cls, obj_list: List[Dict[str, Any]]) -> bytes:
+    async def batch_export_service(cls, obj_list: list[dict[str, Any]]) -> bytes:
         """
         批量导出
         
         参数:
-        - obj_list (List[Dict[str, Any]]): 示例模型实例字典列表
+        - obj_list (list[dict[str, Any]]): 示例模型实例字典列表
         
         返回:
         - bytes: Excel文件字节流

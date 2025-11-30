@@ -20,20 +20,30 @@
             style="width: 170px"
             clearable
           >
-            <el-option value="true" label="启用" />
-            <el-option value="false" label="停用" />
+            <el-option value="0" label="启用" />
+            <el-option value="1" label="停用" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
+        <el-form-item v-if="isExpand" prop="created_id" label="创建人">
           <UserTableSelect
             v-model="queryFormData.created_id"
             @confirm-click="handleConfirm"
             @clear-click="handleQuery"
           />
         </el-form-item>
+        <el-form-item v-if="isExpand" prop="updated_id" label="更新人">
+          <UserTableSelect
+            v-model="queryFormData.updated_id"
+            @confirm-click="handleConfirm"
+            @clear-click="handleQuery"
+          />
+        </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
-        <el-form-item v-if="isExpand" prop="start_time" label="创建时间">
-          <DatePicker v-model="dateRange" @update:model-value="handleDateRangeChange" />
+        <el-form-item v-if="isExpand" prop="created_time" label="创建时间">
+          <DatePicker v-model="createdDateRange" @update:model-value="handleCreatedDateRangeChange" />
+        </el-form-item>
+        <el-form-item v-if="isExpand" prop="updated_time" label="更新时间">
+          <DatePicker v-model="updatedDateRange" @update:model-value="handleUpdatedDateRangeChange" />
         </el-form-item>
         <!-- 查询、重置、展开/收起按钮 -->
         <el-form-item>
@@ -257,9 +267,9 @@
           min-width="180"
         />
         <el-table-column
-          v-if="tableColumns.find((col) => col.prop === 'creator')?.show"
+          v-if="tableColumns.find((col) => col.prop === 'created_id')?.show"
           label="创建人"
-          prop="creator"
+          prop="created_id"
           min-width="120"
         >
           <template #default="scope">
@@ -342,6 +352,9 @@
           <el-descriptions-item label="创建人" :span="2">
             {{ detailFormData.created_by?.name }}
           </el-descriptions-item>
+          <el-descriptions-item label="更新人" :span="2">
+            {{ detailFormData.updated_by?.name }}
+          </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="2">
             {{ detailFormData.created_time }}
           </el-descriptions-item>
@@ -365,8 +378,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formData.status">
-              <el-radio :value="0">启用</el-radio>
-              <el-radio :value="1">停用</el-radio>
+              <el-radio value="0">启用</el-radio>
+              <el-radio value="1">停用</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="描述" prop="description">
@@ -451,7 +464,8 @@ const tableColumns = ref([
   { prop: "description", label: "描述", show: true },
   { prop: "created_time", label: "创建时间", show: true },
   { prop: "updated_time", label: "更新时间", show: true },
-  { prop: "creator", label: "创建人", show: true },
+  { prop: "created_id", label: "创建人", show: true },
+  { prop: "updated_id", label: "更新人", show: true },
   { prop: "operation", label: "操作", show: true },
 ]);
 
@@ -491,15 +505,27 @@ const curdContentConfig = {
 // 详情表单
 const detailFormData = ref<DemoTable>({});
 // 日期范围临时变量
-const dateRange = ref<[Date, Date] | []>([]);
+const createdDateRange = ref<[Date, Date] | []>([]);
+// 更新时间范围临时变量
+const updatedDateRange = ref<[Date, Date] | []>([]);
 
-// 处理日期范围变化
-function handleDateRangeChange(range: [Date, Date]) {
-  dateRange.value = range;
+// 处理创建时间范围变化
+function handleCreatedDateRangeChange(range: [Date, Date]) {
+  createdDateRange.value = range;
   if (range && range.length === 2) {
     queryFormData.created_time = [formatToDateTime(range[0]), formatToDateTime(range[1])];
   } else {
     queryFormData.created_time = undefined;
+  }
+}
+
+// 处理更新时间范围变化
+function handleUpdatedDateRangeChange(range: [Date, Date]) {
+  updatedDateRange.value = range;
+  if (range && range.length === 2) {
+    queryFormData.updated_time = [formatToDateTime(range[0]), formatToDateTime(range[1])];
+  } else {
+    queryFormData.updated_time = undefined;
   }
 }
 
@@ -509,7 +535,10 @@ const queryFormData = reactive<DemoPageQuery>({
   page_size: 10,
   name: undefined,
   status: undefined,
-  created_time: undefined,  created_id: undefined,
+  created_time: undefined,
+  updated_time: undefined,
+  created_id: undefined,
+  updated_id: undefined,
 });
 
 // 编辑表单
@@ -584,8 +613,10 @@ async function handleResetQuery() {
   queryFormRef.value.resetFields();
   queryFormData.page_no = 1;
   // 重置日期范围选择器
-  dateRange.value = [];
+  createdDateRange.value = [];
+  updatedDateRange.value = [];
   queryFormData.created_time = undefined;
+  queryFormData.updated_time = undefined;
   loadingData();
 }
 

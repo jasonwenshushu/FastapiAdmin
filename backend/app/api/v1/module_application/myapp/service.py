@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import List, Dict, Optional, Union
-
 from app.core.base_schema import BatchSetAvailable
 from app.core.exceptions import CustomException
 
@@ -21,7 +19,7 @@ class ApplicationService:
     """
     
     @classmethod
-    async def detail_service(cls, auth: AuthSchema, id: int) -> Dict:
+    async def detail_service(cls, auth: AuthSchema, id: int) -> dict:
         """
         获取应用详情
         
@@ -30,7 +28,7 @@ class ApplicationService:
         - id (int): 应用ID
         
         返回:
-        - Dict: 应用详情字典
+        - dict: 应用详情字典
         """
         obj = await ApplicationCRUD(auth).get_by_id_crud(id=id)
         if not obj:
@@ -38,17 +36,17 @@ class ApplicationService:
         return ApplicationOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def list_service(cls, auth: AuthSchema, search: Optional[ApplicationQueryParam] = None, order_by: Optional[List[Dict[str, str]]] = None) -> List[Dict]:
+    async def list_service(cls, auth: AuthSchema, search: ApplicationQueryParam | None = None, order_by: list[dict[str, str]] | None = None) -> list[dict]:
         """
         获取应用列表
         
         参数:
         - auth (AuthSchema): 认证信息模型
-        - search (Optional[ApplicationQueryParam]): 查询参数模型
-        - order_by (Optional[Union[str, List[Dict[str, str]]]]): 排序参数，支持字符串或字典列表
+        - search (ApplicationQueryParam | None): 查询参数模型
+        - order_by (list[dict[str, str]] | None): 排序参数，支持字符串或字典列表
         
         返回:
-        - List[Dict]: 应用详情字典列表
+        - list[dict]: 应用详情字典列表
         """
         # 过滤空值
         search_dict = search.__dict__ if search else None
@@ -56,7 +54,7 @@ class ApplicationService:
         return [ApplicationOutSchema.model_validate(obj).model_dump() for obj in obj_list]
     
     @classmethod
-    async def create_service(cls, auth: AuthSchema, data: ApplicationCreateSchema) -> Dict:
+    async def create_service(cls, auth: AuthSchema, data: ApplicationCreateSchema) -> dict:
         """
         创建应用
         
@@ -76,7 +74,7 @@ class ApplicationService:
         return ApplicationOutSchema.model_validate(obj).model_dump()
     
     @classmethod
-    async def update_service(cls, auth: AuthSchema, id: int, data: ApplicationUpdateSchema) -> Dict:
+    async def update_service(cls, auth: AuthSchema, id: int, data: ApplicationUpdateSchema) -> dict:
         """
         更新应用
         

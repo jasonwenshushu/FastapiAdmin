@@ -74,10 +74,13 @@ export interface TablePageQuery extends PageQuery {
   name?: string;
   status?: string;
   created_id?: number;
+  updated_id?: number;
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface RoleTable extends BaseType {
+  id: number;
   name: string;
   order?: number;
   code?: string;
@@ -86,7 +89,6 @@ export interface RoleTable extends BaseType {
   depts?: permissionDeptType[];
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
 }
 
 export interface RoleForm extends BaseFormType {
@@ -115,7 +117,7 @@ export interface permissionMenuType {
   type: number;
   permission: string;
   parent_id?: number;
-  status: boolean;
+  status: string;
   description?: string;
   children?: permissionMenuType[];
 }

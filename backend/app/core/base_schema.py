@@ -28,10 +28,11 @@ class BaseSchema(BaseModel):
 
     id: int | None = Field(default=None, description="主键ID")
     uuid: str | None = Field(default=None, description="UUID")
-    status: str | None = Field(default=None, description="状态")
+    status: str = Field(default="0", description="状态")
     description: str | None = Field(default=None, description="描述")
     created_time: DateTimeStr | None = Field(default=None, description="创建时间")
     updated_time: DateTimeStr | None = Field(default=None, description="更新时间")
+
 
 class UserBySchema(BaseModel):
     """通用创建模型，包含基础字段和审计字段"""
@@ -41,21 +42,6 @@ class UserBySchema(BaseModel):
     created_by: UserInfoSchema | None = Field(default=None, description="创建人信息")
     updated_id: int | None = Field(default=None, description="更新人ID")
     updated_by: UserInfoSchema | None = Field(default=None, description="更新人信息")
-
-class TenantSchema(BaseModel):
-    """租户模型"""
-    model_config = ConfigDict(from_attributes=True)
-
-    tenant_id: int | None = Field(default=None, description="所属租户ID")
-    tenant: CommonSchema | None = Field(default=None, description="租户信息")
-
-
-class CustomerSchema(BaseModel):
-    """客户模型"""
-    model_config = ConfigDict(from_attributes=True)
-
-    customer_id: int | None = Field(default=None, description="所属客户ID")
-    customer: CommonSchema | None = Field(default=None, description="客户信息")
 
 
 class BatchSetAvailable(BaseModel):

@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import time
+import json
 from typing import Any, Callable, Coroutine
 from fastapi import Request, Response
 from fastapi.routing import APIRoute
 from user_agents import parse
-import json
 
 from app.core.database import async_db_session
 from app.config.setting import settings
 from app.utils.ip_local_util import IpLocalUtil
-
 from app.api.v1.module_system.auth.schema import AuthSchema
 from app.api.v1.module_system.log.schema import OperationLogCreateSchema
 from app.api.v1.module_system.log.service import OperationLogService
@@ -92,20 +91,15 @@ class OperationLogRoute(APIRoute):
                     payload = '请求参数过长'
             
             response_data = response.body if "application/json" in response.headers.get("Content-Type", "") else b"{}"
-            process_time = f"{(time.time() - start_time):.4f}s"
+            process_time = f"{(time.time() - start_time):.2f}s"
 
             # 获取当前用户ID,如果是登录接口则为空
             log_type = 1 # 1:登录日志 2:操作日志
             current_user_id = None
-            tenant_id = 1
-            customer_id = None
 
             # 优化：只在操作日志场景下获取current_user_id
             if "user_id" in request.scope:
                 current_user_id = request.scope.get("user_id")
-                tenant_id = request.scope.get("user_tenant_id")
-                customer_id = request.scope.get("user_customer_id")
-
                 log_type = 2
             
             request_ip = None
@@ -147,8 +141,6 @@ class OperationLogRoute(APIRoute):
                             description = route.summary,
                             created_id = current_user_id,
                             updated_id = current_user_id,
-                            tenant_id = tenant_id,
-                            customer_id = customer_id
                         ), auth = auth) 
             
             return response

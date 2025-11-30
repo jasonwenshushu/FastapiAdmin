@@ -2,7 +2,7 @@
 
 import json
 import uuid
-from typing import Dict, Union, NewType
+from typing import NewType
 from fastapi import Request
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -140,7 +140,7 @@ class LoginService:
         now = datetime.now()
         
         # 记录租户信息到日志
-        log.info(f"用户ID: {user.id}, 用户名: {user.username}, 租户ID: {user.tenant_id} 正在生成JWT令牌")
+        log.info(f"用户ID: {user.id}, 用户名: {user.username} 正在生成JWT令牌")
         
         # 生成会话信息
         session_info=OnlineOutSchema(
@@ -148,7 +148,6 @@ class LoginService:
             user_id=user.id, 
             name=user.name,
             user_name=user.username,
-            tenant_name=user.tenant.name if user.tenant else None,  # 显式包含租户名称
             ipaddr=request_ip,
             login_location=login_location,
             os=user_agent.os.family,
@@ -224,7 +223,7 @@ class LoginService:
             raise CustomException(msg="刷新token失败，用户不存在")
         
         # 记录刷新令牌时的租户信息
-        log.info(f"用户ID: {user.id}, 用户名: {user.username}, 租户ID: {user.tenant_id} 正在刷新JWT令牌")
+        log.info(f"用户ID: {user.id}, 用户名: {user.username} 正在刷新JWT令牌")
 
         # 设置新的 token
         access_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -236,15 +235,13 @@ class LoginService:
         access_token = create_access_token(payload=JWTPayloadSchema(
             sub=session_info_json,
             is_refresh=False,
-            exp=now + access_expires,
-            tenant_id=user.tenant_id
+            exp=now + access_expires
         ))
 
         refresh_token_new = create_access_token(payload=JWTPayloadSchema(
             sub=session_info_json,
             is_refresh=True,
-            exp=now + refresh_expires,
-            tenant_id=user.tenant_id
+            exp=now + refresh_expires
         ))
         
         # 覆盖写入 Redis
@@ -302,7 +299,7 @@ class CaptchaService:
     """验证码服务"""
 
     @classmethod
-    async def get_captcha_service(cls, redis: Redis) -> Dict[str, Union[CaptchaKey, CaptchaBase64]]:
+    async def get_captcha_service(cls, redis: Redis) -> dict[str, CaptchaKey | CaptchaBase64]:
         """
         获取验证码
         
@@ -310,7 +307,7 @@ class CaptchaService:
         - redis (Redis): Redis客户端对象
             
         返回:
-        - Dict[str, Union[CaptchaKey, CaptchaBase64]]: 包含验证码key和base64图片的字典
+        - dict[str, CaptchaKey | CaptchaBase64]: 包含验证码key和base64图片的字典
             
         异常:
         - CustomException: 验证码服务未启用时抛出异常

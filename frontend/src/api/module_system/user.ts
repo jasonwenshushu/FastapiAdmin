@@ -146,14 +146,8 @@ export interface ForgetPasswordForm {
 }
 
 export interface RegisterForm {
-  name: string;
-  mobile?: string;
   username: string;
   password: string;
-  role_ids?: number[];
-  customer_id?: number;
-  description?: string;
-  user_type?: string;
   confirmPassword: string;
 }
 
@@ -166,6 +160,7 @@ export interface UserPageQuery extends PageQuery {
   status?: string;
   created_time?: string[];
   created_id?: number;
+  updated_id?: number;
 }
 
 export interface searchSelectDataType {
@@ -195,8 +190,6 @@ export interface UserInfo extends BaseType {
   last_login?: string;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
-  customer?: CommonType;
 }
 
 export interface deptTreeType {

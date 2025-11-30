@@ -24,7 +24,7 @@
             <el-option label="操作日志" value="2" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="isExpand" prop="creator" label="创建人">
+        <el-form-item v-if="isExpand" prop="created_id" label="创建人">
           <UserTableSelect
             v-model="queryFormData.created_id"
             @confirm-click="handleConfirm"
@@ -182,7 +182,7 @@
             <CopyButton
               v-if="scope.row.request_ip"
               :text="scope.row.request_ip"
-              style="margin-left: 2px"
+              :style="{ marginLeft: '2px' }"
             />
           </template>
         </el-table-column>
@@ -196,9 +196,14 @@
         <el-table-column label="系统" prop="request_os" min-width="100" />
         <el-table-column label="描述" prop="description" min-width="120" show-overflow-tooltip />
         <el-table-column label="创建时间" prop="created_time" min-width="200" sortable />
-        <el-table-column label="创建人" prop="creator" min-width="120">
+        <el-table-column label="创建人" prop="created_id" min-width="120">
           <template #default="scope">
             {{ scope.row.created_by?.name }}
+          </template>
+        </el-table-column>
+        <el-table-column label="更新人" prop="updated_id" min-width="120">
+          <template #default="scope">
+            {{ scope.row.updated_by?.name }}
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" align="center" min-width="150">
@@ -289,6 +294,9 @@
           <el-descriptions-item label="创建人" :span="4">
             {{ formData.created_by?.name }}
           </el-descriptions-item>
+          <el-descriptions-item label="更新人" :span="4">
+            {{ formData.updated_by?.name }}
+          </el-descriptions-item>
           <el-descriptions-item label="创建时间" :span="4">
             {{ formData.created_time }}
           </el-descriptions-item>
@@ -367,6 +375,7 @@ const queryFormData = reactive<LogPageQuery>({
   creator_name: undefined,
   created_time: undefined,
   created_id: undefined,
+  updated_id: undefined,
 });
 
 // 弹窗状态

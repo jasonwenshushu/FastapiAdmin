@@ -7,8 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.api.v1.module_system.customer.model import CustomerModel
-    from app.api.v1.module_system.tenant.model import TenantModel
     from app.api.v1.module_system.user.model import UserModel
 
 from app.utils.common_util import uuid4_str
@@ -38,29 +36,13 @@ class ModelMixin(MappedBase):
     
     数据隔离设计原则：
     ==================
-    
-    1. 租户隔离 (tenant_id):
-        - 用于实现多租户SaaS架构的核心隔离
-        - 系统租户(tenant_id=1): 管理平台级数据
-        - 普通租户(tenant_id>1): 各自独立的业务数据
-        - 大部分业务表都需要tenant_id字段
-    
-    2. 客户隔离 (customer_id):
-        - 用于租户内部的二级隔离
-        - 仅部分表需要,如用户、日志等
-        - 客户属于租户,实现租户下的业务单元隔离
-    
-    3. 数据权限 (created_id/updated_id):
+    数据权限 (created_id/updated_id):
         - 配合角色的data_scope字段实现精细化权限控制
-        - 1:仅本人 → WHERE created_id = current_user_id
-        - 2:本部门 → WHERE user.dept_id = current_user.dept_id
-        - 3:本部门及以下 → WHERE dept.tree_path LIKE 'current_dept_path%'
-        - 4:全部数据 → WHERE tenant_id = current_tenant_id
-        - 5:自定义 → WHERE dept_id IN (role_depts)
-    
-    继承规则：
-    - 需要租户隔离的业务表继承此类
-    - 不需要隔离的表(如租户表本身)只继承MappedBase
+        - 1:仅本人
+        - 2:本部门
+        - 3:本部门及以下
+        - 4:全部数据
+        - 5:自定义
     
     SQLAlchemy加载策略说明:
     - select(默认): 延迟加载,访问时单独查询
@@ -134,73 +116,6 @@ class UserMixin(MappedBase):
             primaryjoin=f"{cls.__name__}.updated_id == UserModel.id",
             lazy="selectin",
             foreign_keys=lambda: [cls.updated_id],
-            viewonly=True,
-            uselist=False
-        )
-
-
-class TenantMixin(MappedBase):
-    """
-    租户字段 Mixin
-    
-    用于实现多租户SaaS架构的核心隔离
-    """
-    __abstract__: bool = True
-
-    tenant_id: Mapped[int | None] = mapped_column(
-        Integer,
-        ForeignKey('sys_tenant.id', ondelete="CASCADE", onupdate="CASCADE"),
-        nullable=False,
-        index=True,
-        comment="所属租户ID"
-    )
-
-    @declared_attr
-    def tenant(cls) -> Mapped["TenantModel"]:
-        """
-        租户关联关系（延迟加载，避免循环依赖）
-        """
-        return relationship(
-            "TenantModel",
-            primaryjoin=f"{cls.__name__}.tenant_id == TenantModel.id",
-            lazy="selectin",
-            foreign_keys=lambda: [cls.tenant_id],
-            viewonly=True,
-            uselist=False
-        )
-
-
-class CustomerMixin(MappedBase):
-    """
-    客户隔离字段 Mixin
-    
-    用于租户内部的二级数据隔离
-    仅部分表需要此字段:
-    - 客户用户 (必填)
-    - 客户业务数据 (根据业务需求)
-    - 客户专属通知/日志 (可选)
-    """
-    __abstract__: bool = True
-
-    customer_id: Mapped[int | None] = mapped_column(
-        Integer,
-        ForeignKey('sys_customer.id', ondelete="CASCADE", onupdate="CASCADE"),
-        default=None,
-        nullable=True,
-        index=True,
-        comment="所属客户ID(NULL表示租户级数据,>0表示客户级数据)"
-    )
-
-    @declared_attr
-    def customer(cls) -> Mapped["CustomerModel"]:
-        """
-        客户关联关系（延迟加载，避免循环依赖）
-        """
-        return relationship(
-            "CustomerModel",
-            primaryjoin=f"{cls.__name__}.customer_id == CustomerModel.id",
-            lazy="selectin",
-            foreign_keys=lambda: [cls.customer_id],
             viewonly=True,
             uselist=False
         )

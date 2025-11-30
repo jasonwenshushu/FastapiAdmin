@@ -67,6 +67,7 @@ export interface PositionPageQuery extends PageQuery {
   status?: string;
   created_id?: number;
   created_time?: string[];
+  updated_time?: string[];
 }
 
 export interface PositionTable extends BaseType {
@@ -74,7 +75,6 @@ export interface PositionTable extends BaseType {
   order?: number;
   created_by?: creatorType;
   updated_by?: updatorType;
-  tenant?: CommonType;
 }
 
 export interface PositionForm extends BaseFormType {
