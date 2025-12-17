@@ -5,6 +5,7 @@ import json
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.v1.module_system.position.model import PositionModel
 from app.config.path_conf import SCRIPT_DIR
 from app.core.logger import log
 from app.core.database import async_db_session, async_engine
@@ -35,6 +36,7 @@ class InitializeData:
             RoleModel,
             DictTypeModel,
             DictDataModel,
+            PositionModel,
             UserModel,
             UserRolesModel,
         ]

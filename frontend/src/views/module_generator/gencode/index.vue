@@ -147,8 +147,8 @@
         :data="tableList"
         highlight-current-row
         class="data-table__content"
-        height="450"
-        max-height="450px"
+        height="500"
+        max-height="500"
         border
         stripe
         @selection-change="handleTableSelectionChange"
@@ -595,13 +595,13 @@
             <el-table-column
               label="列名"
               prop="column_name"
-              min-width="100"
+              min-width="60"
               :show-overflow-tooltip="true"
             />
             <el-table-column
               label="类型"
               prop="column_type"
-              min-width="80"
+              min-width="60"
               :show-overflow-tooltip="true"
             />
             <el-table-column
@@ -614,12 +614,12 @@
                 <el-input v-model="scope.row.column_length" :disabled="scope.row.is_pk === '1'" />
               </template>
             </el-table-column>
-            <el-table-column label="注释" min-width="120">
+            <el-table-column label="注释" min-width="60">
               <template #default="scope">
                 <el-input v-model="scope.row.column_comment"></el-input>
               </template>
             </el-table-column>
-            <el-table-column label="后端类型" min-width="100">
+            <el-table-column label="后端类型" min-width="60">
               <template #default="scope">
                 <el-select v-model="scope.row.python_type">
                   <el-option label="str" value="str" />
@@ -635,32 +635,32 @@
                 </el-select>
               </template>
             </el-table-column>
-            <el-table-column label="后端属性" min-width="120">
+            <el-table-column label="后端属性" min-width="60">
               <template #default="scope">
                 <el-input v-model="scope.row.python_field"></el-input>
               </template>
             </el-table-column>
-            <el-table-column label="新增" width="50">
+            <el-table-column label="新增" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_insert" />
               </template>
             </el-table-column>
-            <el-table-column label="编辑" width="50">
+            <el-table-column label="编辑" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_edit" />
               </template>
             </el-table-column>
-            <el-table-column label="列表" width="50">
+            <el-table-column label="列表" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_list" />
               </template>
             </el-table-column>
-            <el-table-column label="查询" width="50">
+            <el-table-column label="查询" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_query" />
               </template>
             </el-table-column>
-            <el-table-column label="查询方式" min-width="100">
+            <el-table-column label="查询方式" min-width="60">
               <template #default="scope">
                 <el-select v-model="scope.row.query_type">
                   <el-option label="=" value="EQ" />
@@ -677,34 +677,34 @@
             <el-table-column
               label="默认值"
               prop="column_default"
-              min-width="100"
+              min-width="60"
               :show-overflow-tooltip="true"
             >
               <template #default="scope">
                 <el-input v-model="scope.row.column_default" :disabled="scope.row.is_pk === '1'" />
               </template>
             </el-table-column>
-            <el-table-column label="自增" width="50">
+            <el-table-column label="自增" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_increment" />
               </template>
             </el-table-column>
-            <el-table-column label="允许空" width="50">
+            <el-table-column label="可空" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_nullable" />
               </template>
             </el-table-column>
-            <el-table-column label="唯一" width="50">
+            <el-table-column label="唯一" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_unique" />
               </template>
             </el-table-column>
-            <el-table-column label="主键" width="50">
+            <el-table-column label="主键" width="60">
               <template #default="scope">
                 <el-checkbox v-model="scope.row.is_pk" />
               </template>
             </el-table-column>
-            <el-table-column label="表单类型" min-width="12%">
+            <el-table-column label="表单类型">
               <template #default="scope">
                 <el-select v-model="scope.row.html_type">
                   <el-option label="文本框" value="input" />
@@ -719,7 +719,7 @@
                 </el-select>
               </template>
             </el-table-column>
-            <el-table-column label="字典类型" min-width="12%" fixed="right">
+            <el-table-column label="字典类型" fixed="right">
               <template #default="scope">
                 <el-select v-model="scope.row.dict_type" clearable filterable placeholder="请选择">
                   <el-option

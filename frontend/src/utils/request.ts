@@ -60,8 +60,12 @@ httpRequest.interceptors.response.use(
       return Promise.reject(response);
     }
 
-    // 如果请求不是 GET 请求，请求成功时显示成功提示
-    if (response.config.method?.toUpperCase() !== "GET") {
+    // 如果请求不是 GET 请求，且不是登录或退出登录接口，请求成功时显示成功提示
+    if (
+      response.config.method?.toUpperCase() !== "GET" &&
+      !response.config.url?.includes("login") &&
+      !response.config.url?.includes("logout")
+    ) {
       ElMessage.success(data.msg);
     }
 

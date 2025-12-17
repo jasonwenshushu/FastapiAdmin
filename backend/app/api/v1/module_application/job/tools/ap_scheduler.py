@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 import json
 import importlib
 from datetime import datetime
@@ -71,6 +72,10 @@ class SchedulerUtil:
         返回:
         - None
         """
+        # 只处理任务执行相关事件，不处理任务添加、删除等事件
+        if not isinstance(event, JobExecutionEvent):
+            return
+            
         # 延迟导入避免循环导入
         from app.api.v1.module_application.job.model import JobLogModel
         
@@ -252,41 +257,32 @@ class SchedulerUtil:
         return scheduler.get_jobs()
 
     @classmethod
-    async def _task_wrapper(cls, job_id, func, *args, **kwargs):
-        """
-        任务执行包装器，添加分布式锁防止同一任务被多个实例同时执行。
-        
-        参数:
-        - job_id: 任务ID
-        - func: 实际要执行的任务函数
-        - *args: 任务函数位置参数
-        - **kwargs: 任务函数关键字参数
-        
-        返回:
-        - 任务函数的返回值
-        """
-        import redis.asyncio as redis
-        import asyncio
+    async def _task_wrapper(cls, func, job_id, *args, **kwargs):
+        """任务执行包装器，添加分布式锁防止并发执行"""
+        from redis.asyncio import Redis
         from app.config.setting import settings
-        
-        # 创建Redis客户端
-        redis_client = redis.Redis(
+        from app.core.logger import log
+
+        # 使用项目配置创建Redis连接池
+        redis_client = Redis(
             host=settings.REDIS_HOST,
             port=int(settings.REDIS_PORT),
             username=settings.REDIS_USER,
             password=settings.REDIS_PASSWORD,
             db=int(settings.REDIS_DB_NAME),
+            encoding='utf-8',
+            decode_responses=True,
+            health_check_interval=20,
+            max_connections=settings.POOL_SIZE,
+            socket_timeout=settings.POOL_TIMEOUT
         )
-        
-        # 生成锁键
+
         lock_key = f"job_lock:{job_id}"
-        
-        # 设置锁的过期时间（根据任务类型调整，这里设置为30秒）
-        lock_expire = 30
-        lock_acquired = False
-        
+        lock_expire = 30  # 锁过期时间，根据任务实际执行时间调整
+        lock_acquired = None
+
         try:
-            # 尝试获取锁
+            # 获取分布式锁，使用nx=True确保原子性操作
             lock_acquired = await redis_client.set(lock_key, "1", ex=lock_expire, nx=True)
             
             if lock_acquired:
@@ -307,15 +303,17 @@ class SchedulerUtil:
             if lock_acquired:
                 await redis_client.delete(lock_key)
                 log.info(f"任务 {job_id} 释放执行锁")
-    
+            # 关闭Redis连接
+            await redis_client.close()
+
     @classmethod
     def add_job(cls, job_info: JobModel) -> Job:
         """
         根据任务配置创建并添加调度任务。
-    
+
         参数:
         - job_info (JobModel): 任务对象信息（包含触发器、函数、参数等）。
-    
+
         返回:
         - Job: 新增的任务对象。
         """
@@ -336,17 +334,22 @@ class SchedulerUtil:
             if job_executor is None:
                 job_executor = 'default'
             
-            if job_info.trigger_args is None:
-                raise ValueError("触发器缺少参数")
-            
             # 异步函数必须使用默认执行器
             if iscoroutinefunction(job_func):
                 job_executor = 'default'
             
             # 4. 创建触发器
-            if job_info.trigger == 'date':
+            trigger = None
+            if job_info.trigger is None or job_info.trigger.lower() == 'now':
+                # 立即执行作业：省略trigger或使用'now'时，使用date触发器立即执行
+                trigger = DateTrigger(run_date=datetime.now())
+            elif job_info.trigger == 'date':
+                if job_info.trigger_args is None:
+                    raise ValueError("date触发器缺少执行时间参数")
                 trigger = DateTrigger(run_date=job_info.trigger_args)
             elif job_info.trigger == 'interval':
+                if job_info.trigger_args is None:
+                    raise ValueError("interval触发器缺少参数")
                 # 将传入的 interval 表达式拆分为不同的字段
                 fields = job_info.trigger_args.strip().split()
                 if len(fields) != 5:
@@ -365,6 +368,8 @@ class SchedulerUtil:
                     jitter=None
                 )
             elif job_info.trigger == 'cron':
+                if job_info.trigger_args is None:
+                    raise ValueError("cron触发器缺少参数")
                 # 秒、分、时、天、月、星期几、年 ()
                 fields = job_info.trigger_args.strip().split()
                 if len(fields) not in (6, 7):
@@ -587,3 +592,25 @@ class SchedulerUtil:
             return 'paused'
         else:
             return 'unknown'
+
+    @classmethod
+    def run_job_now(cls, job_id: str | int) -> None:
+        """
+        立即执行指定任务。
+
+        参数:
+        - job_id (str | int): 任务ID。
+
+        返回:
+        - None
+
+        异常:
+        - ValueError: 当任务不存在时抛出。
+        """
+        job = cls.get_job(job_id=str(job_id))
+        if not job:
+            raise ValueError(f"未找到该任务：{job_id}")
+        
+        # 立即执行任务
+        scheduler.modify_job(job_id=str(job_id), next_run_time=datetime.now())
+        log.info(f"任务 {job_id} 已设置为立即执行")

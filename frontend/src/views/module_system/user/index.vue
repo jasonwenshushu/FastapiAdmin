@@ -1,14 +1,14 @@
 <!-- 用户管理 -->
 <template>
   <div class="app-container">
-    <el-row :gutter="12">
+    <el-row :gutter="12" justify="space-around">
       <!-- 部门树 -->
-      <el-col :lg="4" :xs="24">
-        <DeptTree v-model="queryFormData.dept_id" class="h-full" @node-click="handleQuery" />
+      <el-col :span="4">
+        <DeptTree v-model="queryFormData.dept_id" class="h-820px" @node-click="handleQuery" />
       </el-col>
 
       <!-- 用户列表 -->
-      <el-col :lg="20" :xs="24">
+      <el-col :span="20">
         <!-- 搜索区域 -->
         <div class="search-container">
           <el-form
@@ -189,8 +189,8 @@
             :data="pageTableData"
             highlight-current-row
             class="data-table__content"
-            height="450"
-            max-height="450px"
+            height="488"
+            max-height="488"
             border
             stripe
             @selection-change="handleSelectionChange"
@@ -1002,3 +1002,5 @@ onMounted(() => {
   handleQuery();
 });
 </script>
+
+<style lang="scss" scoped></style>

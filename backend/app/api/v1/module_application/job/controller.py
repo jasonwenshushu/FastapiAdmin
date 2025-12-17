@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Body, Depends, Path
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from app.common.response import StreamResponse, SuccessResponse
+from app.common.response import ErrorResponse, StreamResponse, SuccessResponse
 from app.common.request import PaginationService
 from app.core.router_class import OperationLogRoute
 from app.utils.common_util import bytes2file_response
@@ -328,3 +328,26 @@ async def export_job_log_list_controller(
             'Content-Disposition': 'attachment; filename=job_log.xlsx'
         }
     )
+
+@JobRouter.put("/run/{id}", summary="立即执行定时任务", description="立即执行指定的定时任务")
+async def run_job_now_controller(
+    id: int = Path(..., description="定时任务ID"),
+    auth: AuthSchema = Depends(AuthPermission(["module_application:job:update"]))
+) -> JSONResponse:
+    """
+    立即执行定时任务
+    
+    参数:
+    - id (int): 定时任务ID
+    - auth (AuthSchema): 认证信息模型
+    
+    返回:
+    - JSONResponse: 包含操作结果的JSON响应
+    """
+    try:
+        SchedulerUtil.run_job_now(job_id=id)
+        log.info(f"立即执行定时任务成功: {id}")
+        return SuccessResponse(msg="立即执行定时任务成功")
+    except Exception as e:
+        log.error(f"立即执行定时任务失败: {id}, 错误信息: {str(e)}")
+        return ErrorResponse(msg=f"立即执行定时任务失败: {str(e)}")

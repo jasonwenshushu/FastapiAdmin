@@ -149,10 +149,10 @@ class JobService:
             raise CustomException(msg='操作失败，该数据定时任务不存在')
         if option == 1:
             SchedulerUtil().pause_job(job_id=id)
-            await JobCRUD(auth).set_obj_field_crud(ids=[id], status=False)
+            await JobCRUD(auth).set_obj_field_crud(ids=[id], status='1')  # 更新为暂停状态(1)
         elif option == 2:
             SchedulerUtil().resume_job(job_id=id)
-            await JobCRUD(auth).set_obj_field_crud(ids=[id], status=True)
+            await JobCRUD(auth).set_obj_field_crud(ids=[id], status='0')  # 更新为运行状态(0)
         elif option == 3:
             # 重启任务：先移除再添加，确保使用最新的任务配置
             SchedulerUtil().remove_job(job_id=id)
@@ -162,7 +162,7 @@ class JobService:
                 # 重新添加任务
                 SchedulerUtil.add_job(job_info=updated_job)
                 # 设置状态为运行中
-                await JobCRUD(auth).set_obj_field_crud(ids=[id], status=True)
+                await JobCRUD(auth).set_obj_field_crud(ids=[id], status='0')
 
     @classmethod
     async def export_job_service(cls, data_list: list[dict]) -> bytes:
@@ -199,7 +199,7 @@ class JobService:
         # 复制数据并转换状态
         data = data_list.copy()
         for item in data:
-            item['status'] = '已完成' if item['status'] == '0' else '运行中' if item['status'] == '1' else '暂停'
+            item['status'] = '运行中' if item['status'] == '0' else '暂停中' if item['status'] == '1' else '未知状态'
     
         return ExcelUtil.export_list2excel(list_data=data, mapping_dict=mapping_dict)
 

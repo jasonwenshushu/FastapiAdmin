@@ -117,6 +117,14 @@ const JobAPI = {
       responseType: "blob",
     });
   },
+
+  //立即执行定时任务
+  runJob(id: number) {
+    return request<ApiResponse>({
+      url: `${API_PATH}/run/${id}`,
+      method: "put",
+    });
+  },
 };
 
 export default JobAPI;

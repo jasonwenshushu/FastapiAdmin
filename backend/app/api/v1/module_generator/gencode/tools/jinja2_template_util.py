@@ -375,21 +375,26 @@ class Jinja2TemplateUtil:
         """
         if '(' in column:
             column_type_list = column.split('(')
-            if column_type_list[0] in GenConstant.COLUMNTYPE_STR:
-                sqlalchemy_type = (
-                    StringUtil.get_mapping_value_by_key_ignore_case(
-                        GenConstant.DB_TO_SQLALCHEMY, column_type_list[0]
-                    )
-                    + '('
-                    + column_type_list[1]
-                )
-            else:
-                sqlalchemy_type = StringUtil.get_mapping_value_by_key_ignore_case(
-                    GenConstant.DB_TO_SQLALCHEMY, column_type_list[0]
-                )
-        else:
+            column_type = column_type_list[0]
+            # 将 'character' 映射为 'char' 以匹配常量定义
+            if column_type.lower() == 'character':
+                column_type = 'char'
             sqlalchemy_type = StringUtil.get_mapping_value_by_key_ignore_case(
-                GenConstant.DB_TO_SQLALCHEMY, column
+                GenConstant.DB_TO_SQLALCHEMY, column_type
             )
+            # 如果是字符串类型且包含括号参数，保持原参数
+            if sqlalchemy_type in ["String", "CHAR"]:
+                sqlalchemy_type += '(' + column_type_list[1]
+        else:
+            column_type = column
+            # 将 'character' 映射为 'char' 以匹配常量定义
+            if column_type.lower() == 'character':
+                column_type = 'char'
+            sqlalchemy_type = StringUtil.get_mapping_value_by_key_ignore_case(
+                GenConstant.DB_TO_SQLALCHEMY, column_type
+            )
+            # 如果是字符串类型且没有指定长度，添加默认长度255
+            if sqlalchemy_type in ["String", "CHAR"]:
+                sqlalchemy_type += '(255)'
 
         return sqlalchemy_type

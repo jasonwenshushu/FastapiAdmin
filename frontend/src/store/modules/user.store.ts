@@ -4,6 +4,7 @@ import AuthAPI, { type LoginFormData } from "@/api/module_system/auth";
 import UserAPI, { type UserInfo } from "@/api/module_system/user";
 import type { MenuTable } from "@/api/module_system/menu";
 import { Auth } from "@/utils/auth";
+import { ResultEnum } from "@/enums";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
@@ -97,6 +98,13 @@ export const useUserStore = defineStore("user", {
     // 登录
     async login(LoginFormData: LoginFormData) {
       const response = await AuthAPI.login(LoginFormData);
+      if (response.data.code === ResultEnum.SUCCESS) {
+        ElNotification({
+          title: "通知",
+          message: response.data.msg,
+          type: "success",
+        });
+      }
       this.rememberMe = LoginFormData.remember;
       Auth.setTokens(
         response.data.data.access_token,
@@ -107,7 +115,14 @@ export const useUserStore = defineStore("user", {
 
     // 登出
     async logout() {
-      await AuthAPI.logout({ token: Auth.getAccessToken() });
+      const response = await AuthAPI.logout({ token: Auth.getAccessToken() });
+      if (response.data.code === ResultEnum.SUCCESS) {
+        ElNotification({
+          title: "通知",
+          message: response.data.msg,
+          type: "success",
+        });
+      }
       this.resetAllState();
     },
 

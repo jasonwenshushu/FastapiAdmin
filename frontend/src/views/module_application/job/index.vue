@@ -20,8 +20,8 @@
             clearable
             style="width: 167.5px"
           >
-            <el-option value="true" label="运行中" />
-            <el-option value="false" label="暂停" />
+            <el-option value="0" label="运行中" />
+            <el-option value="1" label="暂停" />
           </el-select>
         </el-form-item>
         <!-- 时间范围，收起状态下隐藏 -->
@@ -167,8 +167,8 @@
         :data="pageTableData"
         class="data-table__content"
         highlight-current-row
-        height="450"
-        max-height="450px"
+        height="500"
+        max-height="500"
         border
         stripe
         @selection-change="handleSelectionChange"
@@ -218,7 +218,7 @@
         <el-table-column label="状态" prop="status" min-width="100">
           <template #default="scope">
             <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
-              {{ scope.row.status === true ? "运行中" : "暂停" }}
+              {{ scope.row.status === "0" ? "运行中" : "暂停" }}
             </el-tag>
           </template>
         </el-table-column>
@@ -237,6 +237,16 @@
                 @click="handleOpenLogDrawer(scope.row.id, scope.row.name)"
               >
                 日志
+              </el-button>
+              <el-button
+                v-hasPerm="['module_application:job:update']"
+                type="primary"
+                size="small"
+                link
+                icon="smoking"
+                @click="handleRunJob(scope.row.id)"
+              >
+                立即执行
               </el-button>
               <el-button
                 type="info"
@@ -272,14 +282,14 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item
-                      :disabled="scope.row.status === false"
+                      :disabled="scope.row.status === '1'"
                       icon="Check"
                       @click="handleOption(scope.row.id, 1)"
                     >
                       暂停
                     </el-dropdown-item>
                     <el-dropdown-item
-                      :disabled="scope.row.status === true"
+                      :disabled="scope.row.status === '0'"
                       icon="CircleClose"
                       @click="handleOption(scope.row.id, 2)"
                     >
@@ -363,8 +373,8 @@
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
-            <el-tag :type="detailFormData.status ? 'success' : 'danger'">
-              {{ detailFormData.status ? "运行中" : "暂停" }}
+            <el-tag :type="detailFormData.status === '0' ? 'success' : 'danger'">
+              {{ detailFormData.status === "0" ? "运行中" : "暂停" }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="最大实例数" :span="2">
@@ -541,7 +551,7 @@
               </template>
               <vue3CronPlus
                 i18n="cn"
-                max-height="500px"
+                max-height="500"
                 @change="handlechangeCron"
                 @close="openCron = false"
               />
@@ -960,6 +970,13 @@ function handleOpenLogDrawer(jobId: number, jobName: string) {
   currentJobName.value = jobName;
   drawerVisible.value = true;
 }
+
+// 立即执行定时任务
+const handleRunJob = (id: number) => {
+  JobAPI.runJob(id).then(() => {
+    loadingData();
+  });
+};
 
 // 导出字段
 const exportColumns = [

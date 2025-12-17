@@ -61,7 +61,6 @@
               :src="captchaState.img_base"
               @click="getCaptcha"
             />
-            <el-text v-else type="info" size="small">点击获取验证码</el-text>
           </div>
         </div>
       </el-form-item>
@@ -186,7 +185,7 @@ const captchaState = reactive<CaptchaInfo>({
 });
 
 const loginRules = computed(() => {
-  return {
+  const rules: any = {
     username: [
       {
         required: true,
@@ -206,14 +205,20 @@ const loginRules = computed(() => {
         trigger: "blur",
       },
     ],
-    captcha: [
+  };
+
+  // 只有在验证码开启时才添加验证码验证规则
+  if (captchaState.enable) {
+    rules.captcha = [
       {
         required: true,
         trigger: "blur",
         message: t("login.message.captchaCode.required"),
       },
-    ],
-  };
+    ];
+  }
+
+  return rules;
 });
 
 // 获取验证码
@@ -224,6 +229,14 @@ async function getCaptcha() {
     const response = await AuthAPI.getCaptcha();
     loginForm.captcha_key = response.data.data.key;
     captchaState.img_base = response.data.data.img_base;
+    captchaState.enable = response.data.data.enable;
+  } catch (error: any) {
+    // 验证码获取失败时，默认关闭验证码功能
+    console.error("获取验证码失败:", error);
+    captchaState.enable = false;
+    // 清空验证码相关字段，避免影响登录
+    loginForm.captcha = "";
+    loginForm.captcha_key = "";
   } finally {
     codeLoading.value = false;
   }
@@ -243,14 +256,14 @@ async function handleLoginSubmit() {
     // 2. 执行登录
     await userStore.login(loginForm);
 
-    // 3. 登录成功，让路由守卫处理跳转逻辑
+    // 4. 登录成功，让路由守卫处理跳转逻辑
     // 解析目标地址，但不直接跳转
     const redirect = resolveRedirectTarget(route.query);
 
     // 通过替换当前路由触发路由守卫，让守卫处理后续的路由生成和跳转
     await router.replace(redirect);
 
-    // 4. 记住我功能已实现，根据用户选择决定token的存储方式:
+    // 5. 记住我功能已实现，根据用户选择决定token的存储方式:
     // - 选中"记住我": token存储在localStorage中，浏览器关闭后仍然有效
     // - 未选中"记住我": token存储在sessionStorage中，浏览器关闭后失效
 

@@ -145,8 +145,8 @@
         :data="pageTableData"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         class="data-table__content"
-        height="540"
-        max-height="540px"
+        height="600"
+        max-height="600"
         border
         stripe
         @selection-change="handleSelectionChange"
@@ -224,7 +224,6 @@
         <el-table-column label="描述" prop="description" min-width="200" />
         <el-table-column label="创建时间" prop="created_time" min-width="200" sortable />
         <el-table-column label="更新时间" prop="updated_time" min-width="200" sortable />
-
         <el-table-column fixed="right" label="操作" align="center" min-width="260">
           <template #default="scope">
             <el-button
