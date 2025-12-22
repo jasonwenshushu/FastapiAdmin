@@ -518,7 +518,8 @@ const queryFormData = reactive<TenantPageQuery>({
   page_size: 10,
   name: undefined,
   status: undefined,
-  created_time: undefined,  created_id: undefined,
+  created_time: undefined,
+  created_id: undefined,
 });
 
 // 编辑表单
@@ -526,7 +527,7 @@ const formData = reactive<TenantForm>({
   id: undefined,
   name: "",
   code: "",
-  status: '0',
+  status: "0",
   description: undefined,
 });
 
@@ -605,7 +606,7 @@ const initialFormData: TenantForm = {
   id: undefined,
   name: "",
   code: "",
-  status: '0',
+  status: "0",
   description: "",
 };
 

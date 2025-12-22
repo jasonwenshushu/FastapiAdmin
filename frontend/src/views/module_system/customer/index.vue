@@ -427,7 +427,11 @@ import DatePicker from "@/components/DatePicker/index.vue";
 import type { IContentConfig } from "@/components/CURD/types";
 import { QuestionFilled, ArrowUp, ArrowDown } from "@element-plus/icons-vue";
 import { formatToDateTime } from "@/utils/dateUtil";
-import CustomerAPI, { CustomerTable, CustomerForm, CustomerPageQuery } from "@/api/module_system/customer";
+import CustomerAPI, {
+  CustomerTable,
+  CustomerForm,
+  CustomerPageQuery,
+} from "@/api/module_system/customer";
 
 const visible = ref(true);
 const queryFormRef = ref();

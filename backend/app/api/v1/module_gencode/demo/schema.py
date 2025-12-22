@@ -3,7 +3,6 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from fastapi import Query
 
-from app.core.base_params import BaseQueryParam
 from app.core.base_schema import BaseSchema, UserBySchema
 from app.core.validator import DateTimeStr
 
