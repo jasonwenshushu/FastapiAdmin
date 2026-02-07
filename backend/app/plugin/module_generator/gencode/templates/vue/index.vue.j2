@@ -78,6 +78,12 @@
         <el-form-item label="{{ comment }}" prop="{{ column.column_name }}">
           <el-date-picker v-model="queryFormData.{{ column.column_name }}" type="date" value-format="YYYY-MM-DD" clearable placeholder="请选择{{ comment }}" />
         </el-form-item>
+        {% elif column.html_type == "checkbox" and dict_type %}
+        <el-form-item label="{{ comment }}" prop="{{ column.column_name }}">
+          <el-select v-model="queryFormData.{{ column.column_name }}" placeholder="请选择{{ comment }}" style="width: 180px" clearable>
+            <el-option v-for="dict in dictStore.getDictArray('{{ dict_type }}')" :key="dict.dict_value" :label="dict.dict_label" :value="dict.dict_value" />
+          </el-select>
+        </el-form-item>
         {% endif %}
         {% endif %}
         {% endfor %}
@@ -271,19 +277,17 @@
         {% set column_comment = column.column_comment if column.column_comment else '' %}
         {% set parentheseIndex = column_comment.find("（") %}
         {% set comment = column_comment[:parentheseIndex] if parentheseIndex != -1 else column_comment %}
+        {% set dict_type = column.dict_type %}
+        {% set html_type = column.html_type %}
         {% if column.is_list == 1 %}
+        {% set col_width = "180" if python_field in ['created_time', 'updated_time'] else "140" %}
+        {% set show_tooltip = " show-overflow-tooltip" if html_type in ['textarea', 'input', 'text'] else "" %}
+        {% if python_field in ['status', 'created_id', 'updated_id'] or (dict_type and dict_type != "") or html_type == "checkbox" %}
         <el-table-column
           v-if="tableColumns.find((col) => col.prop === '{{ python_field }}')?.show"
           label="{{ comment }}"
-          prop="{{ python_field }}"
-          min-width="140"
-        />
-        {% if python_field in ['status', 'created_id', 'updated_id'] %}
-        <el-table-column
-          v-if="tableColumns.find((col) => col.prop === '{{ python_field }}')?.show"
-          label="{{ comment }}"
-          prop="{{ python_field }}"
-          min-width="140"
+          min-width="{{ col_width }}"
+          show-overflow-tooltip
         >
           {% if python_field == "status" %}
           <template #default="scope">
@@ -299,8 +303,24 @@
           <template #default="scope">
             <el-tag>{{ '{{' }} scope.row.updated_by?.name {{ '}}' }}</el-tag>
           </template>
+          {% elif html_type == "checkbox" and dict_type %}
+          <template #default="scope">
+            <div class="cell-ellipsis">{{ '{{' }} scope.row.{{ python_field }}?.map(v => dictStore.getDictArray('{{ dict_type }}').find(d => d.dict_value === v)?.dict_label || v).join(', ') || '-' {{ '}}' }}</div>
+          </template>
+          {% elif dict_type and dict_type != "" %}
+          <template #default="scope">
+            <div class="cell-ellipsis">{{ '{{' }} dictStore.getDictArray('{{ dict_type }}').find(d => d.dict_value === scope.row.{{ python_field }})?.dict_label || scope.row.{{ python_field }} {{ '}}' }}</div>
+          </template>
           {% endif %}
         </el-table-column>
+        {% else %}
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === '{{ python_field }}')?.show"
+          label="{{ comment }}"
+          prop="{{ python_field }}"
+          min-width="{{ col_width }}"
+          show-overflow-tooltip
+        />
         {% endif %}
         {% endif %}
         {% endfor %}
@@ -309,7 +329,7 @@
           fixed="right"
           label="操作"
           align="center"
-          min-width="180"
+          min-width="250"
         >
           <template #default="scope">
             <el-button
@@ -370,6 +390,8 @@
           {% set column_comment = column.column_comment if column.column_comment else '' %}
           {% set parentheseIndex = column_comment.find("（") %}
           {% set comment = column_comment[:parentheseIndex] if parentheseIndex != -1 else column_comment %}
+          {% set dict_type = column.dict_type %}
+          {% set html_type = column.html_type %}
           {% if column.column_name == 'status' %}
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status == '0' ? 'success' : 'danger'">
@@ -383,6 +405,19 @@
           {% elif column.column_name == 'updated_id' %}
           <el-descriptions-item label="更新人" :span="2">
             {{ '{{' }} detailFormData.updated_by?.name {{ '}}' }}
+          </el-descriptions-item>
+          {% elif html_type == "imageUpload" %}
+          <el-descriptions-item label="{{ comment }}" :span="2">
+            <el-image v-if="detailFormData.{{ column.column_name }}" :src="detailFormData.{{ column.column_name }}" style="width: 100px; height: 100px" fit="cover" :preview-src-list="[detailFormData.{{ column.column_name }}]" />
+            <span v-else>-</span>
+          </el-descriptions-item>
+          {% elif html_type == "checkbox" and dict_type %}
+          <el-descriptions-item label="{{ comment }}" :span="2">
+            {{ '{{' }} detailFormData.{{ column.column_name }}?.map(v => dictStore.getDictArray('{{ dict_type }}').find(d => d.dict_value === v)?.dict_label || v).join(', ') || '-' {{ '}}' }}
+          </el-descriptions-item>
+          {% elif dict_type and dict_type != "" %}
+          <el-descriptions-item label="{{ comment }}" :span="2">
+            {{ '{{' }} dictStore.getDictArray('{{ dict_type }}').find(d => d.dict_value === detailFormData.{{ column.column_name }})?.dict_label || detailFormData.{{ column.column_name }} {{ '}}' }}
           </el-descriptions-item>
           {% else %}
           <el-descriptions-item label="{{ comment }}" :span="2">
@@ -456,6 +491,14 @@
           {% elif column.html_type == "datetime" %}
           <el-form-item label="{{ comment }}" prop="{{ column.column_name }}" :required="{{ required }}">
             <el-date-picker v-model="formData.{{ column.column_name }}" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择{{ comment }}" />
+          </el-form-item>
+          {% elif column.html_type == "checkbox" and dict_type %}
+          <el-form-item label="{{ comment }}" prop="{{ column.column_name }}">
+            <el-checkbox-group v-model="formData.{{ column.column_name }}">
+              <el-checkbox v-for="dict in dictStore.getDictArray('{{ dict_type }}')" :key="dict.dict_value" :label="dict.dict_value">
+                {{ '{{' }} dict.dict_label {{ '}}' }}
+              </el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
           {% elif column.html_type == "checkbox" %}
           <el-form-item label="{{ comment }}" prop="{{ column.column_name }}">
@@ -881,4 +924,11 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+/* 表格单元格内容省略显示 */
+.cell-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

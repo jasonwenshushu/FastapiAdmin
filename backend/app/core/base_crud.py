@@ -3,10 +3,11 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import Select, asc, delete, desc, func, select, update
+from sqlalchemy import Select, asc, delete, desc, func, select, update, text
 from sqlalchemy import inspect as sa_inspect
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
+from app.config.setting import settings
 
 from app.api.v1.module_system.auth.schema import AuthSchema
 from app.core.base_model import MappedBase
@@ -413,6 +414,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                     conditions.append(attr <= val)
                 elif seq == "==" or (seq == "eq" and val):
                     conditions.append(attr == val)
+                elif seq == "contains" and val:
+                    # JSON 数组包含查询 - 单选，自动适配数据库类型
+                    db_type = settings.DATABASE_TYPE
+                    val_str = str(val)
+                    
+                    if db_type == "postgres":
+                        # PostgreSQL: @> 操作符
+                        conditions.append(text(f"{key} @> :val").bindparams(val=f'["{val_str}"]'))
+                    elif db_type == "sqlite":
+                        # SQLite: LIKE 模糊匹配
+                        conditions.append(text(f"{key} LIKE :val").bindparams(val=f'%{val_str}%'))
+                    else:
+                        # MySQL/默认: JSON_CONTAINS
+                        conditions.append(text(f"JSON_CONTAINS({key}, :val)").bindparams(val=f'"{val_str}"'))
             else:
                 conditions.append(attr == value)
         return conditions

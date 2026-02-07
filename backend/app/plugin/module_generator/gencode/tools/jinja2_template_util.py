@@ -109,7 +109,7 @@ class Jinja2TemplateUtil:
             "model_import_list": cls.get_model_import_list(gen_table),
             "schema_import_list": cls.get_schema_import_list(gen_table),
             "permission_prefix": cls.get_permission_prefix(module_name, business_name),
-            "columns": gen_table.columns or [],
+            "columns": cls.sort_columns(gen_table.columns or []),
             "table": gen_table,
             "dicts": cls.get_dicts(gen_table),
             "db_type": settings.DATABASE_TYPE,
@@ -453,6 +453,30 @@ class Jinja2TemplateUtil:
         - str: 权限前缀字符串。
         """
         return f"{module_name}:{business_name}"
+
+    @classmethod
+    def sort_columns(cls, columns: list[GenTableColumnOutSchema]) -> list[GenTableColumnOutSchema]:
+        """
+        对字段进行排序，将系统字段（创建时间、更新时间、创建人、更新人、备注）放到最后。
+
+        参数:
+        - columns (list[GenTableColumnOutSchema]): 字段列表。
+
+        返回:
+        - list[GenTableColumnOutSchema]: 排序后的字段列表。
+        """
+        # 定义系统字段（需要放到最后的字段）
+        system_fields = {'description', 'created_time', 'updated_time', 'created_id', 'updated_id'}
+        
+        # 分离业务字段和系统字段
+        business_columns = [col for col in columns if col.column_name not in system_fields]
+        system_columns = [col for col in columns if col.column_name in system_fields]
+        
+        # 系统字段按固定顺序排序
+        system_order = {'description': 0, 'created_id': 1, 'updated_id': 2, 'created_time': 3, 'updated_time': 4}
+        system_columns.sort(key=lambda col: system_order.get(col.column_name, 99))
+        
+        return business_columns + system_columns
 
     @classmethod
     def get_sqlalchemy_type(cls, column: Any) -> str:

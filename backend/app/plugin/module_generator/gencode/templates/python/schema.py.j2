@@ -71,8 +71,14 @@ class {{ class_name }}QueryParam:
         # 模糊查询字段
         self.{{ column.column_name }} = ("like", {{ column.column_name }})
         {% elif column.query_type == 'EQ' and column.column_name not in ['created_time', 'updated_time'] %}
+        {% if column.html_type == 'checkbox' %}
+        # JSON 数组包含查询字段
+        if {{ column.column_name }}:
+            self.{{ column.column_name }} = ("contains", {{ column.column_name }})
+        {% else %}
         # 精确查询字段
         self.{{ column.column_name }} = {{ column.column_name }}
+        {% endif %}
         {% endif %}
         {% endfor %}
         {% if table.created_time %}
