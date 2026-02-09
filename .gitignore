@@ -17,7 +17,6 @@ backend/alembic/versions/*
 backend/*.db
 backend/env/.env.dev
 backend/env/.env.prod
-backend/env/.env.frame
 backend/.ruff_cache
 backend/.ruff.toml
 
